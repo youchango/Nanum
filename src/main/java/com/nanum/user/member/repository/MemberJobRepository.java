@@ -1,8 +1,9 @@
 package com.nanum.user.member.repository;
 
-import com.nanum.user.member.model.MemberJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.nanum.user.member.model.MemberJob;
 
 import java.util.List;
 
