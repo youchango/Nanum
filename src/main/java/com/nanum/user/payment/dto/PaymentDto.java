@@ -1,0 +1,32 @@
+package com.nanum.user.payment.dto;
+
+import lombok.Data;
+import java.time.LocalDateTime;
+
+import com.nanum.user.payment.model.Payment;
+import com.nanum.user.payment.model.PaymentStatus;
+
+@Data
+public class PaymentDto {
+    private Long paymentId;
+    private Long memberId;
+    private String memberName;
+    private Integer paymentAmount;
+    private Integer usedPoint;
+    private PaymentStatus paymentStatus;
+    private String paymentMethod;
+    private LocalDateTime paymentDate;
+    private LocalDateTime createdAt;
+
+    public PaymentDto(Payment payment) {
+        this.paymentId = payment.getPaymentId();
+        this.memberId = payment.getMember().getMemberId();
+        this.memberName = payment.getMember().getMemberName();
+        this.paymentAmount = payment.getPaymentAmount();
+        this.usedPoint = payment.getUsedPoint();
+        this.paymentStatus = payment.getPaymentStatus();
+        this.paymentMethod = payment.getPaymentMethod();
+        this.paymentDate = payment.getPaymentDate();
+        this.createdAt = payment.getCreatedAt();
+    }
+}

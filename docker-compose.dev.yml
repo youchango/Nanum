@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8090:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      # Datasource config is now in application-dev.yml
+
+
+  db:
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_password: ttcc1234
+      MYSQL_DATABASE: db_nanum
+    ports:
+      - "33306:3306"
+
+
+    volumes:
+      - ./Local/DB:/var/lib/mysql
+      - ./Document/DB/SQL:/app/sql
+      - ./docker-init.sh:/docker-entrypoint-initdb.d/init.sh
+

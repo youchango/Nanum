@@ -1,0 +1,91 @@
+package com.nanum.user.member.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.sql.Timestamp;
+
+/**
+ * DB의 member 테이블과 매핑되는 도메인 객체(Entity)입니다.
+ * 회원의 상세 정보를 담고 있습니다.
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "member")
+public class Member {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long memberId; // 회원 고유 ID (PK)
+
+    @Column(name = "member_name")
+    private String memberName; // 회원명
+
+    @Column(name = "member_login", unique = true)
+    private String memberLogin; // 로그인 ID
+
+    private String password; // 암호화된 비밀번호
+
+    // business_number는 MemberBiz 엔티티로 이전되었습니다. (B2B 구매 권한 관리를 위함)
+
+    private String phone; // 일반 전화번호
+
+    @Column(name = "mobile_phone")
+    private String mobilePhone; // 휴대전화번호
+
+    private String zipcode; // 우편번호
+    private String address; // 주소
+
+    @Column(name = "address_detail")
+    private String addressDetail; // 상세주소
+
+    private String email; // 이메일
+    @Enumerated(jakarta.persistence.EnumType.STRING)
+    private MemberRole role; // 권한 (ROLE_MASTER, ROLE_BIZ, ROLE_USER)
+
+    @Column(name = "member_type")
+    @Enumerated(jakarta.persistence.EnumType.STRING)
+    private MemberType memberType; // 회원 유형 (Admin, Biz, User)
+
+    @Column(name = "withdraw_yn", insertable = false)
+    private String withdrawYn; // 탈퇴 여부 (Y/N) - DB default 'N' case
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt; // 가입일
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.withdrawYn == null) {
+            this.withdrawYn = "N";
+        }
+    }
+
+    /**
+     * JSP fmt:formatDate 태그 사용을 위해 LocalDateTime을 Date로 변환하는 편의 메서드입니다.
+     * 
+     * @return java.util.Date 객체
+     */
+    public Date getCreatedAtAsDate() {
+        return createdAt == null ? null : Timestamp.valueOf(createdAt);
+    }
+
+    // MemberJob removed for E-Commerce migration
+}

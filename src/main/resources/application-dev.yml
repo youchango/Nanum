@@ -1,0 +1,38 @@
+server:
+  port: 9013
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    # Docker Internal Connect (db container name)
+    url: jdbc:mariadb://db:3306/db_nanum?serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: root  
+    password: ttcc1234
+    driver-class-name: org.mariadb.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.ctso.domain.**.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: INFO
+    com.ctso: DEBUG
+
+file:
+  storage:
+    type: local
+    local:
+      path: ${CONTAINER_UPLOAD_PATH:/app/uploads/}

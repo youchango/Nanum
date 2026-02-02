@@ -1,0 +1,22 @@
+CREATE TABLE banner (
+    banner_id      INT AUTO_INCREMENT COMMENT '배너코드',
+    banner_type    VARCHAR(20) NOT NULL COMMENT '배너구분 (MAIN_TOP, SUB_MID)',
+    image_file     VARCHAR(255) NOT NULL COMMENT '이미지파일',
+    link_type      VARCHAR(20) NULL COMMENT '링크 타입',
+    link_url       VARCHAR(255) NULL COMMENT '링크 URL',
+    sort_order     INT DEFAULT 1 NOT NULL COMMENT '노출순서',
+    device_type    VARCHAR(10) DEFAULT 'ALL' NOT NULL COMMENT '노출기기 (PC, MOBILE, ALL)',
+    start_datetime DATETIME NOT NULL COMMENT '게시 시작일시',
+    end_datetime   DATETIME NOT NULL COMMENT '게시 종료일시',
+    use_yn         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
+    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by     INT NULL COMMENT '생성자',
+    updated_at     DATETIME NULL COMMENT '수정일',
+    updated_by     INT NULL COMMENT '수정자',
+    deleted_at     DATETIME NULL COMMENT '삭제일',
+    deleted_by     INT NULL COMMENT '삭제자',
+    PRIMARY KEY (banner_id),
+    INDEX idx_banner_sort (banner_type, sort_order),
+    INDEX idx_banner_date (start_datetime, end_datetime)
+) COMMENT '배너 관리';
