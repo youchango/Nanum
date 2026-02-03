@@ -51,7 +51,7 @@ public class AdminPopupService {
      * 팝업 등록
      */
     @Transactional
-    public void registerPopup(PopupDTO popupDTO, Long createdBy) throws IOException {
+    public void registerPopup(PopupDTO popupDTO, String createdBy) throws IOException {
         Popup popup = new Popup();
 
         // 파일 업로드 처리
@@ -85,7 +85,7 @@ public class AdminPopupService {
      * 팝업 수정
      */
     @Transactional
-    public void updatePopup(PopupDTO popupDTO, Long updatedBy) throws IOException {
+    public void updatePopup(PopupDTO popupDTO, String updatedBy) throws IOException {
         Popup popup = popupRepository.findById(popupDTO.getPopupId())
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다."));
 
@@ -119,7 +119,7 @@ public class AdminPopupService {
      * 팝업 삭제
      */
     @Transactional
-    public void deletePopup(int popupId, Long deletedBy) {
+    public void deletePopup(int popupId, String deletedBy) {
         Popup popup = popupRepository.findById(popupId)
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다."));
 

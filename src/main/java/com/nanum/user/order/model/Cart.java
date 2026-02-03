@@ -18,8 +18,8 @@ public class Cart extends BaseTimeEntity {
     @Column(name = "cart_id")
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @Column(name = "member_code", nullable = false)
+    private String memberCode;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;

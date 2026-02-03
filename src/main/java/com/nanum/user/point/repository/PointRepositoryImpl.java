@@ -29,8 +29,8 @@ public class PointRepositoryImpl implements PointRepositoryCustom {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (searchDto.getMemberId() != null) {
-            builder.and(point.member.memberId.eq(searchDto.getMemberId()));
+        if (searchDto.getMemberCode() != null) {
+            builder.and(point.member.memberCode.eq(searchDto.getMemberCode()));
         }
 
         if (StringUtils.hasText(searchDto.getMemberName())) {

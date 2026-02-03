@@ -30,8 +30,8 @@ import java.sql.Timestamp;
 @Table(name = "member")
 public class Member {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memberId; // 회원 고유 ID (PK)
+    @Column(name = "member_code", nullable = false, unique = true)
+    private String memberCode; // 회원 코드 (PK) 'M_TYPE_001'
 
     @Column(name = "member_name")
     private String memberName; // 회원명

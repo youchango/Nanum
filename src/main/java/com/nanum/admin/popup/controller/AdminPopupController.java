@@ -67,7 +67,7 @@ public class AdminPopupController {
     public ResponseEntity<ApiResponse<Object>> create(@ModelAttribute PopupDTO popupDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            Long createdBy = userDetails.getMember().getMemberId();
+            String createdBy = userDetails.getMember().getMemberCode();
             adminPopupService.registerPopup(popupDTO, createdBy);
             return ResponseEntity.ok(ApiResponse.success("팝업이 등록되었습니다.", null));
         } catch (IOException e) {
@@ -82,7 +82,7 @@ public class AdminPopupController {
             @ModelAttribute PopupDTO popupDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            Long updatedBy = userDetails.getMember().getMemberId();
+            String updatedBy = userDetails.getMember().getMemberCode();
             popupDTO.setPopupId(id);
             adminPopupService.updatePopup(popupDTO, updatedBy);
             return ResponseEntity.ok(ApiResponse.success("팝업이 수정되었습니다.", null));
@@ -96,7 +96,7 @@ public class AdminPopupController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Object>> delete(@PathVariable int id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long deletedBy = userDetails.getMember().getMemberId();
+        String deletedBy = userDetails.getMember().getMemberCode();
         adminPopupService.deletePopup(id, deletedBy);
         return ResponseEntity.ok(ApiResponse.success("팝업이 삭제되었습니다.", null));
     }

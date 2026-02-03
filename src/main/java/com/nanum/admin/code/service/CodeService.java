@@ -161,7 +161,7 @@ public class CodeService {
      * @return 등록된 코드 ID
      */
     @Transactional
-    public int createCode(CodeDTO codeDTO, int createdBy) {
+    public int createCode(CodeDTO codeDTO, String createdBy) {
         log.info("코드 등록 - codeDTO: {}, createdBy: {}", codeDTO, createdBy);
 
         // depth 검증
@@ -187,7 +187,7 @@ public class CodeService {
      * @param updatedBy 수정자 ID
      */
     @Transactional
-    public void updateCode(CodeDTO codeDTO, int updatedBy) {
+    public void updateCode(CodeDTO codeDTO, String updatedBy) {
         log.info("코드 수정 - codeDTO: {}, updatedBy: {}", codeDTO, updatedBy);
 
         Code code = codeRepository.findById(codeDTO.getCodeId())
@@ -209,7 +209,7 @@ public class CodeService {
      * @param deletedBy 삭제자 ID
      */
     @Transactional
-    public void deleteCode(int codeId, int deletedBy) {
+    public void deleteCode(int codeId, String deletedBy) {
         log.info("코드 삭제 - codeId: {}, deletedBy: {}", codeId, deletedBy);
 
         // 하위 코드 존재 여부 확인

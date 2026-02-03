@@ -7,7 +7,7 @@ import com.nanum.user.payment.model.PaymentStatus;
 
 @Data
 public class PaymentSearchDto {
-    private Long memberId;
+    private String memberCode;
     private String memberName;
     private LocalDate startDate;
     private LocalDate endDate;

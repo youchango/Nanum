@@ -28,8 +28,8 @@ public class OrderController {
         // Let's use hardcoded 1L for now or if DTO doesn't have it, assume Auth
         // context.
         // Wait, OrderService.createOrder needs memberId.
-        Long memberId = 1L; // Placeholder for current user
-        return ApiResponse.success(orderService.createOrder(memberId, request));
+        String memberCode = "M_USER_001"; // Placeholder for current user
+        return ApiResponse.success(orderService.createOrder(memberCode, request));
     }
 
     @GetMapping("/{id}")

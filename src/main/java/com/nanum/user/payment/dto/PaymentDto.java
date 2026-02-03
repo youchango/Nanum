@@ -9,7 +9,7 @@ import com.nanum.user.payment.model.PaymentStatus;
 @Data
 public class PaymentDto {
     private Long paymentId;
-    private Long memberId;
+    private String memberCode;
     private String memberName;
     private Integer paymentAmount;
     private Integer usedPoint;
@@ -20,7 +20,7 @@ public class PaymentDto {
 
     public PaymentDto(Payment payment) {
         this.paymentId = payment.getPaymentId();
-        this.memberId = payment.getMember().getMemberId();
+        this.memberCode = payment.getMember().getMemberCode();
         this.memberName = payment.getMember().getMemberName();
         this.paymentAmount = payment.getPaymentAmount();
         this.usedPoint = payment.getUsedPoint();

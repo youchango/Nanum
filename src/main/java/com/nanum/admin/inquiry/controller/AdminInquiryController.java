@@ -76,7 +76,7 @@ public class AdminInquiryController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         String answer = request.getAnswer();
         try {
-            Long answererId = userDetails.getMember().getMemberId();
+            String answererId = userDetails.getMember().getMemberCode();
             adminInquiryService.registerAnswer(id, answer, answererId);
             return ResponseEntity.ok(ApiResponse.success("답변이 등록되었습니다.", null));
         } catch (Exception e) {

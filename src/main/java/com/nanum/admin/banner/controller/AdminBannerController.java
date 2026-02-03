@@ -80,7 +80,7 @@ public class AdminBannerController {
             } else {
                 log.warn("수신된 파일이 없습니다 (null)");
             }
-            Long createdBy = userDetails.getMember().getMemberId();
+            String createdBy = userDetails.getMember().getMemberCode();
             adminBannerService.registerBanner(bannerDTO, createdBy);
             return ResponseEntity.ok(ApiResponse.success("배너가 등록되었습니다.", null));
         } catch (IOException e) {
@@ -97,7 +97,7 @@ public class AdminBannerController {
             @ModelAttribute BannerDTO bannerDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
-            Long updatedBy = userDetails.getMember().getMemberId();
+            String updatedBy = userDetails.getMember().getMemberCode();
             bannerDTO.setBannerId(id);
             adminBannerService.updateBanner(bannerDTO, updatedBy);
             return ResponseEntity.ok(ApiResponse.success("배너가 수정되었습니다.", null));
@@ -111,7 +111,7 @@ public class AdminBannerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Object>> delete(@PathVariable int id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long deletedBy = userDetails.getMember().getMemberId();
+        String deletedBy = userDetails.getMember().getMemberCode();
         adminBannerService.deleteBanner(id, deletedBy);
         return ResponseEntity.ok(ApiResponse.success("배너가 삭제되었습니다.", null));
     }

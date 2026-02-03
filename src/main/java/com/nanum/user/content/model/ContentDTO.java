@@ -17,7 +17,7 @@ public class ContentDTO {
     private String subject;
     private String contentBody;
     private String urlInfo;
-    private Long createdBy;
+    private String createdBy;
     private String createdByName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

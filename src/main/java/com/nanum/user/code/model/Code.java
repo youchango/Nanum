@@ -77,7 +77,7 @@ public class Code {
      * 생성자 ID
      */
     @Column(name = "created_by", updatable = false)
-    private Integer createdBy;
+    private String createdBy;
 
     /**
      * 수정일시
@@ -89,7 +89,7 @@ public class Code {
      * 수정자 ID
      */
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private String updatedBy;
 
     /**
      * 삭제일시
@@ -101,7 +101,7 @@ public class Code {
      * 삭제자 ID
      */
     @Column(name = "deleted_by")
-    private Integer deletedBy;
+    private String deletedBy;
 
     @PrePersist
     public void prePersist() {

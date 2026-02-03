@@ -28,7 +28,7 @@ public class Inquiry {
     private int inquiryId; // 문의 ID (PK)
 
     @Column(name = "writer_id")
-    private Long memberId; // 작성자 회원 ID (FK) - DB column name might be writer_id based on XML
+    private String memberId; // 작성자 회원 ID (FK) - DB column name might be writer_id based on XML
 
     @Column(name = "inquiry_type")
     private int inquiryTypeCode; // 문의 유형 코드 (FK -> Code)
@@ -47,7 +47,7 @@ public class Inquiry {
     private InquiryStatus inquiryStatus; // 상태
 
     @Transient
-    private Long writerId; // Duplicate of memberId/writer_id? Mapped as writer_id in XML. check usage.
+    private String writerId; // Duplicate of memberId/writer_id? Mapped as writer_id in XML. check usage.
     // In XML: <result property="memberId" column="writer_id" /> AND <result
     // property="writerId" column="writer_id" />
     // It seems they are the same. I'll map memberId to writer_id column.
@@ -56,13 +56,13 @@ public class Inquiry {
     private LocalDateTime createdAt;// 생성일
 
     @Column(name = "answerer_id")
-    private Long answererId; // 답변자 ID (FK)
+    private String answererId; // 답변자 ID (FK)
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;// 답변일
 
     @Column(name = "deleted_by")
-    private Long deletedBy; // 삭제자 ID
+    private String deletedBy; // 삭제자 ID
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;// 삭제일

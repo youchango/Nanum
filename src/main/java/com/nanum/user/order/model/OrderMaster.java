@@ -24,7 +24,7 @@ public class OrderMaster extends BaseTimeEntity {
     private String orderName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_code")
     private com.nanum.user.member.model.Member member;
 
     @Enumerated(EnumType.STRING)

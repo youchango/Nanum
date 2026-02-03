@@ -67,19 +67,19 @@ public class Banner {
     private LocalDateTime createdAt;
 
     @Column(name = "created_by", updatable = false)
-    private Long createdBy;
+    private String createdBy;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private String updatedBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name = "deleted_by")
-    private Long deletedBy;
+    private String deletedBy;
 
     @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @jakarta.persistence.JoinColumn(name = "created_by", insertable = false, updatable = false)

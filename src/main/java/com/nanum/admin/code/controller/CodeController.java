@@ -78,8 +78,8 @@ public class CodeController {
         }
 
         try {
-            Long createdBy = userDetails.getMember().getMemberId();
-            codeService.createCode(codeDTO, createdBy.intValue());
+            String createdBy = userDetails.getMember().getMemberCode();
+            codeService.createCode(codeDTO, createdBy);
             return ResponseEntity.ok(ApiResponse.success("코드가 등록되었습니다.", null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
@@ -102,8 +102,8 @@ public class CodeController {
         }
 
         try {
-            Long updatedBy = userDetails.getMember().getMemberId();
-            codeService.updateCode(codeDTO, updatedBy.intValue());
+            String updatedBy = userDetails.getMember().getMemberCode();
+            codeService.updateCode(codeDTO, updatedBy);
             return ResponseEntity.ok(ApiResponse.success("코드가 수정되었습니다.", null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
@@ -117,8 +117,8 @@ public class CodeController {
         log.info("코드 삭제 요청 - codeId: {}", codeId);
 
         try {
-            Long deletedBy = userDetails.getMember().getMemberId();
-            codeService.deleteCode(codeId, deletedBy.intValue());
+            String deletedBy = userDetails.getMember().getMemberCode();
+            codeService.deleteCode(codeId, deletedBy);
             return ResponseEntity.ok(ApiResponse.success("코드가 삭제되었습니다.", null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));

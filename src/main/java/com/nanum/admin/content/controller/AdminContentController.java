@@ -70,8 +70,8 @@ public class AdminContentController {
     @PostMapping
     public ResponseEntity<ApiResponse<Object>> register(@RequestBody ContentDTO contentDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long memberId = userDetails.getMember().getMemberId();
-        adminContentService.registerContent(contentDTO, memberId);
+        String memberCode = userDetails.getMember().getMemberCode();
+        adminContentService.registerContent(contentDTO, memberCode);
 
         return ResponseEntity.ok(ApiResponse.success("컨텐츠가 등록되었습니다.", null));
     }
@@ -82,8 +82,8 @@ public class AdminContentController {
             @RequestBody ContentDTO contentDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         contentDTO.setContentId(id);
-        Long memberId = userDetails.getMember().getMemberId();
-        adminContentService.updateContent(contentDTO, memberId);
+        String memberCode = userDetails.getMember().getMemberCode();
+        adminContentService.updateContent(contentDTO, memberCode);
 
         return ResponseEntity.ok(ApiResponse.success("컨텐츠가 수정되었습니다.", null));
     }
@@ -92,7 +92,7 @@ public class AdminContentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Object>> delete(@PathVariable int id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long deletedBy = userDetails.getMember().getMemberId();
+        String deletedBy = userDetails.getMember().getMemberCode();
         adminContentService.deleteContent(id, deletedBy);
 
         return ResponseEntity.ok(ApiResponse.success("컨텐츠가 삭제되었습니다.", null));

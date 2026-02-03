@@ -52,7 +52,7 @@ public class AdminBannerService {
      * 배너 등록
      */
     @Transactional
-    public void registerBanner(BannerDTO bannerDTO, Long createdBy) throws IOException {
+    public void registerBanner(BannerDTO bannerDTO, String createdBy) throws IOException {
         // DTO -> Entity 변환
         Banner banner = bannerDTO.toEntity();
 
@@ -72,7 +72,7 @@ public class AdminBannerService {
      * 배너 수정
      */
     @Transactional
-    public void updateBanner(BannerDTO bannerDTO, Long updatedBy) throws IOException {
+    public void updateBanner(BannerDTO bannerDTO, String updatedBy) throws IOException {
         Banner banner = bannerRepository.findById(bannerDTO.getBannerId())
                 .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
 
@@ -95,7 +95,7 @@ public class AdminBannerService {
      * 배너 삭제
      */
     @Transactional
-    public void deleteBanner(int bannerId, Long deletedBy) {
+    public void deleteBanner(int bannerId, String deletedBy) {
         Banner banner = bannerRepository.findById(bannerId)
                 .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
 

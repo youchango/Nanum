@@ -45,13 +45,13 @@ public class AdminContentService {
     /**
      * 컨텐츠 등록
      */
-    public void registerContent(ContentDTO contentDTO, Long memberId) {
+    public void registerContent(ContentDTO contentDTO, String memberCode) {
         Content content = Content.builder()
                 .contentTypeCode(contentDTO.getContentType())
                 .subject(contentDTO.getSubject())
                 .contentBody(contentDTO.getContentBody())
                 .urlInfo(contentDTO.getUrlInfo())
-                .createdBy(memberId)
+                .createdBy(memberCode)
                 .build();
 
         contentRepository.save(content);
@@ -61,7 +61,7 @@ public class AdminContentService {
      * 컨텐츠 수정
      */
     @Transactional
-    public void updateContent(ContentDTO contentDTO, Long memberId) {
+    public void updateContent(ContentDTO contentDTO, String memberCode) {
         Content content = contentRepository.findById(contentDTO.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("Content not found"));
 
@@ -69,7 +69,7 @@ public class AdminContentService {
         content.setSubject(contentDTO.getSubject());
         content.setContentBody(contentDTO.getContentBody());
         content.setUrlInfo(contentDTO.getUrlInfo());
-        content.setUpdatedBy(memberId);
+        content.setUpdatedBy(memberCode);
         // @PreUpdate will handle updatedAt
     }
 
@@ -77,7 +77,7 @@ public class AdminContentService {
      * 컨텐츠 삭제
      */
     @Transactional
-    public void deleteContent(int contentId, Long deletedBy) {
+    public void deleteContent(int contentId, String deletedBy) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("Content not found"));
 

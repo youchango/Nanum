@@ -13,12 +13,12 @@ import lombok.*;
 public class MemberBiz extends BaseTimeEntity {
 
     @Id
-    @Column(name = "member_id")
-    private Long memberId;
+    @Column(name = "member_code")
+    private String memberCode;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_code")
     private Member member;
 
     @Column(name = "business_number", nullable = false)
@@ -38,6 +38,6 @@ public class MemberBiz extends BaseTimeEntity {
 
     public void setMember(Member member) {
         this.member = member;
-        this.memberId = member.getMemberId();
+        this.memberCode = member.getMemberCode();
     }
 }

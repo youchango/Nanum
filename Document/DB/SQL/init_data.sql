@@ -1,86 +1,57 @@
--- Initial Data Setup
--- Password for all initial accounts is '1234'
--- BCrypt Hash: $2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVwdFYiNu.kZoDDK.z/g5e1a
+-- ==========================================
+-- Nanum Shopping Mall Platform Initial Data
+-- ==========================================
 
--- 1. Master Admin
-INSERT INTO member (
-    member_name, member_login, password, business_number, phone, mobile_phone, 
-    zipcode, address, address_detail, email, role, member_type
-) VALUES (
-    'Master Administrator', 'admin', '$2a$10$gucmZaGXYDF6Nk8DdJRzbe9zAA14dmKlOEHPmZuGsSLCpcYzMYjYS', 
-    '000-00-00000', '02-1234-5678', '010-1234-5678', 
-    '04524', 'Seoul', 'Gangnam-gu', 'admin@ctso.com', 'ROLE_MASTER', 'ADMIN'
-);
+-- 1. Members
+-- Admin
+INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, role, member_type)
+VALUES ('M_ADMIN_001', 'admin', 'Master Admin', '$2a$10$gucmZaGXYDF6Nk8DdJRzbe9zAA14dmKlOEHPmZuGsSLCpcYzMYjYS', '010-1234-5678', 'admin@nanum.com', 'ROLE_MASTER', 'ADMIN');
 
--- 2. Biz Partner (Test Account)
-INSERT INTO member (
-    member_name, member_login, password, business_number, phone, mobile_phone, 
-    zipcode, address, address_detail, email, role, member_type
-) VALUES (
-    'Test Biz Partner', 'test_biz', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', 
-    '111-11-11111', '02-111-1111', '010-1111-1111', 
-    '11111', 'Biz Office', 'Room 101', 'biz@ctso.com', 'ROLE_BIZ', 'Biz'
-);
+-- Biz User
+INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
+VALUES ('M_BIZ_001', 'bizuser', 'Biz Partner', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-1111-2222', 'biz@nanum.com', '12345', 'Seoul', 'Gangnam 123', 'ROLE_BIZ', 'BIZ');
 
--- 3. System Codes
+-- General User
+INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
+VALUES ('M_USER_001', 'user01', 'Normal User', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-3333-4444', 'user@nanum.com', '54321', 'Busan', 'Haeundae 456', 'ROLE_USER', 'USER');
 
--- 서비스 타입 (상위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES ('SERVICE_TYPE', 1, NULL, '서비스 타입', 'Y');
+-- 2. Member Biz Info
+INSERT INTO member_biz (member_code, company_name, ceo_name, business_number, approval_status)
+VALUES ('M_BIZ_001', 'Nanum Corp', 'Kim Biz', '123-45-67890', 'APPROVED');
 
--- 서비스 타입 (하위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES 
-  ('SERVICE_TYPE', 2, 1, '정기점검', 'Y'),
-  ('SERVICE_TYPE', 2, 1, '소독', 'Y'),
-  ('SERVICE_TYPE', 2, 1, '청소', 'Y');
+-- 3. Address Book
+INSERT INTO address_book (member_code, address_name, receiver_name, receiver_phone, zipcode, address, address_detail, is_default)
+VALUES ('M_USER_001', 'Home', 'Normal User', '010-3333-4444', '54321', 'Busan', 'Haeundae 456', 'Y');
 
--- 건물 타입 (상위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES ('BUILDING_TYPE', 1, NULL, '건물 타입', 'Y');
+-- 4. Product Categories
+INSERT INTO product_category (category_name, depth, display_order) VALUES ('Electronics', 1, 1);
+INSERT INTO product_category (category_name, depth, display_order) VALUES ('Fashion', 1, 2);
+INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Computers', 2, 1);
+INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Smartphones', 2, 2);
 
--- 건물 타입 (하위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES 
-  ('BUILDING_TYPE', 2, 5, '아파트', 'Y'),
-  ('BUILDING_TYPE', 2, 5, '빌라', 'Y'),
-  ('BUILDING_TYPE', 2, 5, '오피스텔', 'Y'),
-  ('BUILDING_TYPE', 2, 5, '단독주택', 'Y'),
-  ('BUILDING_TYPE', 2, 5, '상가', 'Y');
+-- 5. Products
+-- Public Product
+INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
+VALUES (3, 'Gaming Laptop', 1500000, 1350000, 'SALE', 'High performance gaming laptop', '/uploads/laptop.jpg');
 
--- 문의 유형 (상위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES ('INQUIRY_TYPE', 1, NULL, '문의 유형', 'Y');
+-- Biz Only Product (Only mapped users can see discount? Or mapping logic)
+INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
+VALUES (4, 'Biz Smartphone', 1000000, 900000, 'SALE', 'Corporate optimized phone', '/uploads/phone.jpg');
 
--- 문의 유형 (하위 코드)
--- Note: 'upper' value refers to the Code ID of 'INQUIRY_TYPE' (depth=1). 
--- Assuming auto_increment continues, it might differ. Using subquery is safer but for init_data usually fixed IDs or variables are used.
--- Here we assume sequential execution on clean DB. 
--- However, since we cannot use variables easily in simple SQL script without procedural wrapper, 
--- we will use a subquery to find the upper code ID dynamically.
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES 
-  ('INQUIRY_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='INQUIRY_TYPE' AND depth=1 LIMIT 1) as c), '시스템 이용 문의', 'Y'),
-  ('INQUIRY_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='INQUIRY_TYPE' AND depth=1 LIMIT 1) as c), '계약/결제 문의', 'Y'),
-  ('INQUIRY_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='INQUIRY_TYPE' AND depth=1 LIMIT 1) as c), '기타 문의', 'Y');
+-- 6. Product Options
+INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
+VALUES (1, 'RAM 16GB', 0, 100);
+INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
+VALUES (1, 'RAM 32GB', 200000, 50);
 
--- 4. Content Types & Initial Contents
+-- 7. Product Biz Mapping
+INSERT INTO product_biz_mapping (product_id, member_code, discount_rate)
+VALUES (2, 'M_BIZ_001', 10); -- 10% discount for this biz member
 
--- 컨텐츠 구분 (상위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES ('CONTENT_TYPE', 1, NULL, '컨텐츠 구분', 'Y');
+-- 8. Content (Notice)
+INSERT INTO content (content_type, subject, body)
+VALUES ('NOTICE', 'Nanum Mall Open!', 'Welcome to Nanum Shopping Mall.');
 
--- 컨텐츠 구분 (하위 코드)
-INSERT INTO code (code_type, depth, upper, code_name, use_yn) 
-VALUES 
-  ('CONTENT_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='CONTENT_TYPE' AND depth=1 LIMIT 1) as c), '공지사항', 'Y'),
-  ('CONTENT_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='CONTENT_TYPE' AND depth=1 LIMIT 1) as c), 'FAQ', 'Y'),
-  ('CONTENT_TYPE', 2, (SELECT c.code_id FROM (SELECT code_id FROM code WHERE code_type='CONTENT_TYPE' AND depth=1 LIMIT 1) as c), '서비스소개', 'Y');
-
--- Insert Contents using Code IDs
-INSERT INTO content (content_type, subject, content_body, url_info, created_by)
-VALUES
-  ((SELECT code_id FROM code WHERE code_name='공지사항' AND depth=2 LIMIT 1), 'CTSO 서비스 오픈 안내', '안녕하세요. CTSO 통합 관리 시스템이 오픈되었습니다.<br>많은 이용 부탁드립니다.', NULL, 1),
-  ((SELECT code_id FROM code WHERE code_name='서비스소개' AND depth=2 LIMIT 1), '프리미엄 방역 솔루션', '병원, 학교 등 다중 이용 시설을 위한<br><strong>프리미엄 방역 솔루션</strong>을 소개합니다.', 'http://ctso.com/product', 1),
-  ((SELECT code_id FROM code WHERE code_name='공지사항' AND depth=2 LIMIT 1), '정기 점검 서비스 가이드', '월 1회 전문 기사가 방문하여<br>시설물 상태를 점검해드립니다.', NULL, 1);
-
+-- 9. Inquiry
+INSERT INTO inquiry (member_code, inquiry_type, title, content, status)
+VALUES ('M_USER_001', 'General', 'Delivery Question', 'When does shipping start?', 'WAITING');
