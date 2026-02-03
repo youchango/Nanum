@@ -75,27 +75,28 @@ public class AdminMemberService {
         member.setPassword(passwordEncoder.encode(memberDTO.getPassword()));
 
         // 권한 설정 (DTO에 없으면 기본 BIZ)
-        MemberRole role = MemberRole.ROLE_BIZ;
-        if (memberDTO.getRole() != null && !memberDTO.getRole().isEmpty()) {
-            try {
-                role = MemberRole.valueOf(memberDTO.getRole());
-            } catch (IllegalArgumentException e) {
-                // Invalid role, keep default or throw
-            }
-        }
-        member.setRole(role);
+        // 회원 유형 및 권한 설정 (U: 사용자, B: 업무자, M: 관리자)
+        MemberRole role = MemberRole.ROLE_USER;
+        MemberType memberType = MemberType.U;
 
-        // 타입 설정
-        MemberType memberType = MemberType.BIZ;
-        if (role == MemberRole.ROLE_MASTER) {
-            memberType = MemberType.ADMIN;
-        } else if (role == MemberRole.ROLE_USER) {
-            memberType = MemberType.USER;
+        String typeInput = memberDTO.getMemberType();
+        if ("M".equals(typeInput)) {
+            role = MemberRole.ROLE_MASTER;
+            memberType = MemberType.M;
+        } else if ("B".equals(typeInput)) {
+            role = MemberRole.ROLE_BIZ;
+            memberType = MemberType.B;
+        } else {
+            // Default or "U"
+            role = MemberRole.ROLE_USER;
+            memberType = MemberType.U;
         }
+
+        member.setRole(role);
         member.setMemberType(memberType);
 
         // Member Code 생성
-        String prefix = (memberType == MemberType.BIZ) ? "CB" : "MB";
+        String prefix = (memberType == MemberType.B) ? "CB" : "MB";
         // generateMemberCode 복제 필요 혹은 서비스 분리 필요. 일단 복제 (Repository 호출)
         String memberCode = generateMemberCode(prefix); // 아래 private 메서드 추가 필요
         member.setMemberCode(memberCode);
@@ -121,7 +122,7 @@ public class AdminMemberService {
 
         // MemberBiz 조회도 memberCode 사용 (MemberBizRepository PK가 String memberCode라면
         // findById 사용 가능)
-        if (member.getMemberType() == MemberType.BIZ && memberDTO.getBusinessNumber() != null) {
+        if (member.getMemberType() == MemberType.B && memberDTO.getBusinessNumber() != null) {
             MemberBiz memberBiz = memberBizRepository.findById(memberCode)
                     .orElseGet(() -> MemberBiz.builder().member(member).build());
             // 기업회원 상세 정보 업데이트 (MemberBiz 엔티티에 업데이트 메서드 추가 권장)
@@ -141,20 +142,18 @@ public class AdminMemberService {
             member.setPassword(passwordEncoder.encode(memberDTO.getPassword()));
         }
 
-        // Role update if provided
-        if (memberDTO.getRole() != null && !memberDTO.getRole().isEmpty()) {
-            try {
-                MemberRole role = MemberRole.valueOf(memberDTO.getRole());
-                member.setRole(role);
-                // Update Type accordingly
-                if (role == MemberRole.ROLE_MASTER)
-                    member.setMemberType(MemberType.ADMIN);
-                else if (role == MemberRole.ROLE_USER)
-                    member.setMemberType(MemberType.USER);
-                else
-                    member.setMemberType(MemberType.BIZ);
-            } catch (IllegalArgumentException e) {
-                // Ignore invalid role
+        // Role/Type update if provided
+        if (memberDTO.getMemberType() != null && !memberDTO.getMemberType().isEmpty()) {
+            String typeInput = memberDTO.getMemberType();
+            if ("M".equals(typeInput)) {
+                member.setRole(MemberRole.ROLE_MASTER);
+                member.setMemberType(MemberType.M);
+            } else if ("B".equals(typeInput)) {
+                member.setRole(MemberRole.ROLE_BIZ);
+                member.setMemberType(MemberType.B);
+            } else if ("U".equals(typeInput)) {
+                member.setRole(MemberRole.ROLE_USER);
+                member.setMemberType(MemberType.U);
             }
         }
     }

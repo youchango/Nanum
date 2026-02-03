@@ -86,14 +86,9 @@ public class MemberDTO {
     private String email;
 
     /**
-     * 가입 유형입니다. 기본값은 "User"입니다.
+     * 회원 유형 (U: 사용자, B: 업무자, M: 관리자)
      */
-    private String createType = "User"; // Default signup type
-
-    /**
-     * 회원 권한 (ROLE_MASTER, ROLE_BIZ, ROLE_USER)
-     */
-    private String role;
+    private String memberType;
 
     /**
      * DTO를 Member 엔티티로 변환합니다.

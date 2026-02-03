@@ -56,28 +56,28 @@ public class MemberServiceImpl implements MemberService {
         member.setAddressDetail(memberDTO.getAddressDetail());
         member.setEmail(memberDTO.getEmail());
 
-        // Role 설정 (DTO에 있으면 사용, 없으면 기본값 User)
+        // 회원 유형 및 권한 설정 (U: 사용자, B: 업무자, M: 관리자)
         MemberRole role = MemberRole.ROLE_USER;
-        if (memberDTO.getRole() != null && !memberDTO.getRole().isEmpty()) {
-            try {
-                role = MemberRole.valueOf(memberDTO.getRole());
-            } catch (IllegalArgumentException e) {
-                // Invalid role, keep default
-            }
-        }
-        member.setRole(role);
+        MemberType memberType = MemberType.U;
 
-        // MemberType 설정
-        if (role == MemberRole.ROLE_BIZ) {
-            member.setMemberType(MemberType.BIZ);
-        } else if (role == MemberRole.ROLE_MASTER) {
-            member.setMemberType(MemberType.ADMIN);
+        String typeInput = memberDTO.getMemberType();
+        if ("M".equals(typeInput)) {
+            role = MemberRole.ROLE_MASTER;
+            memberType = MemberType.M;
+        } else if ("B".equals(typeInput)) {
+            role = MemberRole.ROLE_BIZ;
+            memberType = MemberType.B;
         } else {
-            member.setMemberType(MemberType.USER);
+            // Default or "U"
+            role = MemberRole.ROLE_USER;
+            memberType = MemberType.U;
         }
+
+        member.setRole(role);
+        member.setMemberType(memberType);
 
         // MemberCode 생성 (Auto Increment Logic)
-        String prefix = (member.getMemberType() == MemberType.BIZ) ? "CB" : "MB";
+        String prefix = (member.getMemberType() == MemberType.B) ? "CB" : "MB";
         String memberCode = generateMemberCode(prefix);
         member.setMemberCode(memberCode);
 
