@@ -73,9 +73,37 @@ public class ProductService {
         return product.getId();
     }
 
+    @Transactional
+    public void updateProduct(Long productId, ProductDTO.Request request) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+        // Note: Full implementation would update options/images too.
+        // For brevity, we update main fields here.
+        ProductCategory category = productCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+        product.updateInfo(
+                category,
+                request.getName(),
+                request.getPrice(),
+                request.getSalePrice(),
+                request.getStatus(),
+                request.getDescription(),
+                request.getThumbnailUrl());
+    }
+
+    @Transactional
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        product.setDeleteYn("Y");
+    }
+
     public List<ProductDTO.Response> getProductList(Long categoryId) {
         // Simple implementation - should be improved with QueryDSL for paging/search
         return productRepository.findAll().stream()
+                .filter(p -> "N".equals(p.getDeleteYn()))
                 .filter(p -> categoryId == null || p.getCategory().getId().equals(categoryId))
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -84,6 +112,9 @@ public class ProductService {
     public ProductDTO.Response getProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        if ("Y".equals(product.getDeleteYn())) {
+            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+        }
         return toResponse(product);
     }
 

@@ -12,4 +12,5 @@ public class PaymentSearchDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private PaymentStatus paymentStatus;
+    private String paymentMethod;
 }

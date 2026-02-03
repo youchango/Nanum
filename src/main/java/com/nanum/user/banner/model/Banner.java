@@ -28,6 +28,9 @@ public class Banner {
     @Column(name = "banner_id")
     private int bannerId;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "banner_type")
     @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
     private BannerType bannerType; // MAIN_TOP, SUB_MID

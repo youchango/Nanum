@@ -20,8 +20,8 @@ public class CommonController {
     private final FileStorageService fileStorageService;
 
     /**
-     * 공통 ?�일 ?�로??API
-     * CKEditor ???�디?�에???��?지 ?�로?????�용
+     * 怨듯넻 ?뚯씪 ?낅줈??API
+     * CKEditor ???먮뵒?곗뿉???대?吏 ?낅줈?????ъ슜
      */
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadFile(
@@ -40,7 +40,7 @@ public class CommonController {
         } catch (IOException e) {
             log.error("File Upload Failed", e);
             response.put("uploaded", false);
-            response.put("error", Map.of("message", "?�일 ?�로?�에 ?�패?�습?�다."));
+            response.put("error", Map.of("message", "?뚯씪 ?낅줈?쒖뿉 ?ㅽ뙣?덉뒿?덈떎."));
             return ResponseEntity.status(500).body(response);
         }
     }

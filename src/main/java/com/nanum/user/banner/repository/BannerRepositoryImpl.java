@@ -32,7 +32,7 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
 
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();
-            builder.and(banner.bannerName.contains(keyword)
+            builder.and(banner.title.contains(keyword)
                     .or(banner.linkUrl.contains(keyword)));
         }
 

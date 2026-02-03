@@ -1,4 +1,4 @@
-# 🛒 나눔 쇼핑몰 플랫폼 PRD (Product Requirements Document)
+﻿# 🛒 나눔 쇼핑몰 플랫폼 PRD (Product Requirements Document)
 **Version:** 1.0.0  
 **Status:** Draft (Loki Mode Optimized)  
 **Date:** 2026-02-02
@@ -34,8 +34,8 @@
 - **주문 상태 트래킹**: `결제대기` -> `결제완료` -> `상품준비` -> `배송중` -> `배송완료` -> `구매확정`의 표준 프로세스 유지.
 
 ### 3.3 🚚 배송 및 물류 (Delivery & Logistics)
-- **부서별/장소별 배송지 관리**: 기업회원이 부서별 또는 프로젝트 장소별로 다중 주소를 관리하는 기능.
-- **송장 연동 시스템**: 기업 전용 물류 파트너십을 고려한 송장 관리 인터페이스.
+- **전 회원 다중 배송지 관리**: 모든 회원이 여러 개의 배송지(집, 회사, 프로젝트 장소 등)를 등록하고 배송지 테이블을 통해 관리하는 기능.
+- **송장 연동 시스템**: 모든 회원에게 제공되는 표준 송장 관리 인터페이스 및 물류 파트너사 API 연동.
 
 ### 3.4 🎟️ 마케팅 및 리워드 (Benefit System)
 - **정교한 쿠폰 엔진**: 정액/정율 할인, 유효기간, 중복 사용 방지 로직.
@@ -54,7 +54,7 @@ erDiagram
     PRODUCT ||--o{ PRODUCT_IMAGE : "displays"
     ORDER_MASTER ||--o{ ORDER_DETAIL : "contains"
     ORDER_DETAIL }|--|| PRODUCT : "references"
-    USER_ADDRESS ||--|| MEMBER : "belongs to"
+    PRODUCT ||--o{ STOCK_LOG : "tracks"
 ```
 
 ---

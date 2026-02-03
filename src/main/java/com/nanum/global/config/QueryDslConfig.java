@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * QueryDSL ?�정 (JPAQueryFactory Bean ?�록)
+ * QueryDSL ?ㅼ젙 (JPAQueryFactory Bean ?깅줉)
  */
 @Configuration
 public class QueryDslConfig {

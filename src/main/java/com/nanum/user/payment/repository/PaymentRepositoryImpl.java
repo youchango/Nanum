@@ -38,12 +38,8 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
             builder.and(payment.paymentMethod.eq(searchDto.getPaymentMethod()));
         }
 
-        if (StringUtils.hasText(searchDto.getPaymentStatus())) {
-            try {
-                builder.and(payment.paymentStatus.eq(PaymentStatus.valueOf(searchDto.getPaymentStatus())));
-            } catch (Exception e) {
-                // Ignore invalid status
-            }
+        if (searchDto.getPaymentStatus() != null) {
+            builder.and(payment.paymentStatus.eq(searchDto.getPaymentStatus()));
         }
 
         if (searchDto.getStartDate() != null) {

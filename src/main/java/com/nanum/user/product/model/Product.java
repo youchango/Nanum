@@ -57,6 +57,7 @@ public class Product extends BaseTimeEntity {
 
     @Column(name = "delete_yn", nullable = false)
     @ColumnDefault("'N'")
+    @Setter
     private String deleteYn;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -78,7 +79,14 @@ public class Product extends BaseTimeEntity {
         this.status = status;
     }
 
-    public void changeCategory(ProductCategory category) {
+    public void updateInfo(ProductCategory category, String name, int price, int salePrice,
+            ProductStatus status, String description, String thumbnailUrl) {
         this.category = category;
+        this.name = name;
+        this.price = price;
+        this.salePrice = salePrice;
+        this.status = status;
+        this.description = description;
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

@@ -16,12 +16,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping
-    public ApiResponse<Long> createProduct(@RequestBody ProductDTO.Request request) {
-        Long productId = productService.createProduct(request);
-        return ApiResponse.success(productId);
-    }
-
     @GetMapping
     public ApiResponse<List<ProductDTO.Response>> getProducts(@RequestParam(required = false) Long categoryId) {
         return ApiResponse.success(productService.getProductList(categoryId));

@@ -18,52 +18,48 @@ public class OrderMaster extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
-    private Long id;
+    private Long orderId;
 
-    @Column(name = "order_no", nullable = false)
-    private String orderNo;
+    @Column(name = "order_name")
+    private String orderName;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private com.nanum.user.member.model.Member member;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", nullable = false)
+    @Column(name = "order_status")
     @Builder.Default
-    private OrderStatus status = OrderStatus.PAY_WAIT;
+    private OrderStatus status = OrderStatus.PAYMENT_WAIT;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount")
     @ColumnDefault("0")
-    private int totalAmount;
+    private Long totalAmount;
 
-    @Column(name = "discount_amount", nullable = false)
-    @ColumnDefault("0")
-    private int discountAmount;
+    @Column(name = "recipient_name")
+    private String recipientName;
 
-    @Column(name = "delivery_fee", nullable = false)
-    @ColumnDefault("0")
-    private int deliveryFee;
+    @Column(name = "recipient_phone")
+    private String recipientPhone;
 
-    @Column(name = "payment_amount", nullable = false)
-    @ColumnDefault("0")
-    private int paymentAmount;
+    @Column(name = "shipping_address")
+    private String shippingAddress;
 
-    // Receiver Info
-    @Column(name = "receiver_name", nullable = false)
-    private String receiverName;
+    @Column(name = "shipping_address_detail")
+    private String shippingAddressDetail;
 
-    @Column(name = "receiver_phone", nullable = false)
-    private String receiverPhone;
+    @Column(name = "shipping_zipcode")
+    private String shippingZipcode;
 
-    @Column(name = "receiver_zipcode", nullable = false)
-    private String receiverZipcode;
+    @Column(name = "delivery_msg")
+    private String deliveryMsg;
 
-    @Column(name = "receiver_address", nullable = false)
-    private String receiverAddress;
+    @Column(name = "tracking_number")
+    private String trackingNumber;
 
-    @Column(name = "receiver_detail", nullable = false)
-    private String receiverDetail;
-
-    @Column(name = "delivery_memo")
-    private String deliveryMemo;
+    // Business Methods
+    public void changeStatus(OrderStatus status) {
+        this.status = status;
+    }
 
 }
