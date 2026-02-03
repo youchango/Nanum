@@ -25,7 +25,7 @@ public class MemberDTO {
     @NotBlank(message = "아이디는 필수입니다.")
     @Size(min = 4, max = 20, message = "아이디는 4~20자 사이여야 합니다.")
     @Pattern(regexp = "^[a-z0-9]*$", message = "아이디는 영문 소문자와 숫자만 사용 가능합니다.")
-    private String memberLogin;
+    private String memberId;
 
     /**
      * 비밀번호입니다. 최소 4자 이상이어야 합니다.
@@ -103,7 +103,7 @@ public class MemberDTO {
     public Member toEntity() {
         Member member = new Member();
         member.setMemberName(this.memberName);
-        member.setMemberLogin(this.memberLogin);
+        member.setMemberId(this.memberId);
         member.setPassword(this.password);
         member.setMobilePhone(this.mobilePhone);
         member.setPhone(this.phone);

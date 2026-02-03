@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.nanum.user.member.model.MemberBiz;
 
-public interface MemberBizRepository extends JpaRepository<MemberBiz, Long> {
+public interface MemberBizRepository extends JpaRepository<MemberBiz, String> {
 }

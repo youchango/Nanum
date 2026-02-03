@@ -23,7 +23,7 @@ public class OrderService {
 
         @Transactional
         public Long createOrder(String memberCode, com.nanum.user.order.dto.OrderDTO.CreateRequest request) {
-                Member member = memberRepository.findById(memberCode)
+                Member member = memberRepository.findByMemberCode(memberCode)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
                 OrderMaster order = OrderMaster.builder()

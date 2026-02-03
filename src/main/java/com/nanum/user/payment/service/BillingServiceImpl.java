@@ -29,8 +29,8 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     @Transactional
-    public void generateBill(Long memberId, Integer amount) {
-        Member member = memberRepository.findById(memberId)
+    public void generateBill(String memberCode, Integer amount) {
+        Member member = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
         Payment payment = Payment.builder()
@@ -40,7 +40,7 @@ public class BillingServiceImpl implements BillingService {
                 .paymentStatus(PaymentStatus.PENDING)
                 .paymentMethod("NONE")
                 .build();
-        
+
         paymentRepository.save(payment);
     }
 
@@ -58,7 +58,7 @@ public class BillingServiceImpl implements BillingService {
         if (usedPoint > 0) {
             // Check if user has enough points - Need logic to calculate total points
             // For now assume valid and save history
-             Point pointUsage = Point.builder()
+            Point pointUsage = Point.builder()
                     .member(payment.getMember())
                     .pointUse(-usedPoint)
                     .pointBigo("Payment usage for bill: " + paymentId)
@@ -71,20 +71,20 @@ public class BillingServiceImpl implements BillingService {
         payment.setPaymentMethod(method);
         payment.setUsedPoint(usedPoint);
         payment.setPaymentDate(java.time.LocalDateTime.now());
-        
+
         // Point accumulation (e.g., 1%)
         /*
-        int pointEarn = (int) (payment.getPaymentAmount() * 0.01);
-        if (pointEarn > 0) {
-             Point pointAcc = Point.builder()
-                    .member(payment.getMember())
-                    .pointUse(pointEarn)
-                    .pointBigo("Payment accumulation for bill: " + paymentId)
-                    .payment(payment)
-                    .build();
-            pointRepository.save(pointAcc);
-        }
-        */
+         * int pointEarn = (int) (payment.getPaymentAmount() * 0.01);
+         * if (pointEarn > 0) {
+         * Point pointAcc = Point.builder()
+         * .member(payment.getMember())
+         * .pointUse(pointEarn)
+         * .pointBigo("Payment accumulation for bill: " + paymentId)
+         * .payment(payment)
+         * .build();
+         * pointRepository.save(pointAcc);
+         * }
+         */
     }
 
     @Override
@@ -92,16 +92,16 @@ public class BillingServiceImpl implements BillingService {
     public void cancelPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-        
+
         if (!PaymentStatus.PAID.equals(payment.getPaymentStatus())) {
-             throw new IllegalStateException("Cannot cancel unpaid bill");
+            throw new IllegalStateException("Cannot cancel unpaid bill");
         }
 
         payment.setPaymentStatus(PaymentStatus.CANCELLED);
-        
+
         // Refund points if used
         if (payment.getUsedPoint() > 0) {
-             Point pointRefund = Point.builder()
+            Point pointRefund = Point.builder()
                     .member(payment.getMember())
                     .pointUse(payment.getUsedPoint())
                     .pointBigo("Refund for cancelled bill: " + paymentId)
@@ -109,7 +109,7 @@ public class BillingServiceImpl implements BillingService {
                     .build();
             pointRepository.save(pointRefund);
         }
-        
+
         // Revert accumulation?
     }
 

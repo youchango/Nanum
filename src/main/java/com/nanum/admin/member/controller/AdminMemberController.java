@@ -81,10 +81,10 @@ public class AdminMemberController {
      * @return 회원 상세 정보
      */
     @Operation(summary = "회원 상세 조회", description = "회원 ID로 상세 정보를 조회합니다.")
-    @GetMapping("/{memberId}")
-    public ResponseEntity<ApiResponse<Member>> getMember(@PathVariable Long memberId) {
+    @GetMapping("/{memberCode}")
+    public ResponseEntity<ApiResponse<Member>> getMember(@PathVariable String memberCode) {
         try {
-            Member member = adminMemberService.getMember(memberId);
+            Member member = adminMemberService.getMember(memberCode);
             return ResponseEntity.ok(ApiResponse.success(member));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
@@ -99,11 +99,11 @@ public class AdminMemberController {
      * @return 성공 메시지
      */
     @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정합니다.")
-    @PutMapping("/{memberId}")
-    public ResponseEntity<ApiResponse<Object>> updateMember(@PathVariable Long memberId,
+    @PutMapping("/{memberCode}")
+    public ResponseEntity<ApiResponse<Object>> updateMember(@PathVariable String memberCode,
             @RequestBody MemberDTO memberDTO) {
         try {
-            adminMemberService.updateMember(memberId, memberDTO);
+            adminMemberService.updateMember(memberCode, memberDTO);
             return ResponseEntity.ok(ApiResponse.success("Member updated successfully", null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));

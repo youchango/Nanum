@@ -8,9 +8,13 @@ import com.nanum.user.member.model.Member;
 import java.util.Optional;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, String>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
-    Optional<Member> findByMemberLogin(String memberLogin);
+    Optional<Member> findByMemberId(String memberId);
 
-    boolean existsByMemberLogin(String memberLogin);
+    boolean existsByMemberId(String memberId);
+
+    Optional<Member> findTopByMemberCodeStartingWithOrderByMemberCodeDesc(String prefix);
+
+    Optional<Member> findByMemberCode(String memberCode);
 }

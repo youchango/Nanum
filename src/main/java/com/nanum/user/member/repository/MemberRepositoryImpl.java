@@ -32,7 +32,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();
             builder.and(member.memberName.contains(keyword)
-                    .or(member.memberLogin.contains(keyword)));
+                    .or(member.memberId.contains(keyword)));
         }
 
         if (StringUtils.hasText(searchDTO.getSearchType())) {

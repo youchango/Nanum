@@ -39,13 +39,13 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void signup(MemberDTO memberDTO) {
         // 아이디 중복 체크
-        if (memberRepository.existsByMemberLogin(memberDTO.getMemberLogin())) {
-            throw new com.nanum.global.error.exception.DuplicateMemberException(memberDTO.getMemberLogin());
+        if (memberRepository.existsByMemberId(memberDTO.getMemberId())) {
+            throw new com.nanum.global.error.exception.DuplicateMemberException(memberDTO.getMemberId());
         }
 
         Member member = new Member();
         member.setMemberName(memberDTO.getMemberName());
-        member.setMemberLogin(memberDTO.getMemberLogin());
+        member.setMemberId(memberDTO.getMemberId());
 
         // 비밀번호 암호화 (BCrypt)
         member.setPassword(passwordEncoder.encode(memberDTO.getPassword()));
@@ -56,10 +56,53 @@ public class MemberServiceImpl implements MemberService {
         member.setAddressDetail(memberDTO.getAddressDetail());
         member.setEmail(memberDTO.getEmail());
 
-        // 사용자(User) 권한 및 타입 설정
-        member.setRole(MemberRole.ROLE_USER);
-        member.setMemberType(MemberType.USER);
+        // Role 설정 (DTO에 있으면 사용, 없으면 기본값 User)
+        MemberRole role = MemberRole.ROLE_USER;
+        if (memberDTO.getRole() != null && !memberDTO.getRole().isEmpty()) {
+            try {
+                role = MemberRole.valueOf(memberDTO.getRole());
+            } catch (IllegalArgumentException e) {
+                // Invalid role, keep default
+            }
+        }
+        member.setRole(role);
+
+        // MemberType 설정
+        if (role == MemberRole.ROLE_BIZ) {
+            member.setMemberType(MemberType.BIZ);
+        } else if (role == MemberRole.ROLE_MASTER) {
+            member.setMemberType(MemberType.ADMIN);
+        } else {
+            member.setMemberType(MemberType.USER);
+        }
+
+        // MemberCode 생성 (Auto Increment Logic)
+        String prefix = (member.getMemberType() == MemberType.BIZ) ? "CB" : "MB";
+        String memberCode = generateMemberCode(prefix);
+        member.setMemberCode(memberCode);
+
+        // createdBy, updatedBy 등은 JPA Auditing 혹은 여기서 직접 설정
+        // member.setCreatedBy(memberCode); // 자기 자신이 생성
+        // member.setUpdatedBy(memberCode);
 
         memberRepository.save(member);
+    }
+
+    private String generateMemberCode(String prefix) {
+        // 마지막 코드 조회 (예: MB000001)
+        return memberRepository.findTopByMemberCodeStartingWithOrderByMemberCodeDesc(prefix)
+                .map(m -> {
+                    String lastCode = m.getMemberCode();
+                    String numberPart = lastCode.substring(prefix.length());
+                    try {
+                        long number = Long.parseLong(numberPart);
+                        // 숫자 증가 및 포맷팅 (000001 -> 6자리)
+                        return String.format("%s%06d", prefix, number + 1);
+                    } catch (NumberFormatException e) {
+                        // 파싱 실패 시 기본값 (기존 데이터가 잘못되었을 경우)
+                        return prefix + "000001";
+                    }
+                })
+                .orElse(prefix + "000001"); // 데이터가 없으면 최초 생성
     }
 }

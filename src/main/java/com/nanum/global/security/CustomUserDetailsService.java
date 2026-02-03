@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // DB에서 회원 정보 조회
-        Member member = memberRepository.findByMemberLogin(username)
+        Member member = memberRepository.findByMemberId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         // CustomUserDetails 객체 생성 및 반환

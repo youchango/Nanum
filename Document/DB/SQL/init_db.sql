@@ -43,25 +43,34 @@ CREATE TABLE IF NOT EXISTS file_store (
 
 -- Member
 CREATE TABLE IF NOT EXISTS member (
-    member_code      VARCHAR(30) PRIMARY KEY COMMENT '회원코드(PK)',
-    member_login     VARCHAR(50) NOT NULL UNIQUE COMMENT '로그인ID',
+    id               INT AUTO_INCREMENT COMMENT 'ID',
+    member_code      VARCHAR(20) NOT NULL COMMENT '회원코드',
+    member_id     VARCHAR(50) NOT NULL COMMENT '회원아이디',
     member_name      VARCHAR(50) NOT NULL COMMENT '회원명',
     password         VARCHAR(255) NOT NULL COMMENT '비밀번호',
-    business_number  VARCHAR(20) COMMENT '사업자번호', 
-    phone            VARCHAR(20) COMMENT '전화번호',
+    business_number  VARCHAR(20) NULL COMMENT '사업자번호',
+    phone            VARCHAR(20) NULL COMMENT '전화번호',
     mobile_phone     VARCHAR(20) NOT NULL COMMENT '휴대전화',
-    email            VARCHAR(100) COMMENT '이메일',
-    zipcode          VARCHAR(10) COMMENT '우편번호',
-    address          VARCHAR(255) COMMENT '주소',
-    address_detail   VARCHAR(255) COMMENT '상세주소',
-    role             VARCHAR(20) DEFAULT 'ROLE_USER' COMMENT '권한',
-    member_type      VARCHAR(20) DEFAULT 'USER' COMMENT '회원유형(USER, BIZ, ADMIN)',
-    status           VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '상태(ACTIVE, WITHDRAW)',
-    login_fail_count INT DEFAULT 0,
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at       DATETIME ON UPDATE CURRENT_TIMESTAMP,
-    withdraw_at      DATETIME
+    zipcode          VARCHAR(10) NOT NULL COMMENT '우편주소',
+    address          VARCHAR(255) NOT NULL COMMENT '주소',
+    address_detail   VARCHAR(255) NOT NULL COMMENT '상세주소',
+    email            VARCHAR(100) NULL COMMENT '이메일',
+    memo             VARCHAR(2000) NULL COMMENT '메모',
+    role             VARCHAR(20) NOT NULL COMMENT '권한',
+    member_type      VARCHAR(20) NOT NULL COMMENT '회원구분',
+    login_fail_count INT DEFAULT 0 NOT NULL COMMENT '로그인 실패횟수',
+    withdraw_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '탈퇴유무',
+    withdraw_at      DATETIME NULL COMMENT '탈퇴일',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    updated_at       DATETIME NULL COMMENT '수정일',
+    sms_yn           CHAR(1) DEFAULT 'N' NOT NULL COMMENT 'SMS 수신 여부',
+    email_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '이메일 수신 여부',
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_member_code (member_code),
+    UNIQUE KEY uq_member_login (member_login),
+    INDEX idx_member_mobile (mobile_phone)
 ) COMMENT '회원';
+
 
 -- Member Biz (Corporate Info)
 CREATE TABLE IF NOT EXISTS member_biz (

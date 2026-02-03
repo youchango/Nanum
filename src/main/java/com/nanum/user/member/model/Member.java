@@ -30,14 +30,17 @@ import java.sql.Timestamp;
 @Table(name = "member")
 public class Member {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // 내부 식별 ID (PK)
+
     @Column(name = "member_code", nullable = false, unique = true)
-    private String memberCode; // 회원 코드 (PK) 'M_TYPE_001'
+    private String memberCode; // 회원 코드 (Natural Key) 'M_TYPE_001'
 
     @Column(name = "member_name")
     private String memberName; // 회원명
 
-    @Column(name = "member_login", unique = true)
-    private String memberLogin; // 로그인 ID
+    @Column(name = "member_id", unique = true, nullable = false)
+    private String memberId; // 로그인 ID
 
     private String password; // 암호화된 비밀번호
 

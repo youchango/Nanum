@@ -144,7 +144,7 @@ public class AuthController {
         public static MemberInfo from(com.nanum.user.member.model.Member member) {
             MemberInfo info = new MemberInfo();
             info.setMemberName(member.getMemberName());
-            info.setLoginId(member.getMemberLogin());
+            info.setLoginId(member.getMemberId());
             info.setRole(member.getRole().name());
             return info;
         }

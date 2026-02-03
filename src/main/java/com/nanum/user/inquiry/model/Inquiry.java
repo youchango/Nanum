@@ -103,7 +103,7 @@ public class Inquiry {
     public String getWriterLogin() {
         if (writerLogin != null)
             return writerLogin;
-        return writer != null ? writer.getMemberLogin() : null;
+        return writer != null ? writer.getMemberId() : null;
     }
 
     public String getInquiryTypeName() {
