@@ -10,14 +10,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final FileStorageProperties fileStorageProperties;
+    private final com.nanum.global.interceptor.EncodingInterceptor encodingInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -33,5 +32,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     .addResourceLocations(location)
                     .setCachePeriod(3600);
         }
+    }
+
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        // 모든 경로에 대해 인코딩 인터셉터 적용
+        registry.addInterceptor(encodingInterceptor)
+                .addPathPatterns("/**");
     }
 }
