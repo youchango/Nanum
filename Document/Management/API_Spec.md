@@ -61,9 +61,12 @@ Base URL: `/api/v1/admin/products`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/` | 상품 생성 | 신규 상품을 등록합니다. |
-| `PUT` | `/{id}` | 상품 수정 | 상품 정보를 수정합니다. |
-| `DELETE` | `/{id}` | 상품 삭제 | 상품을 삭제합니다. |
+| `GET` | `/` | 상품 목록 조회 | 조건(카테고리, 상태, 검색어)에 맞는 상품 목록을 페이징 조회합니다. |
+| `POST` | `/` | 상품 생성 | 신규 상품(기본정보, 옵션, 이미지)을 등록합니다. |
+| `GET` | `/{id}` | 상품 상세 조회 | 상품 ID로 기본정보, 옵션 목록, 이미지 목록을 상세 조회합니다. |
+| `PUT` | `/{id}` | 상품 수정 | 상품 정보를 수정합니다. (옵션/이미지 포함) |
+| `DELETE` | `/{id}` | 상품 삭제 | 상품을 삭제합니다. (Soft Delete) |
+| `PATCH` | `/{id}/status` | 상품 상태 변경 | 상품의 상태(`SALE`, `STOP`, `SOLD_OUT`)를 변경합니다. |
 
 ### 4.3 User Product (쇼핑몰 상품)
 Base URL: `/api/products` (Note: V1 prefix 미적용)

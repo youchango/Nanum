@@ -5,5 +5,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import com.nanum.user.product.model.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long>, QuerydslPredicateExecutor<Product> {
+public interface ProductRepository
+        extends JpaRepository<Product, Long>, QuerydslPredicateExecutor<Product>, ProductRepositoryCustom {
 }
