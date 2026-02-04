@@ -37,6 +37,9 @@ public class OrderDetail {
     private int price;
 
     @Column(nullable = false)
+    private int discountPrice;
+
+    @Column(nullable = false)
     private int quantity;
 
     @Column(name = "sub_total", nullable = false)
