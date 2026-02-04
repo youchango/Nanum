@@ -23,7 +23,7 @@ CREATE TABLE coupon (
 CREATE TABLE member_coupon (
     issue_id         INT AUTO_INCREMENT COMMENT '발급ID',
     coupon_id        INT NOT NULL COMMENT '쿠폰ID',
-    member_id        INT NOT NULL COMMENT '회원ID',
+    member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     status           VARCHAR(10) DEFAULT 'UNUSED' NOT NULL COMMENT '상태(UNUSED, USED, EXPIRED)',
     used_at          DATETIME NULL COMMENT '사용일시',
     order_id         INT NULL COMMENT '사용주문ID',
@@ -32,6 +32,7 @@ CREATE TABLE member_coupon (
     expired_at       DATETIME NOT NULL COMMENT '만료일시',
     
     PRIMARY KEY (issue_id),
-    INDEX idx_mc_member (member_id),
-    CONSTRAINT fk_mc_coupon FOREIGN KEY (coupon_id) REFERENCES coupon (coupon_id)
+    INDEX idx_mc_member (member_code),
+    CONSTRAINT fk_mc_coupon FOREIGN KEY (coupon_id) REFERENCES coupon (coupon_id),
+    CONSTRAINT fk_mc_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '회원 쿠폰 발급내역';

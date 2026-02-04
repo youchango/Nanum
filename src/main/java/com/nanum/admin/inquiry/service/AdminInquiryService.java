@@ -45,12 +45,12 @@ public class AdminInquiryService {
      * 답변 등록 및 상태 변경
      */
     @Transactional
-    public void registerAnswer(int inquiryId, String answer, String answererId) {
+    public void registerAnswer(int inquiryId, String answer, String answererCode) {
         Inquiry inquiry = inquiryRepository.findById(inquiryId)
                 .orElseThrow(() -> new IllegalArgumentException("Inquiry not found"));
 
         inquiry.setAnswer(answer);
-        inquiry.setAnswererId(answererId);
+        inquiry.setAnswererCode(answererCode);
         inquiry.setInquiryStatus(com.nanum.user.inquiry.model.InquiryStatus.ANSWERED);
         inquiry.setAnsweredAt(java.time.LocalDateTime.now());
     }

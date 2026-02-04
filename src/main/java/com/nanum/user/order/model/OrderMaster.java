@@ -24,7 +24,7 @@ public class OrderMaster extends BaseTimeEntity {
     private String orderName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_code")
+    @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private com.nanum.user.member.model.Member member;
 
     @Enumerated(EnumType.STRING)
@@ -36,20 +36,20 @@ public class OrderMaster extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long totalAmount;
 
-    @Column(name = "recipient_name")
-    private String recipientName;
+    @Column(name = "receiver_name")
+    private String receiverName;
 
-    @Column(name = "recipient_phone")
-    private String recipientPhone;
+    @Column(name = "receiver_phone")
+    private String receiverPhone;
 
-    @Column(name = "shipping_address")
-    private String shippingAddress;
+    @Column(name = "receiver_address")
+    private String receiverAddress;
 
-    @Column(name = "shipping_address_detail")
-    private String shippingAddressDetail;
+    @Column(name = "receiver_detail")
+    private String receiverDetail;
 
-    @Column(name = "shipping_zipcode")
-    private String shippingZipcode;
+    @Column(name = "receiver_zipcode")
+    private String receiverZipcode;
 
     @Column(name = "delivery_msg")
     private String deliveryMsg;

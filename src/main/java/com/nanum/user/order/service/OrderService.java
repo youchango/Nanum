@@ -31,9 +31,12 @@ public class OrderService {
                                 .orderName("Order by " + member.getMemberName()) // Placeholder
                                 .totalAmount(0L) // Will calc below
                                 .status(OrderStatus.PAYMENT_WAIT)
-                                .recipientName(request.getRecipientName())
-                                // .shippingAddress(...) // Add fields to OrderMaster if needed or use
-                                // addressDetail
+                                .receiverName(request.getReceiverName())
+                                .receiverPhone(request.getReceiverPhone())
+                                .receiverAddress(request.getReceiverAddress())
+                                .receiverDetail(request.getReceiverDetail())
+                                .receiverZipcode(request.getReceiverZipcode())
+                                .deliveryMsg(request.getDeliveryMsg())
                                 .build();
 
                 long totalAmount = 0;
@@ -58,7 +61,7 @@ public class OrderService {
                                 .map(o -> com.nanum.user.order.dto.OrderDTO.Response.builder()
                                                 .orderId(o.getOrderId())
                                                 .status(o.getStatus())
-                                                .recipientName(o.getRecipientName())
+                                                .receiverName(o.getReceiverName())
                                                 .totalAmount(o.getTotalAmount())
                                                 .build())
                                 .collect(java.util.stream.Collectors.toList());

@@ -18,8 +18,8 @@ public class AddressBook {
     @Column(name = "address_id")
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @Column(name = "member_code", nullable = false)
+    private String memberCode;
 
     @Column(name = "address_name")
     private String addressName;

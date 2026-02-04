@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "product_category")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -18,14 +19,14 @@ public class ProductCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private Long id;
+    private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private ProductCategory parent;
 
     @Column(name = "category_name", nullable = false)
-    private String name;
+    private String categoryName;
 
     @Column(nullable = false)
     @ColumnDefault("1")

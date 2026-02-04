@@ -14,6 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     boolean existsByMemberId(String memberId);
 
+    boolean existsByMemberIdAndMemberType(String memberId, com.nanum.user.member.model.MemberType memberType);
+
     Optional<Member> findTopByMemberCodeStartingWithOrderByMemberCodeDesc(String prefix);
 
     Optional<Member> findByMemberCode(String memberCode);

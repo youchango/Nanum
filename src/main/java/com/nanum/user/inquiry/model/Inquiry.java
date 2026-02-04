@@ -27,8 +27,8 @@ public class Inquiry {
     @Column(name = "inquiry_id")
     private int inquiryId; // 문의 ID (PK)
 
-    @Column(name = "writer_id")
-    private String memberId; // 작성자 회원 ID (FK) - DB column name might be writer_id based on XML
+    @Column(name = "writer_code")
+    private String writerCode; // 작성자 회원코드 (FK)
 
     @Column(name = "inquiry_type")
     private int inquiryTypeCode; // 문의 유형 코드 (FK -> Code)
@@ -46,23 +46,19 @@ public class Inquiry {
     @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
     private InquiryStatus inquiryStatus; // 상태
 
-    @Transient
-    private String writerId; // Duplicate of memberId/writer_id? Mapped as writer_id in XML. check usage.
-    // In XML: <result property="memberId" column="writer_id" /> AND <result
-    // property="writerId" column="writer_id" />
-    // It seems they are the same. I'll map memberId to writer_id column.
+    // writerId / memberId logic removed/replaced
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;// 생성일
 
-    @Column(name = "answerer_id")
-    private String answererId; // 답변자 ID (FK)
+    @Column(name = "answerer_code")
+    private String answererCode; // 답변자 코드 (FK)
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;// 답변일
 
     @Column(name = "deleted_by")
-    private String deletedBy; // 삭제자 ID
+    private String deletedBy; // 삭제자 코드
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;// 삭제일
@@ -71,7 +67,7 @@ public class Inquiry {
     private String deleteYn; // 삭제 여부
 
     @jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-    @jakarta.persistence.JoinColumn(name = "writer_id", insertable = false, updatable = false)
+    @jakarta.persistence.JoinColumn(name = "writer_code", referencedColumnName = "member_code", insertable = false, updatable = false)
     @lombok.ToString.Exclude
     private com.nanum.user.member.model.Member writer;
 
@@ -103,7 +99,7 @@ public class Inquiry {
     public String getWriterLogin() {
         if (writerLogin != null)
             return writerLogin;
-        return writer != null ? writer.getMemberId() : null;
+        return writer != null ? writer.getMemberId() : null; // 로그인 ID 반환
     }
 
     public String getInquiryTypeName() {

@@ -30,7 +30,7 @@ public class Point {
     private String pointBigo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)

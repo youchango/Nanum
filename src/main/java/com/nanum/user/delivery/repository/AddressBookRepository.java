@@ -7,5 +7,5 @@ import com.nanum.user.delivery.model.AddressBook;
 import java.util.List;
 
 public interface AddressBookRepository extends JpaRepository<AddressBook, Long> {
-    List<AddressBook> findAllByMemberId(Long memberId);
+    List<AddressBook> findAllByMemberCode(String memberCode);
 }

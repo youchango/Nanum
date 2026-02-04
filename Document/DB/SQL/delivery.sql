@@ -12,13 +12,14 @@ CREATE TABLE delivery (
     updated_at       DATETIME NULL COMMENT '수정일',
     
     PRIMARY KEY (delivery_id),
-    UNIQUE KEY uq_delivery_order (order_id)
+    UNIQUE KEY uq_delivery_order (order_id),
+    FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
 ) COMMENT '배송 정보';
 
 -- 2. Address Book
 CREATE TABLE address_book (
     address_id       INT AUTO_INCREMENT COMMENT '배송지ID',
-    member_id        INT NOT NULL COMMENT '회원ID',
+    member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     address_name     VARCHAR(50) NULL COMMENT '배송지명(우리집, 회사 등)',
     dept_name        VARCHAR(100) NULL COMMENT '부서/프로젝트명 (기업회원용)',
     receiver_name    VARCHAR(50) NOT NULL COMMENT '수령자명',
@@ -30,5 +31,6 @@ CREATE TABLE address_book (
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     
     PRIMARY KEY (address_id),
-    INDEX idx_addr_member (member_id)
+    INDEX idx_addr_member (member_code),
+    FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '배송지 목록';

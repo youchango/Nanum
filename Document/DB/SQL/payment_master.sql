@@ -1,6 +1,6 @@
 CREATE TABLE payment_master (
     payment_id     INT AUTO_INCREMENT COMMENT '결제코드',
-    member_id      INT NOT NULL COMMENT '멤버코드',
+    member_code    VARCHAR(30) NOT NULL COMMENT '회원코드',
     payment_amount INT NOT NULL COMMENT '결제금액',
     used_point     INT DEFAULT 0 NOT NULL COMMENT '사용포인트',
     payment_status VARCHAR(20) NOT NULL COMMENT '결제상태',
@@ -15,5 +15,5 @@ CREATE TABLE payment_master (
     delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (payment_id),
     INDEX idx_payment_status (payment_status),
-    CONSTRAINT fk_payment_member FOREIGN KEY (member_id) REFERENCES member (member_id) ON DELETE CASCADE
+    CONSTRAINT fk_payment_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '결제 master';

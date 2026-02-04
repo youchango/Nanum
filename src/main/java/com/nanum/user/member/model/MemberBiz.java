@@ -18,7 +18,7 @@ public class MemberBiz extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "member_code")
+    @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private Member member;
 
     @Column(name = "business_number", nullable = false)

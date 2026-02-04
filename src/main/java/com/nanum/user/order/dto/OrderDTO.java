@@ -14,11 +14,11 @@ public class OrderDTO {
     @AllArgsConstructor
     @Builder
     public static class CreateRequest {
-        private String recipientName;
-        private String recipientPhone;
-        private String shippingAddress;
-        private String shippingAddressDetail;
-        private String shippingZipcode;
+        private String receiverName;
+        private String receiverPhone;
+        private String receiverAddress;
+        private String receiverDetail;
+        private String receiverZipcode;
         private String deliveryMsg;
         private List<OrderDetailItem> items;
     }
@@ -44,7 +44,7 @@ public class OrderDTO {
         private String orderName;
         private Long totalAmount;
         private OrderStatus status;
-        private String recipientName;
+        private String receiverName;
         private LocalDateTime createdAt;
         private List<OrderDetailResponse> items;
     }

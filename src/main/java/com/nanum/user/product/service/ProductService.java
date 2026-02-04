@@ -104,7 +104,7 @@ public class ProductService {
         // Simple implementation - should be improved with QueryDSL for paging/search
         return productRepository.findAll().stream()
                 .filter(p -> "N".equals(p.getDeleteYn()))
-                .filter(p -> categoryId == null || p.getCategory().getId().equals(categoryId))
+                .filter(p -> categoryId == null || p.getCategory().getCategoryId().equals(categoryId))
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -121,7 +121,7 @@ public class ProductService {
     private ProductDTO.Response toResponse(Product product) {
         return ProductDTO.Response.builder()
                 .productId(product.getId())
-                .categoryName(product.getCategory().getName())
+                .categoryName(product.getCategory().getCategoryName())
                 .name(product.getName())
                 .price(product.getPrice())
                 .salePrice(product.getSalePrice())
