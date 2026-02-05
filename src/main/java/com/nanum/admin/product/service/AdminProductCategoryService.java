@@ -18,6 +18,7 @@ import java.util.Map;
 public class AdminProductCategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
+    private final com.nanum.domain.product.repository.ProductRepository productRepository;
 
     /**
      * 카테고리 생성
@@ -92,6 +93,10 @@ public class AdminProductCategoryService {
 
         if (productCategoryRepository.existsByParent(category)) {
             throw new IllegalStateException("하위 카테고리가 존재하여 삭제할 수 없습니다.");
+        }
+
+        if (productRepository.existsByCategoryAndDeleteYn(category, "N")) {
+            throw new IllegalStateException("해당 카테고리에 속한 상품이 존재하여 삭제할 수 없습니다.");
         }
 
         productCategoryRepository.delete(category);
