@@ -147,24 +147,53 @@ CREATE TABLE product_biz_mapping (
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '기업전용상품매핑';
 
--- [NEW] Inventory History (Product Stock In/Out)
-CREATE TABLE inventory_history (
-    history_id       INT AUTO_INCREMENT COMMENT '이력ID',
+-- 5. Product Stock (Warehouse)
+CREATE TABLE product_stock (
+    stock_id         INT AUTO_INCREMENT COMMENT '재고ID',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
-    type             VARCHAR(20) NOT NULL COMMENT '구분(IN:입고, OUT:출고, RETURN:반품입고, ADJUST:재고조정)',
-    quantity         INT NOT NULL COMMENT '수량(항상 양수)',
-    before_quantity  INT NOT NULL COMMENT '변동전재고',
-    after_quantity   INT NOT NULL COMMENT '변동후재고',
-    order_id         INT NULL COMMENT '연관주문ID(출고/반품시)',
-    memo             VARCHAR(500) NULL COMMENT '비고 및 사유',
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    created_by       INT NULL COMMENT '등록자(관리자ID)',
+    stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량(실재고)',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    updated_at       DATETIME NULL COMMENT '수정일',
+    
+    PRIMARY KEY (stock_id),
+    UNIQUE KEY uq_stock_prod_opt (product_id, option_id),
+    CONSTRAINT fk_stock_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
+    CONSTRAINT fk_stock_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
+) COMMENT '상품 재고(창고)';
+
+-- [NEW] Inventory History (Product Stock In/Out) - Master/Detail Structure
+
+-- 1. Inventory History Master
+-- 재고 변동의 공통 정보(날짜, 담당자, 전체 비고)를 관리
+CREATE TABLE inventory_history_master (
+    history_id       INT AUTO_INCREMENT COMMENT '이력마스터ID',
+    history_date     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '입출고일시',
+    memo             VARCHAR(500) NULL COMMENT '전체비고',
+    created_by       INT NULL COMMENT '담당자(관리자ID)',
+    
     PRIMARY KEY (history_id),
-    INDEX idx_inv_product (product_id),
-    INDEX idx_inv_type (type),
-    CONSTRAINT fk_inv_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '재고 입출고 이력';
+    INDEX idx_hist_date (history_date)
+) COMMENT '재고 입출고 이력 마스터';
+
+-- 2. Inventory History Detail
+-- 개별 상품 및 옵션의 수량 변동 내역
+CREATE TABLE inventory_history_detail (
+    detail_id        INT AUTO_INCREMENT COMMENT '상세ID',
+    history_id       INT NOT NULL COMMENT '이력마스터ID',
+    product_id       INT NOT NULL COMMENT '상품ID',
+    option_id        INT NULL COMMENT '옵션ID',
+    type             VARCHAR(20) NOT NULL COMMENT '구분(IN:입고, OUT:출고, RETURN:반품, ADJUST:조정)',
+    quantity         INT NOT NULL COMMENT '변동수량',
+    prev_quantity    INT NOT NULL COMMENT '변동전재고(창고재고 기준)',
+    curr_quantity    INT NOT NULL COMMENT '변동후재고(창고재고 기준)',
+    memo             VARCHAR(500) NULL COMMENT '개별비고',
+    
+    PRIMARY KEY (detail_id),
+    CONSTRAINT fk_detail_master FOREIGN KEY (history_id) REFERENCES inventory_history_master (history_id) ON DELETE CASCADE,
+    CONSTRAINT fk_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
+    CONSTRAINT fk_detail_option FOREIGN KEY (option_id) REFERENCES product_option (option_id)
+) COMMENT '재고 입출고 이력 상세';
 
 -- 1. Coupon Master
 CREATE TABLE coupon (

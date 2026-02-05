@@ -1,9 +1,9 @@
 package com.nanum.user.member.repository;
 
 import com.nanum.global.common.dto.SearchDTO;
-import com.nanum.user.member.model.Member;
-import com.nanum.user.member.model.QMember;
-import com.nanum.user.member.model.MemberType;
+import com.nanum.domain.member.model.Member;
+import com.nanum.domain.member.model.QMember;
+import com.nanum.domain.member.model.MemberType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

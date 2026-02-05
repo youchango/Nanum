@@ -3,7 +3,7 @@ package com.nanum.user.code.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.nanum.user.code.model.Code;
+import com.nanum.domain.code.model.Code;
 
 import java.util.List;
 

@@ -56,3 +56,18 @@ CREATE TABLE product_image (
     PRIMARY KEY (image_id),
     CONSTRAINT fk_image_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 이미지';
+
+-- 5. Product Stock (Warehouse)
+CREATE TABLE product_stock (
+    stock_id         INT AUTO_INCREMENT COMMENT '재고ID',
+    product_id       INT NOT NULL COMMENT '상품ID',
+    option_id        INT NULL COMMENT '옵션ID',
+    stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량(실재고)',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    updated_at       DATETIME NULL COMMENT '수정일',
+    
+    PRIMARY KEY (stock_id),
+    UNIQUE KEY uq_stock_prod_opt (product_id, option_id),
+    CONSTRAINT fk_stock_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
+    CONSTRAINT fk_stock_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
+) COMMENT '상품 재고(창고)';

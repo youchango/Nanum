@@ -1,8 +1,8 @@
 package com.nanum.admin.product.controller;
 
 import com.nanum.admin.product.service.AdminProductCategoryService;
-import com.nanum.user.product.model.ProductCategory;
-import com.nanum.product.model.ProductCategoryDTO;
+import com.nanum.domain.product.model.ProductCategory;
+import com.nanum.domain.product.dto.ProductCategoryDTO;
 import com.nanum.global.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Tag(name = "Admin Product Category", description = "관리자 상품 카테고리 관리 API")
 @RestController
-@RequestMapping("/api/v1/admin/category")
+@RequestMapping("/api/v1/admin/categories")
 @RequiredArgsConstructor
 public class AdminProductCategoryController {
 

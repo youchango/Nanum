@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nanum.user.delivery.service.DeliveryService;
 
 @RestController
-@RequestMapping("/api/deliveries")
+@RequestMapping("/api/v1/deliveries")
 @RequiredArgsConstructor
 public class DeliveryController {
 

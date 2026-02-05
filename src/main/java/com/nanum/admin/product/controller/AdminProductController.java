@@ -1,12 +1,12 @@
 package com.nanum.admin.product.controller;
 
-import com.nanum.admin.product.dto.AdminProductListDTO;
-import com.nanum.admin.product.dto.AdminProductSearchDTO;
+import com.nanum.domain.product.dto.AdminProductListDTO;
+import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.admin.product.service.AdminProductService;
 import com.nanum.global.common.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
-import com.nanum.user.product.dto.ProductDTO;
-import com.nanum.user.product.model.ProductStatus;
+import com.nanum.domain.product.dto.ProductDTO;
+import com.nanum.domain.product.model.ProductStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

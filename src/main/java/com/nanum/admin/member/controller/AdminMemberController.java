@@ -3,8 +3,8 @@ package com.nanum.admin.member.controller;
 import com.nanum.admin.member.service.AdminMemberService;
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.global.common.dto.SearchDTO;
-import com.nanum.user.member.model.Member;
-import com.nanum.user.member.model.MemberDTO;
+import com.nanum.domain.member.dto.MemberDTO;
+import com.nanum.domain.member.model.Member;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

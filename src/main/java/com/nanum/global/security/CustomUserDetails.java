@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.nanum.user.member.model.Member;
+import com.nanum.domain.member.model.Member;
 
 public class CustomUserDetails implements UserDetails {
 

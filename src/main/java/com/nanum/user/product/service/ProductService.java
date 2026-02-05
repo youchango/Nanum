@@ -1,15 +1,15 @@
 package com.nanum.user.product.service;
 
 import com.nanum.global.error.exception.BusinessException;
-import com.nanum.user.product.dto.ProductDTO;
-import com.nanum.user.product.model.Product;
-import com.nanum.user.product.model.ProductCategory;
-import com.nanum.user.product.model.ProductImage;
-import com.nanum.user.product.model.ProductImageType;
-import com.nanum.user.product.model.ProductOption;
-import com.nanum.user.product.model.ProductStatus;
-import com.nanum.user.product.repository.ProductCategoryRepository;
-import com.nanum.user.product.repository.ProductRepository;
+import com.nanum.domain.product.dto.ProductDTO;
+import com.nanum.domain.product.model.Product;
+import com.nanum.domain.product.model.ProductCategory;
+import com.nanum.domain.product.model.ProductImage;
+import com.nanum.domain.product.model.ProductImageType;
+import com.nanum.domain.product.model.ProductOption;
+import com.nanum.domain.product.model.ProductStatus;
+import com.nanum.domain.product.repository.ProductCategoryRepository;
+import com.nanum.domain.product.repository.ProductRepository;
 import com.nanum.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -121,6 +121,7 @@ public class ProductService {
     private ProductDTO.Response toResponse(Product product) {
         return ProductDTO.Response.builder()
                 .productId(product.getId())
+                .categoryId(product.getCategory().getCategoryId())
                 .categoryName(product.getCategory().getCategoryName())
                 .name(product.getName())
                 .price(product.getPrice())

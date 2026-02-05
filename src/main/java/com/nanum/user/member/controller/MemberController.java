@@ -1,7 +1,7 @@
 package com.nanum.user.member.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
-import com.nanum.user.member.model.MemberType;
+import com.nanum.domain.member.model.MemberType;
 import com.nanum.user.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

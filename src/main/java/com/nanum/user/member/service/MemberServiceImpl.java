@@ -4,10 +4,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nanum.user.member.model.Member;
-import com.nanum.user.member.model.MemberDTO;
-import com.nanum.user.member.model.MemberRole;
-import com.nanum.user.member.model.MemberType;
+import com.nanum.domain.member.model.Member;
+import com.nanum.domain.member.dto.MemberDTO;
+import com.nanum.domain.member.model.MemberRole;
+import com.nanum.domain.member.model.MemberType;
 import com.nanum.user.member.repository.MemberRepository;
 
 /**

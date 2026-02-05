@@ -6,16 +6,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nanum.user.member.model.Member;
+import com.nanum.domain.member.model.Member;
 import com.nanum.user.member.repository.MemberRepository;
-import com.nanum.user.payment.dto.PaymentDto;
-import com.nanum.user.payment.dto.PaymentSearchDto;
-import com.nanum.user.payment.model.Payment;
-import com.nanum.user.payment.model.PaymentStatus;
+import com.nanum.domain.payment.dto.PaymentDto;
+import com.nanum.domain.payment.dto.PaymentSearchDto;
+import com.nanum.domain.payment.model.Payment;
+import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.user.payment.repository.PaymentRepository;
-import com.nanum.user.point.dto.PointDto;
-import com.nanum.user.point.dto.PointSearchDto;
-import com.nanum.user.point.model.Point;
+import com.nanum.domain.point.dto.PointDto;
+import com.nanum.domain.point.dto.PointSearchDto;
+import com.nanum.domain.point.model.Point;
 import com.nanum.user.point.repository.PointRepository;
 
 @Service

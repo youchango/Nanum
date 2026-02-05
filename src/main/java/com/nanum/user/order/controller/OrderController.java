@@ -1,6 +1,7 @@
 package com.nanum.user.order.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
+import com.nanum.domain.order.dto.OrderDTO;
 import com.nanum.user.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ApiResponse<Long> createOrder(@RequestBody com.nanum.user.order.dto.OrderDTO.CreateRequest request) {
+    public ApiResponse<Long> createOrder(@RequestBody OrderDTO.CreateRequest request) {
         // Assume memberId comes from Security Context in real app, but for now
         // placeholder or passed in request?
         // User requirements didn't specify auth mechanism detail, but typically Order

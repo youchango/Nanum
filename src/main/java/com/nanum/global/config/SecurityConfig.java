@@ -60,6 +60,9 @@ public class SecurityConfig {
                         .requestMatchers("/resources/**", "/WEB-INF/**").permitAll()
                         .requestMatchers("/", "/login", "/admin/login", "/biz/login", "/signup").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll() // Allow Auth API
+                        .requestMatchers("/api/v1/members/check-id").permitAll() // Allow ID Check API
+                        .requestMatchers("/api/v1/categories/**", "/api/v1/products/**").permitAll() // Allow User
+                                                                                                     // Public API
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow Swagger
                         .requestMatchers("/admin/**", "/api/v1/admin/**").hasRole("MASTER")
                         .requestMatchers("/biz/**", "/api/v1/biz/**").hasRole("BIZ")

@@ -1,10 +1,10 @@
 package com.nanum.user.payment.repository;
 
-import com.nanum.user.payment.dto.PaymentSearchDto;
-import com.nanum.user.payment.model.Payment;
-import com.nanum.user.payment.model.QPayment;
-import com.nanum.user.member.model.QMember;
-import com.nanum.user.payment.model.PaymentStatus;
+import com.nanum.domain.payment.dto.PaymentSearchDto;
+import com.nanum.domain.payment.model.Payment;
+import com.nanum.domain.payment.model.QPayment;
+import com.nanum.domain.member.model.QMember;
+import com.nanum.domain.payment.model.PaymentStatus;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

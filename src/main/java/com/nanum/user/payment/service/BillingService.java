@@ -3,10 +3,10 @@ package com.nanum.user.payment.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.nanum.user.payment.dto.PaymentDto;
-import com.nanum.user.payment.dto.PaymentSearchDto;
-import com.nanum.user.point.dto.PointDto;
-import com.nanum.user.point.dto.PointSearchDto;
+import com.nanum.domain.payment.dto.PaymentDto;
+import com.nanum.domain.payment.dto.PaymentSearchDto;
+import com.nanum.domain.point.dto.PointDto;
+import com.nanum.domain.point.dto.PointSearchDto;
 
 public interface BillingService {
     void generateBill(String memberCode, Integer amount);

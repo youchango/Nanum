@@ -74,10 +74,10 @@
 ### 3.5 👥 회원 시스템 (Member System)
 | Role | Feature | Description |
 | :--- | :--- | :--- |
-| **All** | 인증 (Auth) | 로그인 (JWT), 회원가입. (아이디 중복 확인 API - MemberType별 구분 지원) |
+| **All** | 인증 (Auth) | 로그인 (JWT), 회원가입. (아이디 중복 확인 API - 비로그인 접근 허용) |
 | **Biz** | 기업 정보 관리 | 사업자 정보(`member_biz`) 연동 및 기업 인증 관리. |
 | **Master** | 회원 관리 | 회원 유형별(User, Biz) 조회 및 관리, 승인 프로세스. |
-| **Support** | 고객 지원 | 1:1 문의, 공지사항, FAQ 관리 (Master: 공지/답변 작성, User/Biz: 조회/문의). |
+| **Support** | 고객 지원 | 1:1 문의(Inquiry), 공지사항(Notice), FAQ 관리. (Master: 공지/답변 작성, User/Biz: 조회/문의). <br> - 배너/팝업 관리 기능 포함. |
 
 
 ---

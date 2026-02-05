@@ -1,8 +1,8 @@
 package com.nanum.admin.code.service;
 
 import com.nanum.global.common.dto.SearchDTO;
-import com.nanum.user.code.model.Code;
-import com.nanum.user.code.model.CodeDTO;
+import com.nanum.domain.code.model.Code;
+import com.nanum.domain.code.dto.CodeDTO;
 import com.nanum.user.code.repository.CodeRepository;
 
 import lombok.RequiredArgsConstructor;

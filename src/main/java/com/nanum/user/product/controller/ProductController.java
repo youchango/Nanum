@@ -1,7 +1,7 @@
 package com.nanum.user.product.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
-import com.nanum.user.product.dto.ProductDTO;
+import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.user.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 public class ProductController {
 

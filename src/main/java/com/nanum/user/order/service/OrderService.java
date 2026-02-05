@@ -1,13 +1,13 @@
 package com.nanum.user.order.service;
 
-import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.global.error.ErrorCode;
 import com.nanum.global.error.exception.BusinessException;
-import com.nanum.user.member.model.Member;
+import com.nanum.domain.member.model.Member;
 import com.nanum.user.member.repository.MemberRepository;
-import com.nanum.user.order.model.OrderMaster;
-import com.nanum.user.order.model.OrderStatus;
+import com.nanum.domain.order.model.OrderMaster;
+import com.nanum.domain.order.model.OrderStatus;
 import com.nanum.user.order.repository.OrderRepository;
+import com.nanum.domain.order.dto.OrderDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class OrderService {
         private final MemberRepository memberRepository;
 
         @Transactional
-        public Long createOrder(String memberCode, com.nanum.user.order.dto.OrderDTO.CreateRequest request) {
+        public Long createOrder(String memberCode, OrderDTO.CreateRequest request) {
                 Member member = memberRepository.findByMemberCode(memberCode)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -39,8 +39,6 @@ public class OrderService {
                                 .deliveryMsg(request.getDeliveryMsg())
                                 .build();
 
-                long totalAmount = 0;
-
                 // Items logic (Need OrderDetail repository and Product repository)
                 // Simplified for now: Assume only OrderMaster is saved or Cascade types
 
@@ -49,16 +47,16 @@ public class OrderService {
         }
 
         @Transactional
-        public void updateStatus(Long orderId, com.nanum.user.order.dto.OrderDTO.StatusUpdateRequest request) {
+        public void updateStatus(Long orderId, OrderDTO.StatusUpdateRequest request) {
                 OrderMaster order = orderRepository.findById(orderId)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
                 order.changeStatus(request.getStatus());
                 // order.setTrackingNumber(request.getTrackingNumber()); // Add if needed
         }
 
-        public java.util.List<com.nanum.user.order.dto.OrderDTO.Response> getAllOrders() {
+        public java.util.List<OrderDTO.Response> getAllOrders() {
                 return orderRepository.findAll().stream()
-                                .map(o -> com.nanum.user.order.dto.OrderDTO.Response.builder()
+                                .map(o -> OrderDTO.Response.builder()
                                                 .orderId(o.getOrderId())
                                                 .status(o.getStatus())
                                                 .receiverName(o.getReceiverName())

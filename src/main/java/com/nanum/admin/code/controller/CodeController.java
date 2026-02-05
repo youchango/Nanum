@@ -4,8 +4,8 @@ import com.nanum.admin.code.service.CodeService;
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.global.common.dto.SearchDTO;
 import com.nanum.global.security.CustomUserDetails;
-import com.nanum.user.code.model.Code;
-import com.nanum.user.code.model.CodeDTO;
+import com.nanum.domain.code.model.Code;
+import com.nanum.domain.code.dto.CodeDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,8 +1,8 @@
 package com.nanum.admin.product.service;
 
-import com.nanum.product.model.ProductCategoryDTO;
-import com.nanum.user.product.model.ProductCategory;
-import com.nanum.user.product.repository.ProductCategoryRepository;
+import com.nanum.domain.product.dto.ProductCategoryDTO;
+import com.nanum.domain.product.model.ProductCategory;
+import com.nanum.domain.product.repository.ProductCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

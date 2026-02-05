@@ -1,7 +1,7 @@
 package com.nanum.admin.order.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
-import com.nanum.user.order.dto.OrderDTO;
+import com.nanum.domain.order.dto.OrderDTO;
 import com.nanum.user.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

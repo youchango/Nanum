@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.nanum.domain.member.model.Member;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auth", description = "인증 관련 API")
@@ -31,7 +32,7 @@ public class AuthController {
     @Operation(summary = "회원가입", description = "신규 회원을 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<String>> signup(
-            @jakarta.validation.Valid @RequestBody com.nanum.user.member.model.MemberDTO memberDTO) {
+            @jakarta.validation.Valid @RequestBody com.nanum.domain.member.dto.MemberDTO memberDTO) {
         memberService.signup(memberDTO);
         return ResponseEntity.ok(ApiResponse.success("회원가입이 완료되었습니다.", null));
     }
@@ -141,7 +142,7 @@ public class AuthController {
         private String loginId;
         private String role;
 
-        public static MemberInfo from(com.nanum.user.member.model.Member member) {
+        public static MemberInfo from(Member member) {
             MemberInfo info = new MemberInfo();
             info.setMemberName(member.getMemberName());
             info.setLoginId(member.getMemberId());

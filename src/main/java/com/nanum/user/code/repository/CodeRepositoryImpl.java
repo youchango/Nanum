@@ -1,8 +1,8 @@
 package com.nanum.user.code.repository;
 
 import com.nanum.global.common.dto.SearchDTO;
-import com.nanum.user.code.model.Code;
-import com.nanum.user.code.model.QCode;
+import com.nanum.domain.code.model.Code;
+import com.nanum.domain.code.model.QCode;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

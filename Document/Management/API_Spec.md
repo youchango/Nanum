@@ -50,7 +50,7 @@ Base URL: `/api/v1/admin/category`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | 전체 카테고리 조회 | 모든 카테고리를 계층형(Tree) 구조로 조회합니다. |
+| `GET` | `/` | 전체 카테고리 조회 | 모든 카테고리를 계층형(Tree) 구조로 조회합니다. (`parentId`, `displayOrder` 포함) |
 | `POST` | `/` | 카테고리 생성 | 신규 카테고리를 생성합니다. |
 | `PUT` | `/{id}` | 카테고리 수정 | 카테고리 정보를 수정합니다. |
 | `DELETE` | `/{id}` | 카테고리 삭제 | 카테고리를 삭제합니다. (하위 카테고리 존재 시 불가) |
@@ -69,12 +69,12 @@ Base URL: `/api/v1/admin/products`
 | `PATCH` | `/{id}/status` | 상품 상태 변경 | 상품의 상태(`SALE`, `STOP`, `SOLD_OUT`)를 변경합니다. |
 
 ### 4.3 User Product (쇼핑몰 상품)
-Base URL: `/api/products` (Note: V1 prefix 미적용)
+Base URL: `/api/v1/products`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | 상품 목록 조회 | 카테고리 필터링 등 상품 목록을 조회합니다. |
-| `GET` | `/{id}` | 상품 상세 조회 | 상품 상세 정보를 조회합니다. |
+| `GET` | `/` | 상품 목록 조회 | 카테고리 필터링 등 상품 목록을 조회합니다. (`categoryId` 포함) |
+| `GET` | `/{id}` | 상품 상세 조회 | 상품 상세 정보를 조회합니다. (`categoryId` 포함) |
 
 ## 5. Order (주문)
 
@@ -97,3 +97,50 @@ Base URL: `/api/v1/orders`
 ## 6. Delivery (배송)
 Base URL: `/api/deliveries`
 - *Current Implementation Empty*
+
+## 7. Management (운영 관리)
+
+### 7.1 Inquiry (1:1 문의)
+Base URL: `/api/v1`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin/inquiries` | [Admin] 문의 목록 | 검색 조건(작성자, 상태, 기간)에 따른 문의 목록 조회 |
+| `POST` | `/admin/inquiries/{id}/reply` | [Admin] 답변 등록 | 문의에 대한 답변 등록/수정 (자동 상태 변경) |
+| `GET` | `/inquiries` | [User] 내 문의 목록 | 본인의 1:1 문의 이력 조회 |
+| `GET` | `/inquiries/{id}` | [User] 문의 상세 | 문의 상세 내용 및 답변 조회 |
+| `POST` | `/inquiries` | [User] 문의 등록 | 새로운 1:1 문의 등록 |
+
+### 7.2 Content (게시판: 공지/FAQ)
+Base URL: `/api/v1`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin/contents` | [Admin] 게시글 목록 | 공지사항/FAQ 목록 관리 |
+| `POST` | `/admin/contents` | [Admin] 게시글 등록 | 신규 게시글 작성 |
+| `PUT` | `/admin/contents/{id}` | [Admin] 게시글 수정 | 게시글 내용 수정 |
+| `DELETE` | `/admin/contents/{id}` | [Admin] 게시글 삭제 | 게시글 삭제 (Soft Delete) |
+| `GET` | `/contents` | [User] 게시글 목록 | 타입별(공지/FAQ) 게시글 조회 |
+| `GET` | `/contents/{id}` | [User] 게시글 상세 | 게시글 상세 조회 |
+
+### 7.3 Banner (배너)
+Base URL: `/api/v1`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin/banners` | [Admin] 배너 목록 | 배너 관리 목록 조회 |
+| `POST` | `/admin/banners` | [Admin] 배너 등록 | 신규 배너 및 이미지 등록 |
+| `PUT` | `/admin/banners/{id}` | [Admin] 배너 수정 | 배너 정보(순서, 기간 등) 수정 |
+| `DELETE` | `/admin/banners/{id}` | [Admin] 배너 삭제 | 배너 삭제 |
+| `GET` | `/banners` | [User] 배너 목록 | 현재 노출 가능한 배너 리스트 조회 (위치별) |
+
+### 7.4 Popup (팝업)
+Base URL: `/api/v1`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/admin/popups` | [Admin] 팝업 목록 | 팝업 관리 목록 조회 |
+| `POST` | `/admin/popups` | [Admin] 팝업 등록 | 신규 팝업 등록 |
+| `PUT` | `/admin/popups/{id}` | [Admin] 팝업 수정 | 팝업 정보 수정 |
+| `DELETE` | `/admin/popups/{id}` | [Admin] 팝업 삭제 | 팝업 삭제 |
+| `GET` | `/popups` | [User] 팝업 목록 | 현재 활성화된(기간, 사용여부) 팝업 목록 조회 |

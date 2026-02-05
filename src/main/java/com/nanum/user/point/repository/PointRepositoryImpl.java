@@ -1,9 +1,9 @@
 package com.nanum.user.point.repository;
 
-import com.nanum.user.point.dto.PointSearchDto;
-import com.nanum.user.point.model.Point;
-import com.nanum.user.point.model.QPoint;
-import com.nanum.user.member.model.QMember;
+import com.nanum.domain.point.dto.PointSearchDto;
+import com.nanum.domain.point.model.Point;
+import com.nanum.domain.point.model.QPoint;
+import com.nanum.domain.member.model.QMember;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
