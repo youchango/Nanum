@@ -23,7 +23,7 @@ public class UserCategoryService {
 
         // Filter root categories (depth 1) and active ones
         return allCategories.stream()
-                .filter(c -> c.getDepth() == 1 && "Y".equals(c.getUseYn()))
+                .filter(c -> "Y".equals(c.getUseYn()))
                 .map(UserCategoryDTO::from) // Recursive mapping in DTO
                 .collect(Collectors.toList());
     }
