@@ -171,7 +171,6 @@ CREATE TABLE inventory_history_master (
     history_date     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '입출고일시',
     memo             VARCHAR(500) NULL COMMENT '전체비고',
     created_by       INT NULL COMMENT '담당자(관리자ID)',
-    
     PRIMARY KEY (history_id),
     INDEX idx_hist_date (history_date)
 ) COMMENT '재고 입출고 이력 마스터';
@@ -188,7 +187,6 @@ CREATE TABLE inventory_history_detail (
     prev_quantity    INT NOT NULL COMMENT '변동전재고(창고재고 기준)',
     curr_quantity    INT NOT NULL COMMENT '변동후재고(창고재고 기준)',
     memo             VARCHAR(500) NULL COMMENT '개별비고',
-    
     PRIMARY KEY (detail_id),
     CONSTRAINT fk_detail_master FOREIGN KEY (history_id) REFERENCES inventory_history_master (history_id) ON DELETE CASCADE,
     CONSTRAINT fk_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
@@ -438,3 +436,18 @@ CREATE TABLE content (
     deleted_by   BIGINT NULL COMMENT '삭제자',
     PRIMARY KEY (content_id)
 ) COMMENT '컨텐츠';
+
+-- -----------------------------------------------------
+-- Product Wishlist
+-- -----------------------------------------------------
+CREATE TABLE product_wishlist (
+    wishlist_id      INT AUTO_INCREMENT COMMENT '찜ID',
+    member_code      VARCHAR(30) NOT NULL COMMENT '회원코드(FK)',
+    product_id       INT NOT NULL COMMENT '상품ID(FK)',
+    reg_date         DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    PRIMARY KEY (wishlist_id),
+    UNIQUE KEY uq_wishlist_user_prod (member_code, product_id),
+    CONSTRAINT fk_wishlist_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
+    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
+) COMMENT '상품 찜 목록';
+

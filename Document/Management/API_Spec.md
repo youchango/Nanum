@@ -46,7 +46,7 @@ Base URL: `/api/v1/admin/codes`
 ## 4. Product (상품)
 
 ### 4.1 Admin Category (카테고리 관리)
-Base URL: `/api/v1/admin/category`
+Base URL: `/api/v1/admin/categories`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
@@ -144,3 +144,12 @@ Base URL: `/api/v1`
 | `PUT` | `/admin/popups/{id}` | [Admin] 팝업 수정 | 팝업 정보 수정 |
 | `DELETE` | `/admin/popups/{id}` | [Admin] 팝업 삭제 | 팝업 삭제 |
 | `GET` | `/popups` | [User] 팝업 목록 | 현재 활성화된(기간, 사용여부) 팝업 목록 조회 |
+
+## 8. Wishlist (관심 상품)
+Base URL: `/api/v1/wishlist`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/` | 찜하기 | 상품을 찜 목록에 추가하거나(Toggle) 등록합니다. |
+| `DELETE` | `/{productId}` | 찜 취소 | 상품을 찜 목록에서 제거합니다. |
+| `GET` | `/` | 찜 목록 조회 | 사용자의 찜 상품 목록을 상세 정보(`ProductDTO`)와 함께 페이징 조회합니다. |

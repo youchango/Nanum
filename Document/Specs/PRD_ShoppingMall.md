@@ -39,6 +39,7 @@
   - `STOP` (판매중지): 관리자에 의한 강제 노출 중단 (리스트 숨김).
   - `SOLD_OUT` (품절): 재고 소진 시 자동/수동 전환 (노출하되 구매 불가).
 - **데이터 무결성 정책**: 상품 삭제 시 연관된 `Option` 및 `Image` 데이터는 Cascade(Hard Delete) 처리하며, 주문 내역이 있는 상품은 삭제를 제한하거나 Soft Delete(`delete_yn='Y'`) 처리.
+- **찜하기(Wishlist)**: 사용자는 관심 상품을 찜 목록에 저장할 수 있으며, 중복 저장은 방지됨(Unique Key). 찜한 상품은 마이페이지에서 상세 정보와 함께 조회 가능.
 
 ### 3.2 🛒 기업 특화 주문 및 결제 (Biz-Optimized Order & Pay)
 | Role | Feature | Description |
