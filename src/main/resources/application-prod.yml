@@ -30,5 +30,6 @@ logging:
 file:
   storage:
     type: local
+    server-domain: http://localhost:8080
     local:
       path: ${CONTAINER_UPLOAD_PATH:/app/uploads/} # Default to /app/uploads/ if env var not set

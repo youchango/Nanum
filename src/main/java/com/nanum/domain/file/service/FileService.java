@@ -26,7 +26,7 @@ public class FileService {
 
     private final FileStoreRepository fileStoreRepository;
 
-    @Value("${file.upload-dir:./uploads}")
+    @Value("${file.storage.local.path:./uploads}")
     private String uploadDir;
 
     @Value("${file.storage.type:LOCAL}")

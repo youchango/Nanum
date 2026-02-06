@@ -31,5 +31,6 @@ logging:
 file:
   storage:
     type: local
+    server-domain: http://localhost:8090
     local:
       path: ${CONTAINER_UPLOAD_PATH:./uploads/}
