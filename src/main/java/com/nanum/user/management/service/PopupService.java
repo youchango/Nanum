@@ -16,16 +16,27 @@ import java.util.stream.Collectors;
 public class PopupService {
 
     private final PopupRepository popupRepository;
+    private final com.nanum.domain.file.service.FileService fileService;
 
     public List<PopupDTO.Response> getPopups() {
         // Ideally filter by UseYn='Y' and Date within range via Repository Query
         return popupRepository.findAll().stream()
+                .filter(p -> "N".equals(p.getDeleteYn()))
                 .filter(p -> "Y".equals(p.getUseYn()))
                 .filter(p -> {
                     LocalDateTime now = LocalDateTime.now();
                     return p.getStartDatetime().isBefore(now) && p.getEndDatetime().isAfter(now);
                 })
-                .map(PopupDTO.Response::from)
+                .map(popup -> {
+                    PopupDTO.Response response = PopupDTO.Response.from(popup);
+                    List<com.nanum.domain.file.dto.FileResponseDTO> files = fileService
+                            .getFiles(com.nanum.domain.file.model.ReferenceType.POPUP, String.valueOf(popup.getId()))
+                            .stream()
+                            .map(com.nanum.domain.file.dto.FileResponseDTO::from)
+                            .collect(Collectors.toList());
+                    response.setFiles(files);
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 }

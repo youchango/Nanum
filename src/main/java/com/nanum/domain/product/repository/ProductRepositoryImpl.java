@@ -36,7 +36,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.price,
                         product.salePrice,
                         product.status,
-                        product.thumbnailUrl,
                         product.viewCount,
                         product.createdAt,
                         product.updatedAt,

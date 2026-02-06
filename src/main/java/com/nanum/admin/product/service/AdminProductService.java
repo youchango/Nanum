@@ -23,6 +23,7 @@ public class AdminProductService {
         private final ProductRepository productRepository;
         private final ProductCategoryRepository productCategoryRepository;
         private final InventoryService inventoryService;
+        private final com.nanum.domain.file.service.FileService fileService;
 
         public Page<AdminProductListDTO> getProducts(AdminProductSearchDTO searchDTO, Pageable pageable) {
                 return productRepository.findAdminProducts(searchDTO, pageable);
@@ -32,6 +33,12 @@ public class AdminProductService {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + id));
 
+                List<com.nanum.domain.file.dto.FileResponseDTO> files = fileService
+                                .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, String.valueOf(id))
+                                .stream()
+                                .map(com.nanum.domain.file.dto.FileResponseDTO::from)
+                                .collect(Collectors.toList());
+
                 return ProductDTO.Response.builder()
                                 .productId(product.getId())
                                 .categoryName(product.getCategory().getCategoryName())
@@ -39,7 +46,7 @@ public class AdminProductService {
                                 .price(product.getPrice())
                                 .salePrice(product.getSalePrice())
                                 .status(product.getStatus())
-                                .thumbnailUrl(product.getThumbnailUrl())
+                                .files(files)
                                 .build();
         }
 
@@ -48,6 +55,7 @@ public class AdminProductService {
                 ProductCategory category = productCategoryRepository.findById(request.getCategoryId())
                                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
 
+                // 1. Save Product
                 Product product = Product.builder()
                                 .category(category)
                                 .name(request.getName())
@@ -55,7 +63,6 @@ public class AdminProductService {
                                 .salePrice(request.getSalePrice())
                                 .status(request.getStatus())
                                 .description(request.getDescription())
-                                .thumbnailUrl(request.getThumbnailUrl())
                                 .deleteYn("N")
                                 .build();
 
@@ -73,22 +80,12 @@ public class AdminProductService {
                         product.getOptions().addAll(options);
                 }
 
-                // Images
-                if (request.getImages() != null) {
-                        List<ProductImage> images = request.getImages().stream()
-                                        .map(img -> ProductImage.builder()
-                                                        .product(product)
-                                                        .imageUrl(img.getImageUrl())
-                                                        .type(ProductImageType.valueOf(img.getType()))
-                                                        .displayOrder(img.getDisplayOrder())
-                                                        .build())
-                                        .collect(Collectors.toList());
-                        product.getImages().addAll(images);
-                }
-
                 productRepository.save(product);
 
-                // Initialize Stock (Warehouse)
+                // 2. Link Files (FileStore)
+                processFiles(request.getImages(), product.getId());
+
+                // Initialize Stock
                 inventoryService.initializeStock(product, product.getOptions());
 
                 return product.getId();
@@ -109,13 +106,10 @@ public class AdminProductService {
                                 request.getPrice(),
                                 request.getSalePrice(),
                                 request.getStatus(),
-                                request.getDescription(),
-                                request.getThumbnailUrl());
+                                request.getDescription());
 
-                // Options Update (Clear and Add)
-                // Note: This deletes old options and stock (via cascade).
+                // Options Update
                 product.getOptions().clear();
-                // Since we need to initialize stock for new options, we capture them.
                 if (request.getOptions() != null) {
                         List<ProductOption> options = request.getOptions().stream()
                                         .map(opt -> ProductOption.builder()
@@ -129,26 +123,30 @@ public class AdminProductService {
                         product.getOptions().addAll(options);
                 }
 
-                // Images Update (Clear and Add)
-                product.getImages().clear();
-                if (request.getImages() != null) {
-                        List<ProductImage> images = request.getImages().stream()
-                                        .map(img -> ProductImage.builder()
-                                                        .product(product)
-                                                        .imageUrl(img.getImageUrl())
-                                                        .type(ProductImageType.valueOf(img.getType()))
-                                                        .displayOrder(img.getDisplayOrder())
-                                                        .build())
-                                        .collect(Collectors.toList());
-                        product.getImages().addAll(images);
-                }
+                // Files Update
+                processFiles(request.getImages(), id);
 
-                // Flush to ensure options have IDs before creating stock?
-                // Or simply save product.
                 productRepository.save(product);
-
-                // Initialize Stock for new options
                 inventoryService.initializeStock(product, product.getOptions());
+        }
+
+        private void processFiles(List<ProductDTO.Image> images, Long productId) {
+                if (images == null || images.isEmpty())
+                        return;
+
+                List<String> fileIds = images.stream()
+                                .map(ProductDTO.Image::getFileId)
+                                .filter(id -> id != null && !id.isEmpty())
+                                .collect(Collectors.toList());
+
+                com.nanum.domain.file.model.ReferenceType type = com.nanum.domain.file.model.ReferenceType.PRODUCT;
+                fileService.updateFileReference(fileIds, type, String.valueOf(productId));
+
+                for (ProductDTO.Image img : images) {
+                        if (img.getFileId() != null && "MAIN".equals(img.getType())) {
+                                fileService.setMainImage(img.getFileId(), type, String.valueOf(productId));
+                        }
+                }
         }
 
         @Transactional
@@ -156,13 +154,15 @@ public class AdminProductService {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
                 product.update(product.getName(), product.getPrice(), product.getSalePrice(), product.getDescription(),
-                                product.getThumbnailUrl(), status);
+                                status);
         }
 
         @Transactional
-        public void deleteProduct(Long id) {
+        public void deleteProduct(Long id, String memberCode) {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
-                product.setDeleteYn("Y");
+                product.delete(memberCode);
+                fileService.deleteByReference(com.nanum.domain.file.model.ReferenceType.PRODUCT, String.valueOf(id),
+                                memberCode);
         }
 }

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE banner SET delete_yn = 'Y', deleted_at = NOW() WHERE banner_id = ?")
-@Where(clause = "delete_yn = 'N'")
 public class Banner extends BaseTimeEntity {
 
     @Id
@@ -27,9 +25,6 @@ public class Banner extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "banner_type", nullable = false)
     private BannerType type;
-
-    @Column(name = "image_file", nullable = false)
-    private String imageFile;
 
     @Column(name = "link_url")
     private String linkUrl;
@@ -63,16 +58,23 @@ public class Banner extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "deleted_by")
+    private String deletedBy;
+
     // Updates
-    public void update(BannerType type, String imageFile, String linkUrl, int sortOrder, String useYn,
+    public void update(BannerType type, String linkUrl, int sortOrder, String useYn,
             LocalDateTime start, LocalDateTime end) {
         this.type = type;
-        if (imageFile != null)
-            this.imageFile = imageFile;
         this.linkUrl = linkUrl;
         this.sortOrder = sortOrder;
         this.useYn = useYn;
         this.startDatetime = start;
         this.endDatetime = end;
+    }
+
+    public void delete(String memberCode) {
+        this.deleteYn = "Y";
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = memberCode;
     }
 }

@@ -21,7 +21,6 @@ CREATE TABLE product (
     sale_price       INT DEFAULT 0 NULL COMMENT '할인가(실판매가)',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
-    thumbnail_url    VARCHAR(500) NULL COMMENT '대표이미지URL',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     updated_at       DATETIME NULL COMMENT '수정일',
@@ -45,17 +44,7 @@ CREATE TABLE product_option (
     CONSTRAINT fk_option_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 옵션';
 
--- 4. Product Image
-CREATE TABLE product_image (
-    image_id         INT AUTO_INCREMENT COMMENT '이미지ID',
-    product_id       INT NOT NULL COMMENT '상품ID',
-    image_url        VARCHAR(500) NOT NULL COMMENT '이미지경로',
-    image_type       VARCHAR(20) DEFAULT 'DETAIL' NOT NULL COMMENT '타입(MAIN, DETAIL)',
-    display_order    INT DEFAULT 0 NOT NULL COMMENT '노출순서',
-    
-    PRIMARY KEY (image_id),
-    CONSTRAINT fk_image_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 이미지';
+
 
 -- 5. Product Stock (Warehouse)
 CREATE TABLE product_stock (

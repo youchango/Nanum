@@ -18,7 +18,7 @@ public class AdminProductListDTO {
     private int price;
     private int salePrice;
     private ProductStatus status;
-    private String thumbnailUrl;
+
     private int viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

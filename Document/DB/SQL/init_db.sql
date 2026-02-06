@@ -27,17 +27,24 @@ CREATE TABLE basic (
 ) COMMENT '기본설정';
 
 CREATE TABLE `file_store` (
-    `file_id` VARCHAR(36) NOT NULL COMMENT '파일ID (UUID)',
-    `group_id` VARCHAR(36) NOT NULL COMMENT '파일그룹ID (UUID)',
-    `org_name` VARCHAR(255) NOT NULL COMMENT '원본파일명',
-    `save_name` VARCHAR(255) NOT NULL COMMENT '저장파일명',
-    `size` BIGINT NOT NULL COMMENT '파일크기',
-    `ext` VARCHAR(10) NOT NULL COMMENT '확장자',
-    `path` VARCHAR(255) NOT NULL COMMENT '저장경로',
-    `reg_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일시',
+    `file_id`        VARCHAR(36) NOT NULL COMMENT '파일ID (UUID)',
+    `reference_type` VARCHAR(50) NOT NULL COMMENT '참조구분 (PRODUCT, CATEGORY, BANNER, POPUP, REVIEW, INQUIRY)',
+    `reference_id`   VARCHAR(50) NOT NULL COMMENT '참조ID (Entity PK)',
+    `org_name`       VARCHAR(255) NOT NULL COMMENT '원본파일명',
+    `save_name`      VARCHAR(255) NOT NULL COMMENT '저장파일명(UUID포함)',
+    `path`           VARCHAR(500) NOT NULL COMMENT '전체 URL 또는 상대경로',
+    `ext`            VARCHAR(10) NOT NULL COMMENT '확장자',
+    `size`           BIGINT DEFAULT 0 NOT NULL COMMENT '파일크기(Byte)',
+    `is_main`        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '대표이미지 여부(Y/N)',
+    `display_order`  INT DEFAULT 0 NOT NULL COMMENT '노출순서',
+    `reg_date`       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    `delete_yn`      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
+    `deleted_at`     DATETIME NULL COMMENT '삭제일시',
+    `deleted_by`     VARCHAR(30) NULL COMMENT '삭제자(회원코드)',
     PRIMARY KEY (`file_id`),
-    INDEX `idx_group_id` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='통합 파일 관리';
+    INDEX `idx_file_ref` (`reference_type`, `reference_id`),
+    INDEX `idx_file_reg` (`reg_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='전사 통합 파일 관리';
 
 CREATE TABLE member (
     id               INT AUTO_INCREMENT COMMENT 'ID',
@@ -102,11 +109,11 @@ CREATE TABLE product (
     sale_price       INT DEFAULT 0 NULL COMMENT '할인가(실판매가)',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
-    thumbnail_url    VARCHAR(500) NULL COMMENT '대표이미지URL',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     updated_at       DATETIME NULL COMMENT '수정일',
     deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(30) NULL COMMENT '삭제자(회원코드)',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (product_id),
     INDEX idx_product_cat (category_id)
@@ -124,16 +131,7 @@ CREATE TABLE product_option (
     CONSTRAINT fk_option_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 옵션';
 
--- 4. Product Image
-CREATE TABLE product_image (
-    image_id         INT AUTO_INCREMENT COMMENT '이미지ID',
-    product_id       INT NOT NULL COMMENT '상품ID',
-    image_url        VARCHAR(500) NOT NULL COMMENT '이미지경로',
-    image_type       VARCHAR(20) DEFAULT 'DETAIL' NOT NULL COMMENT '타입(MAIN, DETAIL)',
-    display_order    INT DEFAULT 0 NOT NULL COMMENT '노출순서',
-    PRIMARY KEY (image_id),
-    CONSTRAINT fk_image_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 이미지';
+
 
 -- Product Biz Mapping (B2B Only)
 CREATE TABLE product_biz_mapping (
@@ -155,7 +153,6 @@ CREATE TABLE product_stock (
     stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량(실재고)',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
-    
     PRIMARY KEY (stock_id),
     UNIQUE KEY uq_stock_prod_opt (product_id, option_id),
     CONSTRAINT fk_stock_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
@@ -354,7 +351,6 @@ CREATE TABLE point (
 CREATE TABLE banner (
     banner_id      INT AUTO_INCREMENT COMMENT '배너코드',
     banner_type    VARCHAR(20) NOT NULL COMMENT '배너구분 (MAIN_TOP, SUB_MID)',
-    image_file     VARCHAR(255) NOT NULL COMMENT '이미지파일',
     link_type      VARCHAR(20) NULL COMMENT '링크 타입',
     link_url       VARCHAR(255) NULL COMMENT '링크 URL',
     sort_order     INT DEFAULT 1 NOT NULL COMMENT '노출순서',
@@ -364,39 +360,38 @@ CREATE TABLE banner (
     use_yn         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
     delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by     INT NULL COMMENT '생성자',
+    created_by     VARCHAR(30) NULL COMMENT '생성자',
     updated_at     DATETIME NULL COMMENT '수정일',
-    updated_by     INT NULL COMMENT '수정자',
+    updated_by     VARCHAR(30) NULL COMMENT '수정자',
     deleted_at     DATETIME NULL COMMENT '삭제일',
-    deleted_by     INT NULL COMMENT '삭제자',
-    PRIMARY KEY (banner_id),
-    INDEX idx_banner_sort (banner_type, sort_order),
-    INDEX idx_banner_date (start_datetime, end_datetime)
+    deleted_by     VARCHAR(30) NULL COMMENT '삭제자',
+    PRIMARY KEY (`banner_id`),
+    INDEX `idx_banner_sort` (`banner_type`, `sort_order`),
+    INDEX `idx_banner_date` (`start_datetime`, `end_datetime`)
 ) COMMENT '배너 관리';
 
-CREATE TABLE popup (
-    popup_id       INT AUTO_INCREMENT COMMENT '팝업코드',
-    title          VARCHAR(100) NOT NULL COMMENT '팝업제목',
-    content_image  VARCHAR(255) NULL COMMENT '팝업이미지',
-    content_html   TEXT NULL COMMENT '팝업내용(HTML)',
-    link_type      VARCHAR(20) NULL COMMENT '링크 타입',
-    link_url       VARCHAR(255) NULL COMMENT '링크 URL',
-    width          INT DEFAULT 400 NOT NULL COMMENT '창 너비',
-    height         INT DEFAULT 500 NOT NULL COMMENT '창 높이',
-    pos_x          INT DEFAULT 0 NOT NULL COMMENT '위치 X좌표',
-    pos_y          INT DEFAULT 0 NOT NULL COMMENT '위치 Y좌표',
-    close_type     VARCHAR(20) DEFAULT 'DAY' NOT NULL COMMENT '닫기옵션 (NEVER, DAY, ONCE)',
-    device_type    VARCHAR(10) DEFAULT 'ALL' NOT NULL COMMENT '노출기기 (PC, MOBILE, ALL)',
-    start_datetime DATETIME NOT NULL COMMENT '게시 시작일시',
-    end_datetime   DATETIME NOT NULL COMMENT '게시 종료일시',
-    use_yn         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
-    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
-    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by     INT NULL COMMENT '생성자',
-    updated_at     DATETIME NULL COMMENT '수정일',
-    updated_by     INT NULL COMMENT '수정자',
-    deleted_at     DATETIME NULL COMMENT '삭제일',
-    deleted_by     INT NULL COMMENT '삭제자',
+CREATE TABLE `popup` (
+    `popup_id`       INT AUTO_INCREMENT COMMENT '팝업코드',
+    `title`          VARCHAR(100) NOT NULL COMMENT '팝업제목',
+    `content_html`   TEXT NULL COMMENT '팝업내용(HTML)',
+    `link_type`      VARCHAR(20) NULL COMMENT '링크 타입',
+    `link_url`       VARCHAR(255) NULL COMMENT '링크 URL',
+    `width`          INT DEFAULT 400 NOT NULL COMMENT '창 너비',
+    `height`         INT DEFAULT 500 NOT NULL COMMENT '창 높이',
+    `pos_x`          INT DEFAULT 0 NOT NULL COMMENT '위치 X좌표',
+    `pos_y`          INT DEFAULT 0 NOT NULL COMMENT '위치 Y좌표',
+    `close_type`     VARCHAR(20) DEFAULT 'DAY' NOT NULL COMMENT '닫기옵션 (NEVER, DAY, ONCE)',
+    `device_type`    VARCHAR(10) DEFAULT 'ALL' NOT NULL COMMENT '노출기기 (PC, MOBILE, ALL)',
+    `start_datetime` DATETIME NOT NULL COMMENT '게시 시작일시',
+    `end_datetime`   DATETIME NOT NULL COMMENT '게시 종료일시',
+    `use_yn`         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
+    `delete_yn`      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    `created_at`     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    `created_by`     VARCHAR(30) NULL COMMENT '생성자',
+    `updated_at`     DATETIME NULL COMMENT '수정일',
+    `updated_by`     VARCHAR(30) NULL COMMENT '수정자',
+    `deleted_at`     DATETIME NULL COMMENT '삭제일',
+    `deleted_by`     VARCHAR(30) NULL COMMENT '삭제자',
     PRIMARY KEY (popup_id),
     INDEX idx_popup_date (start_datetime, end_datetime)
 ) COMMENT '팝업 관리';
@@ -427,13 +422,13 @@ CREATE TABLE content (
     subject      VARCHAR(200) NOT NULL COMMENT '제목',
     content_body LONGTEXT NOT NULL COMMENT '내용',
     url_info     VARCHAR(255) NULL COMMENT 'URL 정보',
-    updated_by   BIGINT NULL COMMENT '수정자',
+    updated_by   VARCHAR(30) NULL COMMENT '수정자(회원코드)',
     updated_at   DATETIME NULL COMMENT '수정일',
-    created_by   BIGINT NULL COMMENT '생성자',
+    created_by   VARCHAR(30) NULL COMMENT '생성자(회원코드)',
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    deleted_yn   CHAR(1) DEFAULT 'N' COMMENT '삭제 여부',
+    delete_yn    CHAR(1) DEFAULT 'N' COMMENT '삭제 여부',
     deleted_at   DATETIME NULL COMMENT '삭제일',
-    deleted_by   BIGINT NULL COMMENT '삭제자',
+    deleted_by   VARCHAR(30) NULL COMMENT '삭제자(회원코드)',
     PRIMARY KEY (content_id)
 ) COMMENT '컨텐츠';
 

@@ -20,7 +20,6 @@ public class ProductDTO {
         private int salePrice;
         private ProductStatus status;
         private String description;
-        private String thumbnailUrl;
         private List<Option> options;
         private List<Image> images;
     }
@@ -42,6 +41,7 @@ public class ProductDTO {
     @AllArgsConstructor
     @Builder
     public static class Image {
+        private String fileId;
         private String imageUrl;
         private String type; // MAIN, DETAIL
         private int displayOrder;
@@ -60,6 +60,7 @@ public class ProductDTO {
         private int price;
         private int salePrice;
         private ProductStatus status;
-        private String thumbnailUrl;
+        private List<com.nanum.domain.file.dto.FileResponseDTO> files;
+        // options will be added separately if needed
     }
 }

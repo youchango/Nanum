@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE popup SET delete_yn = 'Y', deleted_at = NOW() WHERE popup_id = ?")
-@Where(clause = "delete_yn = 'N'")
 public class Popup extends BaseTimeEntity {
 
     @Id
@@ -26,9 +24,6 @@ public class Popup extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String title;
-
-    @Column(name = "content_image")
-    private String contentImage;
 
     @Column(name = "content_html")
     private String contentHtml;
@@ -81,11 +76,18 @@ public class Popup extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void update(String title, String contentImage, String linkUrl, int width, int height, int posX, int posY,
+    @Column(name = "deleted_by")
+    private String deletedBy;
+
+    public void delete(String memberCode) {
+        this.deleteYn = "Y";
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = memberCode;
+    }
+
+    public void update(String title, String linkUrl, int width, int height, int posX, int posY,
             PopupCloseType closeType, LocalDateTime start, LocalDateTime end, String useYn) {
         this.title = title;
-        if (contentImage != null)
-            this.contentImage = contentImage;
         this.linkUrl = linkUrl;
         this.width = width;
         this.height = height;

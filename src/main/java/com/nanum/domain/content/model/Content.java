@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE content SET deleted_yn = 'Y', deleted_at = NOW() WHERE content_id = ?")
-@Where(clause = "deleted_yn = 'N'")
+@SQLDelete(sql = "UPDATE content SET delete_yn = 'Y', deleted_at = NOW() WHERE content_id = ?")
 public class Content extends BaseTimeEntity {
 
     @Id
@@ -37,16 +35,22 @@ public class Content extends BaseTimeEntity {
     @Column(name = "url_info")
     private String urlInfo;
 
-    @Column(name = "deleted_yn", nullable = false)
+    @Column(name = "delete_yn", nullable = false)
     @ColumnDefault("'N'")
     @Builder.Default
-    private String deletedYn = "N";
+    private String deleteYn = "N";
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name = "deleted_by")
-    private Long deletedBy;
+    private String deletedBy;
+
+    public void delete(String memberCode) {
+        this.deleteYn = "Y";
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = memberCode;
+    }
 
     // Helper for update
     public void update(ContentType type, String subject, String contentBody, String urlInfo) {

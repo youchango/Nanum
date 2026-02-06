@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.nanum.domain.file.dto.FileResponseDTO;
+import java.util.List;
+
 public class PopupDTO {
 
     @Getter
@@ -15,7 +18,6 @@ public class PopupDTO {
     @Builder
     public static class Request {
         private String title;
-        private String contentImage;
         private String contentHtml;
         private String linkUrl;
         private int width;
@@ -37,7 +39,6 @@ public class PopupDTO {
     public static class Response {
         private Long id;
         private String title;
-        private String contentImage;
         private String contentHtml;
         private String linkUrl;
         private int width;
@@ -49,12 +50,12 @@ public class PopupDTO {
         private LocalDateTime startDatetime;
         private LocalDateTime endDatetime;
         private String useYn;
+        private List<FileResponseDTO> files;
 
         public static Response from(Popup popup) {
             return Response.builder()
                     .id(popup.getId())
                     .title(popup.getTitle())
-                    .contentImage(popup.getContentImage())
                     .contentHtml(popup.getContentHtml())
                     .linkUrl(popup.getLinkUrl())
                     .width(popup.getWidth())

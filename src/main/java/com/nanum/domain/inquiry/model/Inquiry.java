@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE inquiry SET delete_yn = 'Y', deleted_at = NOW() WHERE inquiry_id = ?")
-@Where(clause = "delete_yn = 'N'")
 public class Inquiry extends BaseTimeEntity {
 
     @Id
@@ -78,6 +76,12 @@ public class Inquiry extends BaseTimeEntity {
 
     @Column(name = "deleted_by")
     private String deletedBy; // MemberCode string
+
+    public void delete(String memberCode) {
+        this.deleteYn = "Y";
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = memberCode;
+    }
 
     public void reply(String answer, Member answerer) {
         this.answer = answer;

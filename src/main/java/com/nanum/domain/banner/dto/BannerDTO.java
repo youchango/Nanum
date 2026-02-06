@@ -6,6 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.nanum.domain.file.dto.FileResponseDTO;
+import java.util.List;
+
 public class BannerDTO {
 
     @Getter
@@ -15,7 +18,6 @@ public class BannerDTO {
     @Builder
     public static class Request {
         private BannerType type;
-        private String imageFile;
         private String linkUrl;
         private int sortOrder;
         private String deviceType;
@@ -32,25 +34,26 @@ public class BannerDTO {
     public static class Response {
         private Long id;
         private BannerType type;
-        private String imageFile;
         private String linkUrl;
         private int sortOrder;
         private String deviceType;
         private LocalDateTime startDatetime;
         private LocalDateTime endDatetime;
         private String useYn;
+        private List<FileResponseDTO> files;
 
         public static Response from(Banner banner) {
             return Response.builder()
                     .id(banner.getId())
                     .type(banner.getType())
-                    .imageFile(banner.getImageFile())
                     .linkUrl(banner.getLinkUrl())
                     .sortOrder(banner.getSortOrder())
                     .deviceType(banner.getDeviceType())
                     .startDatetime(banner.getStartDatetime())
                     .endDatetime(banner.getEndDatetime())
                     .useYn(banner.getUseYn())
+                    // Files should be set separately as DTO doesn't have access to FileService here
+                    // or we can expect them to be set by the service
                     .build();
         }
     }

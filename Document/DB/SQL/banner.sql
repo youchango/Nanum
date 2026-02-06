@@ -1,7 +1,6 @@
 CREATE TABLE banner (
     banner_id      INT AUTO_INCREMENT COMMENT '배너코드',
     banner_type    VARCHAR(20) NOT NULL COMMENT '배너구분 (MAIN_TOP, SUB_MID)',
-    image_file     VARCHAR(255) NOT NULL COMMENT '이미지파일',
     link_type      VARCHAR(20) NULL COMMENT '링크 타입',
     link_url       VARCHAR(255) NULL COMMENT '링크 URL',
     sort_order     INT DEFAULT 1 NOT NULL COMMENT '노출순서',

@@ -5,7 +5,9 @@ import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.domain.banner.dto.BannerDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,23 +24,30 @@ public class AdminBannerController {
         return ApiResponse.success(adminBannerService.getBanners());
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "배너 등록")
-    public ApiResponse<Long> createBanner(@RequestBody BannerDTO.Request request) {
-        return ApiResponse.success(adminBannerService.createBanner(request));
+    public ApiResponse<Long> createBanner(
+            @RequestPart(value = "request") BannerDTO.Request request,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        return ApiResponse.success(adminBannerService.createBanner(request, files));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "배너 수정")
-    public ApiResponse<Void> updateBanner(@PathVariable Long id, @RequestBody BannerDTO.Request request) {
-        adminBannerService.updateBanner(id, request);
+    public ApiResponse<Void> updateBanner(
+            @PathVariable Long id,
+            @RequestPart(value = "request") BannerDTO.Request request,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        adminBannerService.updateBanner(id, request, files);
         return ApiResponse.success(null);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "배너 삭제")
     public ApiResponse<Void> deleteBanner(@PathVariable Long id) {
-        adminBannerService.deleteBanner(id);
+        // TODO: Get actual logged-in member code
+        String memberCode = "ADMIN";
+        adminBannerService.deleteBanner(id, memberCode);
         return ApiResponse.success(null);
     }
 }

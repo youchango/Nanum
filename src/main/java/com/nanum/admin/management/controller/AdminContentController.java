@@ -44,7 +44,9 @@ public class AdminContentController {
     @DeleteMapping("/{id}")
     @Operation(summary = "게시글 삭제")
     public ApiResponse<Void> deleteContent(@PathVariable Long id) {
-        adminContentService.deleteContent(id);
+        // TODO: Get actual logged-in member code
+        String memberCode = "ADMIN";
+        adminContentService.deleteContent(id, memberCode);
         return ApiResponse.success(null);
     }
 }

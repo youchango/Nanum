@@ -50,12 +50,27 @@
 - [ ] 상품 옵션 및 재고 관리 시스템
 
 ### 5. 주문 및 결제 (Order & Pay)
-- [ ] **장바구니 (Cart)**
-    - [ ] `Cart` Entity & Repository
-    - [ ] 스마트 장바구니 담기 (중복 체크 & Confirm)
+- [x] **Smart Cart Implementation**
+  - [x] Create `Cart` Entity & Repository
+  - [x] Create `CartDTO` with `forceUpdate`
+  - [x] Implement `CartService` (Duplicate Check Logic)
+  - [x] Implement `CartController` (409 Conflict Handling)
 - [ ] **주문 (Order)**
 - [ ] 결제 시스템 연동 (PG/가상계좌)
 - [ ] 입출고 및 재고 동기화
+
+## Unified File Store
+- [x] DB Schema (`file_store`)
+- [x] `FileService` (Common)
+- [x] Product Domain Integration
+- [ ] Banner/Popup/Etc Integration
+
+## Soft Delete Implementation
+- [x] DB Schema Update (`delete_yn`, `deleted_at`, `deleted_by`)
+- [x] Entity Refactoring (Product, Content, Inquiry, Banner, Popup, FileStore)
+- [x] Service Refactoring (Soft Delete Logic & Legacy Data Access)
+- [x] Admin/User View Separation
+- [x] File Cascading Delete
 
 ---
 

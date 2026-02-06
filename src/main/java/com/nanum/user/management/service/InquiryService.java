@@ -25,6 +25,7 @@ public class InquiryService {
         Member writer = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
         return inquiryRepository.findByWriter(writer).stream()
+                .filter(i -> "N".equals(i.getDeleteYn()))
                 .map(InquiryDTO.Response::from)
                 .collect(Collectors.toList());
     }
@@ -32,6 +33,10 @@ public class InquiryService {
     public InquiryDTO.Response getInquiry(Long id, String memberCode) {
         Inquiry inquiry = inquiryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("문의를 찾을 수 없습니다."));
+
+        if ("Y".equals(inquiry.getDeleteYn())) {
+            throw new IllegalArgumentException("삭제된 문의입니다.");
+        }
 
         if (!inquiry.getWriter().getMemberCode().equals(memberCode)) {
             throw new IllegalArgumentException("본인의 문의만 조회할 수 있습니다.");

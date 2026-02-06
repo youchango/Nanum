@@ -65,7 +65,9 @@ public class AdminProductController {
     @DeleteMapping("/{id}")
     @Operation(summary = "상품 삭제", description = "상품을 삭제합니다. (Soft Delete)")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
-        adminProductService.deleteProduct(id);
+        // TODO: Get actual logged-in member code
+        String memberCode = "ADMIN";
+        adminProductService.deleteProduct(id, memberCode);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }

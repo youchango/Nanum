@@ -1,11 +1,28 @@
 ﻿# 🛒 나눔 쇼핑몰 플랫폼 PRD (Product Requirements Document)
+## 0. 공통 정책 (Common Policies)
+### 0.1 통합 파일 관리 (Unified File Store)
+- **목적**: 전사 도메인(상품, 배너, 팝업, 문의 등)의 파일 및 이미지를 중앙화된 테이블(`file_store`)에서 통합 관리.
+- **주요 기능**:
+  - `reference_type`과 `reference_id`를 통한 다형성 참조.
+  - 대표 이미지(`is_main=Y`) 관리 및 트랜잭션 보장.
+  - 파일 업로드 API(`POST /api/v1/files/upload`)를 통한 공통 처리.
+- **마이그레이션**: 기존 분산된 이미지 정보(`product_image`, `thumbnail_url` 등)는 점진적으로 `file_store`로 통합 후 제거.
+
+### 0.2 소프트 삭제 (Soft Delete)
+- **적용 대상**: `product`, `content`, `inquiry`, `banner`, `popup`, `file_store`.
+- **정책**:
+  - 데이터 삭제 시 물리적 제거(Hard Delete) 대신 `delete_yn = 'Y'`, `deleted_at`, `deleted_by` 필드를 업데이트.
+  - **사용자(User)**: `delete_yn = 'N'`인 활성 데이터만 조회 가능.
+  - **관리자(Admin)**: `delete_yn` 상태와 관계없이 모든 데이터 조회 가능 (삭제된 데이터 포함).
+  - **Cascading**: 상위 엔티티(예: 상품) 삭제 시 연관된 파일(`file_store`)도 소프트 삭제 처리.
+
 **Version:** 1.0.0  
 **Status:** Draft (Loki Mode Optimized)  
 **Date:** 2026-02-02
 
 ---
 
-## 1. 프로젝트 비전 (Project Vision)
+## 1. 개요 (Overview)
 나눔 쇼핑몰 플랫폼은 **"신뢰를 바탕으로 판매자와 구매자를 잇는 건강한 커머스 생태계 구축"**을 목표로 합니다. 기존 프로젝트의 안정적인 모듈러 구조를 재활용하여, 확장성 있는 B2C/B2B 하이브리드 커머스 엔진을 제공합니다.
 
 ---

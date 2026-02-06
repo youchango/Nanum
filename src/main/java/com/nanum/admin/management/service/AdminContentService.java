@@ -36,7 +36,7 @@ public class AdminContentService {
                 .subject(request.getSubject())
                 .contentBody(request.getContentBody())
                 .urlInfo(request.getUrlInfo())
-                .deletedYn("N")
+                .deleteYn("N")
                 .build();
         contentRepository.save(content);
         return content.getId();
@@ -50,8 +50,9 @@ public class AdminContentService {
     }
 
     @Transactional
-    public void deleteContent(Long id) {
-        // SQLDelete annotation handles soft delete
-        contentRepository.deleteById(id);
+    public void deleteContent(Long id, String memberCode) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        content.delete(memberCode);
     }
 }

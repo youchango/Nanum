@@ -20,6 +20,7 @@ public class ContentService {
 
     public List<ContentDTO.Response> getContents(ContentType type) {
         return contentRepository.findByType(type).stream()
+                .filter(c -> "N".equals(c.getDeleteYn()))
                 .map(ContentDTO.Response::from)
                 .collect(Collectors.toList());
     }
@@ -27,6 +28,11 @@ public class ContentService {
     public ContentDTO.Response getContent(Long id) {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        if ("Y".equals(content.getDeleteYn())) {
+            throw new IllegalArgumentException("제하된 게시글입니다.");
+        }
+
         return ContentDTO.Response.from(content);
     }
 }

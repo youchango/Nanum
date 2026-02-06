@@ -32,7 +32,7 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         // Duplicate Check
-        Optional<Cart> existingCart = cartRepository.findByMemberMemberCodeAndProductProductIdAndOptionId(
+        Optional<Cart> existingCart = cartRepository.findByMemberMemberCodeAndProduct_IdAndOptionId(
                 member.getMemberCode(),
                 request.getProductId(),
                 request.getOptionId());

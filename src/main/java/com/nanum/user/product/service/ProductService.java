@@ -4,8 +4,6 @@ import com.nanum.global.error.exception.BusinessException;
 import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.domain.product.model.Product;
 import com.nanum.domain.product.model.ProductCategory;
-import com.nanum.domain.product.model.ProductImage;
-import com.nanum.domain.product.model.ProductImageType;
 import com.nanum.domain.product.model.ProductOption;
 import com.nanum.domain.product.model.ProductStatus;
 import com.nanum.domain.product.repository.ProductCategoryRepository;
@@ -25,6 +23,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductCategoryRepository productCategoryRepository;
+    private final com.nanum.domain.file.service.FileService fileService;
 
     @Transactional
     public Long createProduct(ProductDTO.Request request) {
@@ -38,7 +37,6 @@ public class ProductService {
                 .salePrice(request.getSalePrice())
                 .status(request.getStatus() != null ? request.getStatus() : ProductStatus.SALE)
                 .description(request.getDescription())
-                .thumbnailUrl(request.getThumbnailUrl())
                 .deleteYn("N")
                 .build();
 
@@ -56,20 +54,11 @@ public class ProductService {
             }
         }
 
-        // Add Images
-        if (request.getImages() != null) {
-            for (ProductDTO.Image imgDto : request.getImages()) {
-                ProductImage image = ProductImage.builder()
-                        .product(product)
-                        .imageUrl(imgDto.getImageUrl())
-                        .type(ProductImageType.valueOf(imgDto.getType()))
-                        .displayOrder(imgDto.getDisplayOrder())
-                        .build();
-                product.getImages().add(image);
-            }
-        }
-
         productRepository.save(product);
+
+        // Link Files
+        processFiles(request.getImages(), product.getId());
+
         return product.getId();
     }
 
@@ -78,8 +67,6 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        // Note: Full implementation would update options/images too.
-        // For brevity, we update main fields here.
         ProductCategory category = productCategoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
@@ -89,15 +76,19 @@ public class ProductService {
                 request.getPrice(),
                 request.getSalePrice(),
                 request.getStatus(),
-                request.getDescription(),
-                request.getThumbnailUrl());
+                request.getDescription());
+
+        // Update Files
+        processFiles(request.getImages(), productId);
     }
 
     @Transactional
-    public void deleteProduct(Long productId) {
+    public void deleteProduct(Long productId, String memberCode) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
-        product.setDeleteYn("Y");
+        product.delete(memberCode);
+        fileService.deleteByReference(com.nanum.domain.file.model.ReferenceType.PRODUCT, String.valueOf(productId),
+                memberCode);
     }
 
     public List<ProductDTO.Response> getProductList(Long categoryId) {
@@ -119,6 +110,12 @@ public class ProductService {
     }
 
     private ProductDTO.Response toResponse(Product product) {
+        List<com.nanum.domain.file.dto.FileResponseDTO> files = fileService
+                .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, String.valueOf(product.getId()))
+                .stream()
+                .map(com.nanum.domain.file.dto.FileResponseDTO::from)
+                .collect(Collectors.toList());
+
         return ProductDTO.Response.builder()
                 .productId(product.getId())
                 .categoryId(product.getCategory().getCategoryId())
@@ -127,7 +124,26 @@ public class ProductService {
                 .price(product.getPrice())
                 .salePrice(product.getSalePrice())
                 .status(product.getStatus())
-                .thumbnailUrl(product.getThumbnailUrl())
+                .files(files)
                 .build();
+    }
+
+    private void processFiles(List<ProductDTO.Image> images, Long productId) {
+        if (images == null || images.isEmpty())
+            return;
+
+        List<String> fileIds = images.stream()
+                .map(ProductDTO.Image::getFileId)
+                .filter(id -> id != null && !id.isEmpty())
+                .collect(Collectors.toList());
+
+        com.nanum.domain.file.model.ReferenceType type = com.nanum.domain.file.model.ReferenceType.PRODUCT;
+        fileService.updateFileReference(fileIds, type, String.valueOf(productId));
+
+        for (ProductDTO.Image img : images) {
+            if (img.getFileId() != null && "MAIN".equals(img.getType())) {
+                fileService.setMainImage(img.getFileId(), type, String.valueOf(productId));
+            }
+        }
     }
 }

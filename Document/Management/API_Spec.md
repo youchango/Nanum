@@ -76,6 +76,33 @@ Base URL: `/api/v1/products`
 | `GET` | `/` | 상품 목록 조회 | 카테고리 필터링 등 상품 목록을 조회합니다. (`categoryId` 포함) |
 | `GET` | `/{id}` | 상품 상세 조회 | 상품 상세 정보를 조회합니다. (`categoryId` 포함) |
 
+**Response Schema (`ProductDTO.Response`)**
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "productId": 1,
+    "categoryId": 10,
+    "categoryName": "의류",
+    "name": "나눔 티셔츠",
+    "price": 20000,
+    "salePrice": 15000,
+    "status": "SALE",
+
+    "files": [
+      {
+        "fileId": "uuid-...",
+        "orgName": "detail_image.jpg",
+        "path": "/uploads/PRODUCT/...",
+        "isMain": "Y",
+        "displayOrder": 0
+      }
+    ],
+    "options": []
+  }
+}
+```
+
 ## 5. Order (주문)
 
 ### 5.1 Admin Order (주문 관리)
@@ -128,22 +155,22 @@ Base URL: `/api/v1`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/admin/banners` | [Admin] 배너 목록 | 배너 관리 목록 조회 |
-| `POST` | `/admin/banners` | [Admin] 배너 등록 | 신규 배너 및 이미지 등록 |
-| `PUT` | `/admin/banners/{id}` | [Admin] 배너 수정 | 배너 정보(순서, 기간 등) 수정 |
+| `GET` | `/admin/banners` | [Admin] 배너 목록 | 배너 관리 목록 조회 (Files 포함) |
+| `POST` | `/admin/banners` | [Admin] 배너 등록 | 신규 배너 및 이미지 등록 (Multipart/form-data) |
+| `PUT` | `/admin/banners/{id}` | [Admin] 배너 수정 | 배너 정보 및 이미지 수정 (Multipart/form-data) |
 | `DELETE` | `/admin/banners/{id}` | [Admin] 배너 삭제 | 배너 삭제 |
-| `GET` | `/banners` | [User] 배너 목록 | 현재 노출 가능한 배너 리스트 조회 (위치별) |
+| `GET` | `/banners` | [User] 배너 목록 | 현재 노출 가능한 배너 리스트 조회 (Files 포함) |
 
 ### 7.4 Popup (팝업)
 Base URL: `/api/v1`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/admin/popups` | [Admin] 팝업 목록 | 팝업 관리 목록 조회 |
-| `POST` | `/admin/popups` | [Admin] 팝업 등록 | 신규 팝업 등록 |
-| `PUT` | `/admin/popups/{id}` | [Admin] 팝업 수정 | 팝업 정보 수정 |
+| `GET` | `/admin/popups` | [Admin] 팝업 목록 | 팝업 관리 목록 조회 (Files 포함) |
+| `POST` | `/admin/popups` | [Admin] 팝업 등록 | 신규 팝업 등록 (Multipart/form-data) |
+| `PUT` | `/admin/popups/{id}` | [Admin] 팝업 수정 | 팝업 정보 및 이미지 수정 (Multipart/form-data) |
 | `DELETE` | `/admin/popups/{id}` | [Admin] 팝업 삭제 | 팝업 삭제 |
-| `GET` | `/popups` | [User] 팝업 목록 | 현재 활성화된(기간, 사용여부) 팝업 목록 조회 |
+| `GET` | `/popups` | [User] 팝업 목록 | 현재 활성화된 팝업 목록 조회 (Files 포함) |
 
 ## 8. Wishlist (관심 상품)
 Base URL: `/api/v1/wishlist`

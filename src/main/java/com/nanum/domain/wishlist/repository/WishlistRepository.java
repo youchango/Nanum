@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
-    boolean existsByMemberMemberCodeAndProductProductId(String memberCode, Long productId);
+    boolean existsByMemberMemberCodeAndProduct_Id(String memberCode, Long productId);
 
-    Optional<Wishlist> findByMemberMemberCodeAndProductProductId(String memberCode, Long productId);
+    Optional<Wishlist> findByMemberMemberCodeAndProduct_Id(String memberCode, Long productId);
 
     Page<Wishlist> findAllByMemberMemberCode(String memberCode, Pageable pageable);
 
-    void deleteByMemberMemberCodeAndProductProductId(String memberCode, Long productId);
+    void deleteByMemberMemberCodeAndProduct_Id(String memberCode, Long productId);
 }

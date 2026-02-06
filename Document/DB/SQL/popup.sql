@@ -1,7 +1,6 @@
 CREATE TABLE popup (
     popup_id       INT AUTO_INCREMENT COMMENT '팝업코드',
     title          VARCHAR(100) NOT NULL COMMENT '팝업제목',
-    content_image  VARCHAR(255) NULL COMMENT '팝업이미지',
     content_html   TEXT NULL COMMENT '팝업내용(HTML)',
     link_type      VARCHAR(20) NULL COMMENT '링크 타입',
     link_url       VARCHAR(255) NULL COMMENT '링크 URL',
