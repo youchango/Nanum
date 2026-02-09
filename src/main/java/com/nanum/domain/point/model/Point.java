@@ -2,6 +2,7 @@ package com.nanum.domain.point.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -22,6 +23,10 @@ public class Point {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "point_id")
     private Long pointId;
+
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
 
     @Column(name = "point_use")
     private Integer pointUse;

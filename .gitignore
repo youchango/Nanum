@@ -4,6 +4,12 @@
 # Log file
 *.log
 
+# Text file
+*.txt
+
+# Python file
+*.py
+
 # BlueJ files
 *.ctxt
 

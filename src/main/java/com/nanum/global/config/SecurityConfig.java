@@ -60,11 +60,12 @@ public class SecurityConfig {
                         .requestMatchers("/resources/**", "/WEB-INF/**").permitAll()
                         .requestMatchers("/", "/login", "/admin/login", "/biz/login", "/signup").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll() // Allow Auth API
+                        .requestMatchers("/api/v1/admin/auth/**").permitAll() // Allow Admin Auth API
                         .requestMatchers("/api/v1/members/check-id").permitAll() // Allow ID Check API
                         .requestMatchers("/api/v1/categories/**", "/api/v1/products/**").permitAll() // Allow User
                                                                                                      // Public API
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow Swagger
-                        .requestMatchers("/admin/**", "/api/v1/admin/**").hasRole("MASTER")
+                        .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyRole("MASTER", "ADMIN", "SCM")
                         .requestMatchers("/biz/**", "/api/v1/biz/**").hasRole("BIZ")
                         .requestMatchers("/user/**", "/api/v1/user/**").hasRole("USER")
                         .anyRequest().authenticated())

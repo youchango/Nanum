@@ -10,6 +10,18 @@ Base URL: `/api/v1/auth`
 | `POST` | `/signup` | 회원가입 | 신규 회원을 등록합니다. |
 | `POST` | `/login` | 로그인 | Login ID/PW로 인증하여 Access/Refresh Token을 발급합니다. (Cookie) |
 | `POST` | `/refresh` | 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
+| `POST` | `/admin/auth/login` | 관리자 로그인 | 관리자 ID/PW로 인증하여 Access/Refresh Token을 발급합니다. |
+| `POST` | `/admin/auth/refresh` | 관리자 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
+
+## 1.1 Shop (상점 관리) [Master Only]
+Base URL: `/api/v1/admin/shops`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 상점 목록 조회 | 전체 상점 목록을 조회합니다. |
+| `POST` | `/` | 상점 등록 | 신규 상점을 등록합니다. (사이트 코드, 상점명 등) |
+| `GET` | `/{shopKey}` | 상점 상세 조회 | 상점 상세 정보를 조회합니다. |
+| `PUT` | `/{shopKey}` | 상점 수정 | 상점 정보를 수정합니다. |
 
 ## 2. Member (회원)
 
@@ -81,12 +93,13 @@ Base URL: `/api/v1/products`
 {
   "status": "SUCCESS",
   "data": {
+  "data": {
     "productId": 1,
-    "categoryId": 10,
+    "categoryId": [10, 12],
     "categoryName": "의류",
     "name": "나눔 티셔츠",
-    "price": 20000,
-    "salePrice": 15000,
+    "mapPrice": 20000,
+    "standardPrice": 15000,
     "status": "SALE",
 
     "files": [
@@ -180,3 +193,12 @@ Base URL: `/api/v1/wishlist`
 | `POST` | `/` | 찜하기 | 상품을 찜 목록에 추가하거나(Toggle) 등록합니다. |
 | `DELETE` | `/{productId}` | 찜 취소 | 상품을 찜 목록에서 제거합니다. |
 | `GET` | `/` | 찜 목록 조회 | 사용자의 찜 상품 목록을 상세 정보(`ProductDTO`)와 함께 페이징 조회합니다. |
+
+## 5.4 Claim Management (클레임 관리)
+Base URL: `/api/v1/admin/claims`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 클레임 목록 조회 | 클레임 목록을 조회합니다. |
+| `GET` | `/{id}` | 클레임 상세 조회 | 클레임 상세 정보를 조회합니다. |
+| `PUT` | `/{id}/status` | 클레임 상태 변경 | 클레임 상태(승인/반려/환불 등)를 변경합니다. |

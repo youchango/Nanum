@@ -2,7 +2,7 @@ package com.nanum.admin.order.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.domain.order.dto.OrderDTO;
-import com.nanum.user.order.service.OrderService;
+import com.nanum.admin.order.service.AdminOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,16 +13,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminOrderController {
 
-    private final OrderService orderService;
+    private final AdminOrderService adminOrderService;
 
     @GetMapping
-    public ApiResponse<List<OrderDTO.Response>> getAllOrders() {
-        return ApiResponse.success(orderService.getAllOrders());
+    public ApiResponse<List<OrderDTO.Response>> getAllOrders(@RequestParam(required = false) String siteCd) {
+        return ApiResponse.success(adminOrderService.getOrders(siteCd));
     }
 
     @PatchMapping("/{id}/status")
     public ApiResponse<String> updateStatus(@PathVariable Long id, @RequestBody OrderDTO.StatusUpdateRequest request) {
-        orderService.updateStatus(id, request);
+        adminOrderService.updateStatus(id, request);
         return ApiResponse.success("Order Status Updated");
     }
 }

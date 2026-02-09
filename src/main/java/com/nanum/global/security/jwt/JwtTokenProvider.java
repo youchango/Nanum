@@ -15,6 +15,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import com.nanum.admin.manager.service.CustomManagerDetails;
+import com.nanum.admin.manager.service.CustomManagerDetailsService;
+import com.nanum.global.security.CustomUserDetailsService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -34,16 +37,17 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token-validity-in-seconds:86400}") // 1 day
     private long refreshTokenValidityInSeconds;
 
-    private final com.nanum.global.security.CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final CustomManagerDetailsService managerDetailsService;
     private SecretKey key;
 
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         if (keyBytes.length < 32) {
-             this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+            this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
         } else {
-             this.key = Keys.hmacShaKeyFor(keyBytes);
+            this.key = Keys.hmacShaKeyFor(keyBytes);
         }
     }
 
@@ -60,12 +64,18 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        String userType = "MEMBER";
+        if (authentication.getPrincipal() instanceof CustomManagerDetails) {
+            userType = "MANAGER";
+        }
+
         long now = (new Date()).getTime();
         Date validity = new Date(now + validityInSeconds * 1000);
 
         return Jwts.builder()
                 .subject(authentication.getName())
                 .claim("auth", authorities)
+                .claim("userType", userType)
                 .issuedAt(new Date())
                 .expiration(validity)
                 .signWith(key)
@@ -79,7 +89,15 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+        String userType = (String) claims.get("userType");
+        UserDetails userDetails;
+
+        if ("MANAGER".equals(userType)) {
+            userDetails = managerDetailsService.loadUserByUsername(claims.getSubject());
+        } else {
+            userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
+        }
+
         return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
@@ -108,7 +126,7 @@ public class JwtTokenProvider {
                 }
             }
         }
-        
+
         // Fallback to Header
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

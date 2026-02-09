@@ -24,6 +24,10 @@ public class OrderMaster extends BaseTimeEntity {
     @Column(name = "order_name")
     private String orderName;
 
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private Member member;

@@ -22,6 +22,10 @@ public class Popup extends BaseTimeEntity {
     @Column(name = "popup_id")
     private Long id;
 
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
+
     @Column(nullable = false)
     private String title;
 

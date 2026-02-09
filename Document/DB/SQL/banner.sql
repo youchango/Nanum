@@ -1,5 +1,6 @@
 CREATE TABLE banner (
     banner_id      INT AUTO_INCREMENT COMMENT '배너코드',
+    site_cd        VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
     banner_type    VARCHAR(20) NOT NULL COMMENT '배너구분 (MAIN_TOP, SUB_MID)',
     link_type      VARCHAR(20) NULL COMMENT '링크 타입',
     link_url       VARCHAR(255) NULL COMMENT '링크 URL',

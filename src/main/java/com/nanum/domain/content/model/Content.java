@@ -22,6 +22,10 @@ public class Content extends BaseTimeEntity {
     @Column(name = "content_id")
     private Long id;
 
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
+
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "content_type", nullable = false)
     private ContentType type;

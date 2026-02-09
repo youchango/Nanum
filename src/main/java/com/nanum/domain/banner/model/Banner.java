@@ -22,6 +22,10 @@ public class Banner extends BaseTimeEntity {
     @Column(name = "banner_id")
     private Long id;
 
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "banner_type", nullable = false)
     private BannerType type;

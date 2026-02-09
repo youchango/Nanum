@@ -23,6 +23,10 @@ public class Inquiry extends BaseTimeEntity {
     @Column(name = "inquiry_id")
     private Long id;
 
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
+
     @Enumerated(EnumType.ORDINAL) // init_db.sql defines INT. Mapping might need Code converter or just ordinal if
                                   // aligned.
     // Plan suggested Enum. Let's strictly map to DB definition 'inquiry_type INT'.

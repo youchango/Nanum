@@ -15,8 +15,9 @@ public class AdminProductListDTO {
     private Long categoryId;
     private String categoryName;
     private String name;
-    private int price;
-    private int salePrice;
+    private int supplyPrice;
+    private int mapPrice;
+    private int standardPrice;
     private ProductStatus status;
 
     private int viewCount;

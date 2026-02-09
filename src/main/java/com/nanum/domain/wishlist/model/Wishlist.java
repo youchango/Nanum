@@ -7,13 +7,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "product_wishlist", uniqueConstraints = {
+@Table(name = "wishlist", uniqueConstraints = {
         @UniqueConstraint(name = "uq_wishlist_user_prod", columnNames = { "member_code", "product_id" })
 })
 @Getter
@@ -25,6 +26,10 @@ public class Wishlist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "wishlist_id")
     private Long wishlistId;
+
+    @Column(name = "site_cd", length = 20)
+    @ColumnDefault("'SITECD000001'")
+    private String siteCd;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code", nullable = false)

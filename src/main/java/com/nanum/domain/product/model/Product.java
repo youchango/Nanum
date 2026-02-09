@@ -24,20 +24,25 @@ public class Product extends BaseTimeEntity {
     @Column(name = "product_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private ProductCategory category;
+    @ManyToMany
+    @JoinTable(name = "product_category_by", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @Builder.Default
+    private List<ProductCategory> categories = new ArrayList<>();
 
     @Column(name = "product_name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "supply_price", nullable = false)
     @ColumnDefault("0")
-    private int price;
+    private int supplyPrice;
 
-    @Column(name = "sale_price")
+    @Column(name = "map_price", nullable = false)
     @ColumnDefault("0")
-    private int salePrice;
+    private int mapPrice;
+
+    @Column(name = "standard_price")
+    @ColumnDefault("0")
+    private int standardPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -74,21 +79,21 @@ public class Product extends BaseTimeEntity {
     private List<ProductOption> options = new ArrayList<>();
 
     // Business Methods
-    public void update(String name, int price, int salePrice, String description,
+    public void update(String name, int mapPrice, int standardPrice, String description,
             ProductStatus status) {
         this.name = name;
-        this.price = price;
-        this.salePrice = salePrice;
+        this.mapPrice = mapPrice;
+        this.standardPrice = standardPrice;
         this.description = description;
         this.status = status;
     }
 
-    public void updateInfo(ProductCategory category, String name, int price, int salePrice,
+    public void updateInfo(List<ProductCategory> categories, String name, int mapPrice, int standardPrice,
             ProductStatus status, String description) {
-        this.category = category;
+        this.categories = categories;
         this.name = name;
-        this.price = price;
-        this.salePrice = salePrice;
+        this.mapPrice = mapPrice;
+        this.standardPrice = standardPrice;
         this.status = status;
         this.description = description;
     }
