@@ -53,6 +53,10 @@ public class Manager {
     @ColumnDefault("'Y'")
     private String useYn;
 
+    @Column(name = "apply_yn", length = 1, nullable = false)
+    @ColumnDefault("'N'")
+    private String applyYn;
+
     @Column(name = "delete_yn", length = 1, nullable = false)
     @ColumnDefault("'N'")
     private String deleteYn;
@@ -88,5 +92,10 @@ public class Manager {
     @PreUpdate
     public void preUpdate() {
         this.updateDate = LocalDateTime.now();
+    }
+
+    public void approve() {
+        this.applyYn = "Y";
+        this.useYn = "Y";
     }
 }

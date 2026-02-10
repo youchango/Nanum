@@ -23,6 +23,15 @@ Base URL: `/api/v1/admin/shops`
 | `GET` | `/{shopKey}` | 상점 상세 조회 | 상점 상세 정보를 조회합니다. |
 | `PUT` | `/{shopKey}` | 상점 수정 | 상점 정보를 수정합니다. |
 
+## 1.2 Manager (관리자 관리) [Master Only]
+Base URL: `/api/v1/admin/managers`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 관리자 목록 조회 | 전체 관리자 목록을 조회합니다. (`applyYn` 필터 가능) |
+| `POST` | `/` | 관리자 생성 | 신규 관리자 계정을 생성합니다. (승인 대기 상태로 생성됨) |
+| `POST` | `/{id}/approve` | 관리자 승인 | 승인 대기 중인 관리자 계정을 승인합니다. |
+
 ## 2. Member (회원)
 
 ### 2.1 Admin (관리자용)

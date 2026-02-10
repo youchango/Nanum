@@ -41,6 +41,8 @@ public class ManagerDTO {
         private String type; // MASTER, SCM, ADMIN
         private Integer authGroupSeq;
         private LocalDateTime lastLoginDate;
+        private String siteCd;
+        private String applyYn;
 
         public static ManagerInfo from(Manager manager) {
             return ManagerInfo.builder()
@@ -51,6 +53,8 @@ public class ManagerDTO {
                     .type(manager.getMbType())
                     .authGroupSeq(manager.getAuthGroupSeq())
                     .lastLoginDate(manager.getLoginDate())
+                    .siteCd(manager.getSiteCd())
+                    .applyYn(manager.getApplyYn())
                     .build();
         }
     }
@@ -68,5 +72,6 @@ public class ManagerDTO {
         private Integer authGroupSeq;
         private String type;
         private String description;
+        private String siteCd;
     }
 }

@@ -12,6 +12,7 @@ CREATE TABLE manager (
     manager_name     VARCHAR(50) NOT NULL COMMENT '이름',
     manager_email    VARCHAR(50) NOT NULL COMMENT '이메일',
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
+    apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     description      VARCHAR(200) NULL COMMENT '설명',
     regist_by        VARCHAR(20) NOT NULL COMMENT '등록자',

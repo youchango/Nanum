@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ManagerRepository extends JpaRepository<Manager, Integer> {
+public interface ManagerRepository extends JpaRepository<Manager, Long> {
     Optional<Manager> findByManagerId(String managerId);
+
+    java.util.List<Manager> findAllByApplyYn(String applyYn);
+
+    java.util.List<Manager> findAll();
 }

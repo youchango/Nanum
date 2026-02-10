@@ -27,6 +27,19 @@ public class ManagerController {
         return ResponseEntity.ok().build();
     }
 
+    @org.springframework.web.bind.annotation.GetMapping("/managers")
+    public ResponseEntity<java.util.List<ManagerDTO.ManagerInfo>> getManagers(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String applyYn) {
+        return ResponseEntity.ok(managerService.getManagers(applyYn));
+    }
+
+    @PostMapping("/managers/{id}/approve")
+    public ResponseEntity<Void> approveManager(
+            @org.springframework.web.bind.annotation.PathVariable Long id) {
+        managerService.approveManager(id);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/auth/refresh")
     public ResponseEntity<ManagerDTO.LoginResponse> refresh(jakarta.servlet.http.HttpServletRequest request,
             jakarta.servlet.http.HttpServletResponse response) {
