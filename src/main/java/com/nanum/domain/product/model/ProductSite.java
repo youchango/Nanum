@@ -1,6 +1,6 @@
 package com.nanum.domain.product.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ProductSite extends BaseTimeEntity {
+public class ProductSite extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,3 +63,4 @@ public class ProductSite extends BaseTimeEntity {
         this.cPrice = cPrice;
     }
 }
+

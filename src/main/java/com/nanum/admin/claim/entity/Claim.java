@@ -122,6 +122,6 @@ public class Claim {
     @Column(name = "refund_manager_cd", length = 30)
     private String refundManagerCd;
 
-    @Column(name = "reg_by", length = 30)
-    private String regBy;
+    @Column(name = "created_by", length = 30)
+    private String createdBy;
 }

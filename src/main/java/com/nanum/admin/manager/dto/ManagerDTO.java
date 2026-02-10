@@ -39,10 +39,11 @@ public class ManagerDTO {
         private String name;
         private String email;
         private String type; // MASTER, SCM, ADMIN
-        private Integer authGroupSeq;
+        private Long authGroupSeq;
         private LocalDateTime lastLoginDate;
         private String siteCd;
         private String applyYn;
+        private ManagerScmDTO.Info scmInfo;
 
         public static ManagerInfo from(Manager manager) {
             return ManagerInfo.builder()
@@ -51,10 +52,11 @@ public class ManagerDTO {
                     .name(manager.getManagerName())
                     .email(manager.getManagerEmail())
                     .type(manager.getMbType())
-                    .authGroupSeq(manager.getAuthGroupSeq())
+                    .authGroupSeq(manager.getAuthGroup() != null ? manager.getAuthGroup().getAuthGroupSeq() : null)
                     .lastLoginDate(manager.getLoginDate())
                     .siteCd(manager.getSiteCd())
                     .applyYn(manager.getApplyYn())
+                    .scmInfo(manager.getManagerScm() != null ? ManagerScmDTO.Info.from(manager.getManagerScm()) : null)
                     .build();
         }
     }
@@ -69,9 +71,10 @@ public class ManagerDTO {
         private String password;
         private String name;
         private String email;
-        private Integer authGroupSeq;
+        private Long authGroupSeq;
         private String type;
         private String description;
         private String siteCd;
+        private ManagerScmDTO.Info scmInfo;
     }
 }

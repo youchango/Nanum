@@ -102,8 +102,7 @@ public class CodeController {
         }
 
         try {
-            String updatedBy = userDetails.getMember().getMemberCode();
-            codeService.updateCode(codeDTO, updatedBy);
+            codeService.updateCode(codeDTO);
             return ResponseEntity.ok(ApiResponse.success("코드가 수정되었습니다.", null));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));

@@ -101,7 +101,7 @@ public class AdminProductService {
                                 .status(request.getStatus())
                                 .description(request.getDescription())
                                 .supplyPrice(request.getSupplyPrice())
-                                .deleteYn("N")
+                                .viewCount(0)
                                 .build();
 
                 // Check if options exist and add them

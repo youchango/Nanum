@@ -35,3 +35,5 @@
 ## 9. System
 - `/admin/codes`: 공통 코드 관리 (`CodeListPage.tsx`)
 - `/admin/system/terms`: 약관 관리 (`TermsManagePage.tsx`)
+- `/admin/system/auth-groups`: 권한 그룹 관리 (`AuthGroupPage.tsx`)
+- `/admin/system/menus`: 메뉴 관리 (`MenuPage.tsx`)

@@ -1,12 +1,14 @@
 package com.nanum.admin.manager.entity;
 
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "manager_menu")
@@ -16,15 +18,20 @@ import java.time.LocalDateTime;
 @Builder
 @DynamicInsert
 @DynamicUpdate
-public class ManagerMenu {
+public class ManagerMenu extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_seq")
-    private Integer menuSeq;
+    private Long menuSeq;
 
-    @Column(name = "parent_menu_seq")
-    private Integer parentMenuSeq;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_menu_seq")
+    private ManagerMenu parent;
+
+    @OneToMany(mappedBy = "parent")
+    @Builder.Default
+    private List<ManagerMenu> children = new ArrayList<>();
 
     @Column(name = "menu_name", length = 100, nullable = false)
     private String menuName;
@@ -33,35 +40,25 @@ public class ManagerMenu {
     private String programUrl;
 
     @Column(name = "display_yn", length = 1, nullable = false)
-    private String displayYn;
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private String displayYn = "Y";
 
     @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Column(name = "regist_by", length = 200, nullable = false)
-    private String registBy;
-
-    @Column(name = "regist_date", nullable = false, updatable = false)
-    private LocalDateTime registDate;
-
-    @Column(name = "update_by", length = 200, nullable = false)
-    private String updateBy;
-
-    @Column(name = "update_date", nullable = false)
-    private LocalDateTime updateDate;
-
     @Column(name = "program_parameter", length = 100, nullable = false)
     @ColumnDefault("''")
-    private String programParameter;
+    @Builder.Default
+    private String programParameter = "";
 
-    @PrePersist
-    public void prePersist() {
-        this.registDate = LocalDateTime.now();
-        this.updateDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updateDate = LocalDateTime.now();
+    public void update(String menuName, String programUrl, String displayYn, Integer displayOrder,
+            String programParameter, ManagerMenu parent) {
+        this.menuName = menuName;
+        this.programUrl = programUrl;
+        this.displayYn = displayYn;
+        this.displayOrder = displayOrder;
+        this.programParameter = programParameter;
+        this.parent = parent;
     }
 }

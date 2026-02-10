@@ -1,4 +1,4 @@
--- -----------------------------------------------------
+﻿-- -----------------------------------------------------
 -- Shop Information
 -- -----------------------------------------------------
 CREATE TABLE shop_info (
@@ -23,9 +23,9 @@ CREATE TABLE shop_info (
     shop_dam_position VARCHAR(20) NULL COMMENT '담당자직급',
     shop_dam_phone   VARCHAR(20) NULL COMMENT '담당자연락처',
     shop_dam_email   VARCHAR(50) NULL COMMENT '담당자이메일',
-    shop_bank_account_name VARCHAR(20) NULL COMMENT '예금주',
     shop_bank_name   VARCHAR(20) NULL COMMENT '은행명',
     shop_bank_account_num VARCHAR(50) NULL COMMENT '계좌번호',
+    shop_bank_account_name VARCHAR(20) NULL COMMENT '예금주',
     shop_set_product_use_max_point DECIMAL(19, 4) DEFAULT 0 NULL COMMENT '포인트사용최대치',
     shop_set_product_acc_point DECIMAL(19, 4) DEFAULT 0 NULL COMMENT '포인트적립율',
     shop_insert_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',

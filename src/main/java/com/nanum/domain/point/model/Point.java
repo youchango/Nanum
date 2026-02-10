@@ -7,7 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.nanum.domain.member.model.Member;
-import com.nanum.domain.payment.model.Payment;
+import com.nanum.domain.payment.model.PaymentMaster;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +40,7 @@ public class Point {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
-    private Payment payment;
+    private PaymentMaster payment;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -50,7 +50,7 @@ public class Point {
     private Long createdBy;
 
     @Builder
-    public Point(Integer pointUse, String pointBigo, Member member, Payment payment) {
+    public Point(Integer pointUse, String pointBigo, Member member, PaymentMaster payment) {
         this.pointUse = pointUse;
         this.pointBigo = pointBigo;
         this.member = member;

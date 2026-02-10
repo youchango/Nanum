@@ -42,11 +42,11 @@ public class OrderDTO {
     public static class Response {
         private Long orderId;
         private String orderName;
-        private Long totalAmount;
+        private java.math.BigDecimal totalPrice;
         private OrderStatus status;
         private String receiverName;
-        private LocalDateTime createdAt;
-        private List<OrderDetailResponse> items;
+        private java.time.LocalDateTime createdAt;
+        private java.util.List<OrderDetailResponse> items;
     }
 
     @Getter

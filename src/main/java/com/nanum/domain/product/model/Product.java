@@ -1,6 +1,6 @@
 package com.nanum.domain.product.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE product SET delete_yn = 'Y', deleted_at = NOW() WHERE product_id = ?")
-public class Product extends BaseTimeEntity {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,9 @@ public class Product extends BaseTimeEntity {
 
     @Column(name = "product_name", nullable = false)
     private String name;
+
+    @Column(name = "brand_name", length = 100)
+    private String brandName;
 
     @Column(name = "supply_price", nullable = false)
     @ColumnDefault("0")
@@ -55,24 +58,6 @@ public class Product extends BaseTimeEntity {
     @Column(name = "view_count")
     @ColumnDefault("0")
     private int viewCount;
-
-    @Column(name = "delete_yn", nullable = false)
-    @ColumnDefault("'N'")
-    @Builder.Default
-    private String deleteYn = "N";
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    // Helper for delete
-    public void delete(String memberCode) {
-        this.deleteYn = "Y";
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = memberCode;
-    }
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

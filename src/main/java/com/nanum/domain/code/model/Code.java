@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "code")
-public class Code {
+public class Code extends com.nanum.global.common.dto.BaseEntity {
 
     /**
      * 코드 ID (PK)
@@ -61,60 +61,4 @@ public class Code {
     @Column(name = "use_yn")
     private String useYn;
 
-    /**
-     * 삭제 여부 (Y/N)
-     */
-    @Column(name = "delete_yn", insertable = false)
-    private String deleteYn;
-
-    /**
-     * 생성일시
-     */
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    /**
-     * 생성자 ID
-     */
-    @Column(name = "created_by", updatable = false)
-    private String createdBy;
-
-    /**
-     * 수정일시
-     */
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    /**
-     * 수정자 ID
-     */
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    /**
-     * 삭제일시
-     */
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    /**
-     * 삭제자 ID
-     */
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    @PrePersist
-    public void prePersist() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-        if (this.deleteYn == null) {
-            this.deleteYn = "N";
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

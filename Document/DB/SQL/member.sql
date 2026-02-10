@@ -1,4 +1,4 @@
-CREATE TABLE member (
+﻿CREATE TABLE member (
     id               INT AUTO_INCREMENT COMMENT 'ID',
     member_code      VARCHAR(20) NOT NULL COMMENT '회원코드',
     member_id        VARCHAR(50) NOT NULL COMMENT '회원아이디',

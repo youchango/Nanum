@@ -1,20 +1,20 @@
 package com.nanum.user.payment.repository;
 
 import com.nanum.domain.payment.dto.PaymentSearchDto;
-import com.nanum.domain.payment.model.Payment;
-import com.nanum.domain.payment.model.QPayment;
-import com.nanum.domain.member.model.QMember;
+import com.nanum.domain.payment.model.PaymentMaster;
 import com.nanum.domain.payment.model.PaymentStatus;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.nanum.domain.payment.model.QPaymentMaster;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -24,50 +24,42 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Payment> searchPayments(PaymentSearchDto searchDto, Pageable pageable) {
-        QPayment payment = QPayment.payment;
-        QMember member = QMember.member;
+    public Page<PaymentMaster> searchPayments(PaymentSearchDto paymentSearchDto, Pageable pageable) {
+        QPaymentMaster paymentMaster = QPaymentMaster.paymentMaster;
 
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (StringUtils.hasText(searchDto.getMemberName())) {
-            builder.and(payment.member.memberName.contains(searchDto.getMemberName()));
-        }
-
-        if (StringUtils.hasText(searchDto.getPaymentMethod())) {
-            builder.and(payment.paymentMethod.eq(searchDto.getPaymentMethod()));
-        }
-
-        if (searchDto.getPaymentStatus() != null) {
-            builder.and(payment.paymentStatus.eq(searchDto.getPaymentStatus()));
-        }
-
-        if (searchDto.getStartDate() != null) {
-            builder.and(payment.paymentDate.goe(searchDto.getStartDate().atStartOfDay()));
-        }
-
-        if (searchDto.getEndDate() != null) {
-            builder.and(payment.paymentDate.loe(searchDto.getEndDate().atTime(23, 59, 59)));
-        }
-
-        List<Payment> content = queryFactory
-                .selectFrom(payment)
-                .leftJoin(payment.member, member).fetchJoin()
-                .where(builder)
-                .orderBy(payment.paymentDate.desc())
+        List<PaymentMaster> content = queryFactory
+                .selectFrom(paymentMaster)
+                .where(
+                        paymentDateBetween(paymentSearchDto.getStartDate(), paymentSearchDto.getEndDate()),
+                        paymentStatusEq(paymentSearchDto.getPaymentStatus()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(paymentMaster.paymentId.desc())
                 .fetch();
 
-        JPAQuery<Long> countQuery = queryFactory
-                .select(payment.count())
-                .from(payment)
-                .where(builder);
-
-        Long total = countQuery.fetchOne();
-        if (total == null)
-            total = 0L;
+        long total = queryFactory
+                .selectFrom(paymentMaster)
+                .where(
+                        paymentDateBetween(paymentSearchDto.getStartDate(), paymentSearchDto.getEndDate()),
+                        paymentStatusEq(paymentSearchDto.getPaymentStatus()))
+                .fetch().size();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private BooleanExpression paymentDateBetween(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return null;
+        }
+        return QPaymentMaster.paymentMaster.paymentDate.between(
+                LocalDateTime.of(startDate, LocalTime.MIN),
+                LocalDateTime.of(endDate, LocalTime.MAX));
+    }
+
+    private BooleanExpression paymentStatusEq(PaymentStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return QPaymentMaster.paymentMaster.paymentStatus.eq(status);
     }
 }

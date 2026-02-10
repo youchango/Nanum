@@ -1,6 +1,6 @@
 package com.nanum.domain.member.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class MemberBiz extends BaseTimeEntity {
+public class MemberBiz extends BaseEntity {
 
     @Id
     @Column(name = "member_code")
@@ -41,3 +41,4 @@ public class MemberBiz extends BaseTimeEntity {
         this.memberCode = member.getMemberCode();
     }
 }
+

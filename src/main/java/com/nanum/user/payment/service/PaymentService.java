@@ -8,8 +8,8 @@ import com.nanum.domain.payment.dto.PaymentSearchDto;
 import com.nanum.domain.point.dto.PointDto;
 import com.nanum.domain.point.dto.PointSearchDto;
 
-public interface BillingService {
-    void generateBill(String memberCode, Integer amount);
+public interface PaymentService {
+    void createPayment(String memberCode, Integer amount);
 
     void processPayment(Long paymentId, String method, Integer usedPoint);
 

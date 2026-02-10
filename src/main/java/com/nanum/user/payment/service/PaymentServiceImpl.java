@@ -10,7 +10,8 @@ import com.nanum.domain.member.model.Member;
 import com.nanum.user.member.repository.MemberRepository;
 import com.nanum.domain.payment.dto.PaymentDto;
 import com.nanum.domain.payment.dto.PaymentSearchDto;
-import com.nanum.domain.payment.model.Payment;
+import com.nanum.domain.payment.model.PaymentMaster;
+import com.nanum.domain.payment.model.PaymentMethod;
 import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.user.payment.repository.PaymentRepository;
 import com.nanum.domain.point.dto.PointDto;
@@ -18,10 +19,12 @@ import com.nanum.domain.point.dto.PointSearchDto;
 import com.nanum.domain.point.model.Point;
 import com.nanum.user.point.repository.PointRepository;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BillingServiceImpl implements BillingService {
+public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PointRepository pointRepository;
@@ -29,16 +32,22 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     @Transactional
-    public void generateBill(String memberCode, Integer amount) {
+    public void createPayment(String memberCode, Integer amount) {
+        // TODO: Update this method to handle Order creation or linking if needed.
+        // For now, adapting to PaymentMaster creation.
         Member member = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
-        Payment payment = Payment.builder()
+        PaymentMaster payment = PaymentMaster.builder()
                 .member(member)
-                .paymentAmount(amount)
-                .usedPoint(0)
+                .totalPrice(BigDecimal.valueOf(amount))
+                .paymentPrice(BigDecimal.valueOf(amount))
+                .usedPoint(BigDecimal.ZERO)
+                .usedCoupon(BigDecimal.ZERO)
+                .deliveryPrice(BigDecimal.ZERO)
+                .discountPrice(BigDecimal.ZERO)
                 .paymentStatus(PaymentStatus.PENDING)
-                .paymentMethod("NONE")
+                // .paymentMethod(PaymentMethod.CARD) // Default or null?
                 .build();
 
         paymentRepository.save(payment);
@@ -47,39 +56,49 @@ public class BillingServiceImpl implements BillingService {
     @Override
     @Transactional
     public void processPayment(Long paymentId, String method, Integer usedPoint) {
-        Payment payment = paymentRepository.findById(paymentId)
+        PaymentMaster payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
 
         if (PaymentStatus.PAID.equals(payment.getPaymentStatus())) {
             throw new IllegalStateException("Already paid");
         }
 
+        BigDecimal pointUsage = BigDecimal.valueOf(usedPoint);
+
         // Logic for point usage
         if (usedPoint > 0) {
             // Check if user has enough points - Need logic to calculate total points
             // For now assume valid and save history
-            Point pointUsage = Point.builder()
+            Point point = Point.builder()
                     .member(payment.getMember())
                     .pointUse(-usedPoint)
-                    .pointBigo("Payment usage for bill: " + paymentId)
+                    .pointBigo("Payment usage for payment: " + paymentId)
                     .payment(payment)
                     .build();
-            pointRepository.save(pointUsage);
+            pointRepository.save(point);
         }
 
         payment.setPaymentStatus(PaymentStatus.PAID);
-        payment.setPaymentMethod(method);
-        payment.setUsedPoint(usedPoint);
+        // payment.setPaymentMethod(PaymentMethod.valueOf(method)); // Need to handle
+        // String to Enum conversion safely
+        try {
+            payment.setPaymentMethod(PaymentMethod.valueOf(method));
+        } catch (IllegalArgumentException e) {
+            // Handle invalid method or Default
+        }
+
+        payment.setUsedPoint(pointUsage);
         payment.setPaymentDate(java.time.LocalDateTime.now());
 
         // Point accumulation (e.g., 1%)
         /*
-         * int pointEarn = (int) (payment.getPaymentAmount() * 0.01);
-         * if (pointEarn > 0) {
+         * BigDecimal pointEarn =
+         * payment.getPaymentPrice().multiply(BigDecimal.valueOf(0.01));
+         * if (pointEarn.compareTo(BigDecimal.ZERO) > 0) {
          * Point pointAcc = Point.builder()
          * .member(payment.getMember())
-         * .pointUse(pointEarn)
-         * .pointBigo("Payment accumulation for bill: " + paymentId)
+         * .pointUse(pointEarn.intValue())
+         * .pointBigo("Payment accumulation for payment: " + paymentId)
          * .payment(payment)
          * .build();
          * pointRepository.save(pointAcc);
@@ -90,21 +109,22 @@ public class BillingServiceImpl implements BillingService {
     @Override
     @Transactional
     public void cancelPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
+        PaymentMaster payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
 
         if (!PaymentStatus.PAID.equals(payment.getPaymentStatus())) {
-            throw new IllegalStateException("Cannot cancel unpaid bill");
+            throw new IllegalStateException("Cannot cancel unpaid payment");
         }
 
         payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        payment.setCancelTotalPrice(payment.getPaymentPrice()); // Simple cancel logic
 
         // Refund points if used
-        if (payment.getUsedPoint() > 0) {
+        if (payment.getUsedPoint().compareTo(BigDecimal.ZERO) > 0) {
             Point pointRefund = Point.builder()
                     .member(payment.getMember())
-                    .pointUse(payment.getUsedPoint())
-                    .pointBigo("Refund for cancelled bill: " + paymentId)
+                    .pointUse(payment.getUsedPoint().intValue())
+                    .pointBigo("Refund for cancelled payment: " + paymentId)
                     .payment(payment)
                     .build();
             pointRepository.save(pointRefund);
@@ -121,7 +141,7 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     public PaymentDto getPaymentDetail(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
+        PaymentMaster payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
         return new PaymentDto(payment);
     }

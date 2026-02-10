@@ -48,7 +48,6 @@ public class AdminPopupService {
                 .startDatetime(request.getStartDatetime())
                 .endDatetime(request.getEndDatetime())
                 .useYn(request.getUseYn())
-                .deleteYn("N")
                 .build();
         popupRepository.save(popup);
 

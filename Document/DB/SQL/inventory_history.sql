@@ -1,4 +1,4 @@
--- [NEW] Inventory History (Product Stock In/Out) - Master/Detail Structure
+﻿-- [NEW] Inventory History (Product Stock In/Out) - Master/Detail Structure
 
 -- 1. Inventory History Master
 -- 재고 변동의 공통 정보(날짜, 담당자, 전체 비고)를 관리

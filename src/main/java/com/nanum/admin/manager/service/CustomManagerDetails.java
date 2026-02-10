@@ -51,6 +51,6 @@ public class CustomManagerDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return "Y".equals(manager.getUseYn());
+        return "Y".equals(manager.getUseYn()) && "N".equals(manager.getDeleteYn());
     }
 }

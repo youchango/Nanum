@@ -1,6 +1,6 @@
 package com.nanum.domain.delivery.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Delivery extends BaseTimeEntity {
+public class Delivery extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +22,14 @@ public class Delivery extends BaseTimeEntity {
     @Column(name = "order_id", nullable = false, unique = true)
     private Long orderId;
 
-    @Column(name = "courier_company")
-    private String courierCompany;
+    @Column(name = "order_no", nullable = false, length = 50)
+    private String orderNo;
+
+    @Column(name = "order_detail_id", nullable = false)
+    private Long orderDetailId;
+
+    @Column(name = "delivery_corp", length = 200)
+    private String deliveryCorp;
 
     @Column(name = "tracking_number")
     private String trackingNumber;

@@ -1,4 +1,4 @@
-CREATE TABLE popup (
+﻿CREATE TABLE popup (
     popup_id       INT AUTO_INCREMENT COMMENT '팝업코드',
     site_cd        VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
     title          VARCHAR(100) NOT NULL COMMENT '팝업제목',

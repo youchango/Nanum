@@ -41,7 +41,7 @@ public class ProductService {
                 .description(request.getDescription())
                 .supplyPrice(0) // Default for user side creation? Or maybe not needed if nullable? Entity says
                                 // nullable=false, default 0.
-                .deleteYn("N")
+                .viewCount(0)
                 .build();
 
         // Add Options

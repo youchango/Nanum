@@ -96,6 +96,14 @@
 - [x] 관리자/사용자 뷰 분리
 - [x] 연관 파일 Cascading Delete 처리
 
+## 시스템 안정화 및 표준화 (System Stabilization)
+- [x] **Audit Column 표준화 (Standardization)**
+  - [x] DB 스키마 (`created_at`, `created_by`, `updated_at`, `updated_by` 등) 통일
+  - [x] Entity 리팩토링 (`BaseEntity` 적용 및 중복 제거)
+  - [x] `merge_sql.py` 스크립트 수정 및 `init_db.sql` 재생성
+  - [x] SQL 파일 UTF-8 인코딩 점검 및 BOM 제거
+
+
 ## 프론트엔드 리팩토링 (Nanum_Master)
 - [x] 서비스 계층 분리 (`memberService.ts`)
 - [x] 페이지 리팩토링 (`MemberListPage.tsx`)

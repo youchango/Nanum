@@ -1,4 +1,4 @@
-CREATE TABLE inquiry (
+﻿CREATE TABLE inquiry (
     inquiry_id   INT AUTO_INCREMENT COMMENT '문의코드',
     site_cd      VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
     inquiry_type INT NOT NULL COMMENT '문의구분 (코드ID)',

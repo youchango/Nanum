@@ -66,7 +66,7 @@ public class AdminOrderService {
         return OrderDTO.Response.builder()
                 .orderId(order.getOrderId())
                 .orderName(order.getOrderName())
-                .totalAmount(order.getTotalAmount())
+                .totalPrice(order.getTotalPrice())
                 .status(order.getStatus())
                 .receiverName(order.getReceiverName())
                 .createdAt(order.getCreatedAt())

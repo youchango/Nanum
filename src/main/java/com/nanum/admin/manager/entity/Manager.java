@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @DynamicInsert
 @DynamicUpdate
-public class Manager {
+public class Manager extends com.nanum.global.common.dto.BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,8 +40,12 @@ public class Manager {
     @ColumnDefault("0")
     private Integer loginFailCount;
 
-    @Column(name = "auth_group_seq", nullable = false)
-    private Integer authGroupSeq;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auth_group_seq")
+    private ManagerAuthGroup authGroup;
+
+    @OneToOne(mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ManagerScm managerScm;
 
     @Column(name = "manager_name", length = 50, nullable = false)
     private String managerName;
@@ -51,30 +55,16 @@ public class Manager {
 
     @Column(name = "use_yn", length = 1, nullable = false)
     @ColumnDefault("'Y'")
-    private String useYn;
+    @Builder.Default
+    private String useYn = "Y";
 
     @Column(name = "apply_yn", length = 1, nullable = false)
     @ColumnDefault("'N'")
-    private String applyYn;
-
-    @Column(name = "delete_yn", length = 1, nullable = false)
-    @ColumnDefault("'N'")
-    private String deleteYn;
+    @Builder.Default
+    private String applyYn = "N";
 
     @Column(name = "description", length = 200)
     private String description;
-
-    @Column(name = "regist_by", length = 20, nullable = false)
-    private String registBy;
-
-    @Column(name = "regist_date", nullable = false, updatable = false)
-    private LocalDateTime registDate;
-
-    @Column(name = "update_by", length = 20, nullable = false)
-    private String updateBy;
-
-    @Column(name = "update_date", nullable = false)
-    private LocalDateTime updateDate;
 
     @Column(name = "login_date")
     private LocalDateTime loginDate;
@@ -82,17 +72,6 @@ public class Manager {
     @Column(name = "mb_type", length = 20, nullable = false)
     @ColumnDefault("''")
     private String mbType; // MASTER, SCM, ADMIN
-
-    @PrePersist
-    public void prePersist() {
-        this.registDate = LocalDateTime.now();
-        this.updateDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updateDate = LocalDateTime.now();
-    }
 
     public void approve() {
         this.applyYn = "Y";

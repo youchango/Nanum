@@ -2,8 +2,10 @@ package com.nanum.admin.manager.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,33 +15,30 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @IdClass(ManagerMenuGroupId.class)
+@EntityListeners(AuditingEntityListener.class)
 public class ManagerMenuGroup {
 
     @Id
     @Column(name = "auth_group_seq")
-    private Integer authGroupSeq;
+    private Long authGroupSeq;
 
     @Id
     @Column(name = "menu_seq")
-    private Integer menuSeq;
+    private Long menuSeq;
 
-    @Column(name = "regist_by", length = 200, nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auth_group_seq", insertable = false, updatable = false)
+    private ManagerAuthGroup authGroup;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_seq", insertable = false, updatable = false)
+    private ManagerMenu menu;
+
+    @CreatedBy
+    @Column(name = "regist_by", length = 200, updatable = false)
     private String registBy;
 
-    @Column(name = "regist_date", nullable = false, updatable = false)
-    private LocalDateTime registDate;
-
-    @PrePersist
-    public void prePersist() {
-        this.registDate = LocalDateTime.now();
-    }
-}
-
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-class ManagerMenuGroupId implements Serializable {
-    private Integer authGroupSeq;
-    private Integer menuSeq;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

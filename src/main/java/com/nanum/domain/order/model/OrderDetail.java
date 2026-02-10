@@ -1,5 +1,6 @@
 package com.nanum.domain.order.model;
 
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class OrderDetail {
+public class OrderDetail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,32 +42,27 @@ public class OrderDetail {
     @Column(name = "option_name", length = 100)
     private String optionName;
 
-    @Column(name = "price", nullable = false)
-    private int price;
+    @Column(name = "product_price", precision = 19, scale = 4, nullable = false)
+    private BigDecimal productPrice;
 
-    @Column(name = "discount_price", nullable = false)
-    private int discountPrice;
-
-    @Column(name = "point_price", nullable = false)
-    private int pointPrice;
-
-    @Column(name = "coupon_price", nullable = false)
-    private int couponPrice;
-
-    @Column(name = "delivery_price", nullable = false)
-    private int deliveryPrice;
+    @Column(name = "option_price", precision = 19, scale = 4)
+    @ColumnDefault("0")
+    private BigDecimal optionPrice;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "sub_total", nullable = false)
-    private int subTotal;
+    @Column(name = "total_price", precision = 19, scale = 4, nullable = false)
+    private BigDecimal totalPrice;
 
     @Column(name = "order_status", nullable = false, length = 20)
     private String orderStatus;
 
     @Column(name = "delivery_num", length = 100)
     private String deliveryNum;
+
+    @Column(name = "delivery_corp", length = 200)
+    private String deliveryCorp;
 
     @Column(name = "delivery_date_start")
     private LocalDateTime deliveryDateStart;
@@ -109,6 +105,4 @@ public class OrderDetail {
     @Column(name = "pickup_date_end")
     private LocalDateTime pickupDateEnd;
 
-    @Column(name = "detail_status", length = 20)
-    private String detailStatus;
 }

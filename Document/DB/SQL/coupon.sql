@@ -1,4 +1,4 @@
--- 1. Coupon Master
+﻿-- 1. Coupon Master
 CREATE TABLE coupon (
     coupon_id        INT AUTO_INCREMENT COMMENT '쿠폰ID',
     site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',

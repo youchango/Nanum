@@ -1,4 +1,4 @@
--- -----------------------------------------------------
+﻿-- -----------------------------------------------------
 -- Claim (Order Claim)
 -- -----------------------------------------------------
 CREATE TABLE claim (
@@ -34,7 +34,7 @@ CREATE TABLE claim (
     exchange_detail  VARCHAR(200) NULL COMMENT '교환상세주소',
     refund_status    VARCHAR(20) NULL COMMENT '환불상태',
     refund_manager_cd VARCHAR(30) NULL COMMENT '환불담당자(ManagerCode)',
-    reg_by           VARCHAR(30) NULL COMMENT '등록자(MemberCode)',
+    created_by       VARCHAR(30) NULL COMMENT '등록자(MemberCode)',
     PRIMARY KEY (claim_id),
     CONSTRAINT fk_claim_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     CONSTRAINT fk_claim_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE,

@@ -40,8 +40,8 @@ public class Wishlist {
     private Product product;
 
     @CreatedDate
-    @Column(name = "reg_date", updatable = false)
-    private LocalDateTime regDate;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @Builder
     public Wishlist(Member member, Product product) {

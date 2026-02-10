@@ -1,4 +1,4 @@
--- Product Biz Mapping (B2B Only)
+﻿-- Product Biz Mapping (B2B Only)
 CREATE TABLE product_biz_mapping (
     mapping_id       INT AUTO_INCREMENT PRIMARY KEY,
     product_id       INT NOT NULL,

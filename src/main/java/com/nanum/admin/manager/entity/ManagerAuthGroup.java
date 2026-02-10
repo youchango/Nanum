@@ -1,11 +1,14 @@
 package com.nanum.admin.manager.entity;
 
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "manager_auth_group")
@@ -15,39 +18,27 @@ import java.time.LocalDateTime;
 @Builder
 @DynamicInsert
 @DynamicUpdate
-public class ManagerAuthGroup {
+public class ManagerAuthGroup extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auth_group_seq")
-    private Integer authGroupSeq;
+    private Long authGroupSeq;
 
     @Column(name = "auth_group_name", length = 100, nullable = false)
     private String authGroupName;
 
     @Column(name = "use_yn", length = 1, nullable = false)
-    private String useYn;
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private String useYn = "Y";
 
-    @Column(name = "regist_by", length = 200, nullable = false)
-    private String registBy;
+    @OneToMany(mappedBy = "authGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ManagerMenuGroup> menuGroups = new ArrayList<>();
 
-    @Column(name = "regist_date", nullable = false, updatable = false)
-    private LocalDateTime registDate;
-
-    @Column(name = "update_by", length = 200, nullable = false)
-    private String updateBy;
-
-    @Column(name = "update_date", nullable = false)
-    private LocalDateTime updateDate;
-
-    @PrePersist
-    public void prePersist() {
-        this.registDate = LocalDateTime.now();
-        this.updateDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updateDate = LocalDateTime.now();
+    public void update(String authGroupName, String useYn) {
+        this.authGroupName = authGroupName;
+        this.useYn = useYn;
     }
 }

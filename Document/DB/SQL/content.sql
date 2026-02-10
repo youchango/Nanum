@@ -1,4 +1,4 @@
-CREATE TABLE content (
+﻿CREATE TABLE content (
     content_id   INT AUTO_INCREMENT COMMENT '컨텐츠 코드',
     site_cd      VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
     content_type INT NOT NULL COMMENT '구분(Code ID)',

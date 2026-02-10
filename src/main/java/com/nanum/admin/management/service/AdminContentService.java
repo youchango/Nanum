@@ -36,7 +36,6 @@ public class AdminContentService {
                 .subject(request.getSubject())
                 .contentBody(request.getContentBody())
                 .urlInfo(request.getUrlInfo())
-                .deleteYn("N")
                 .build();
         contentRepository.save(content);
         return content.getId();

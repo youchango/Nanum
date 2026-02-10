@@ -32,6 +32,28 @@ Base URL: `/api/v1/admin/managers`
 | `POST` | `/` | 관리자 생성 | 신규 관리자 계정을 생성합니다. (승인 대기 상태로 생성됨) |
 | `POST` | `/{id}/approve` | 관리자 승인 | 승인 대기 중인 관리자 계정을 승인합니다. |
 
+### 1.2.1 Manager Auth Group (권한 그룹 관리)
+Base URL: `/api/admin/manager/auth-group`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 권한 그룹 목록 조회 | 전체 권한 그룹 목록을 조회합니다. |
+| `GET` | `/{seq}` | 권한 그룹 상세 조회 | 권한 그룹 상세 정보를 조회합니다. |
+| `POST` | `/` | 권한 그룹 생성 | 신규 권한 그룹을 생성합니다. |
+| `PUT` | `/` | 권한 그룹 수정 | 권한 그룹 정보를 수정합니다. |
+| `DELETE` | `/{seq}` | 권한 그룹 삭제 | 권한 그룹을 삭제합니다. |
+
+### 1.2.2 Manager Menu (메뉴 관리)
+Base URL: `/api/admin/manager/menu`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 메뉴 목록 조회 | 전체 메뉴 목록을 계층형으로 조회합니다. |
+| `GET` | `/{seq}` | 메뉴 상세 조회 | 메뉴 상세 정보를 조회합니다. |
+| `POST` | `/` | 메뉴 생성 | 신규 메뉴를 생성합니다. |
+| `PUT` | `/` | 메뉴 수정 | 메뉴 정보를 수정합니다. |
+| `DELETE` | `/{seq}` | 메뉴 삭제 | 메뉴를 삭제합니다. |
+
 ## 2. Member (회원)
 
 ### 2.1 Admin (관리자용)
@@ -117,7 +139,8 @@ Base URL: `/api/v1/products`
         "orgName": "detail_image.jpg",
         "path": "/uploads/PRODUCT/...",
         "isMain": "Y",
-        "displayOrder": 0
+        "displayOrder": 0,
+        "createdAt": "2026-02-09T10:00:00"
       }
     ],
     "options": []
