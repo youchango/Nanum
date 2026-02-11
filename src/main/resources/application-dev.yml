@@ -22,14 +22,14 @@ spring:
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.ctso.domain.**.model
+  type-aliases-package: com.nanum.domain.**.model
   configuration:
     map-underscore-to-camel-case: true
 
 logging:
   level:
     root: INFO
-    com.ctso: DEBUG
+    com.nanum: DEBUG
 
 file:
   storage:
