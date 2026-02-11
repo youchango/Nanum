@@ -73,7 +73,9 @@ public class PaymentServiceImpl implements PaymentService {
                     .member(payment.getMember())
                     .pointUse(-usedPoint)
                     .pointBigo("Payment usage for payment: " + paymentId)
-                    .payment(payment)
+                    .pointGubun("USE")
+                    .orderNo(null) // PaymentMaster doesn't have orderNo readily available in this context, using
+                                   // null as permitted
                     .build();
             pointRepository.save(point);
         }
@@ -125,7 +127,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .member(payment.getMember())
                     .pointUse(payment.getUsedPoint().intValue())
                     .pointBigo("Refund for cancelled payment: " + paymentId)
-                    .payment(payment)
+                    .pointGubun("SAVE")
+                    .orderNo(null)
                     .build();
             pointRepository.save(pointRefund);
         }

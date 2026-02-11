@@ -32,7 +32,6 @@ public class ProductSite extends BaseEntity {
     // List of product dir had 20 children.
 
     @Column(name = "site_cd", length = 100)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Column(name = "view_yn", nullable = false, length = 1)
@@ -63,4 +62,3 @@ public class ProductSite extends BaseEntity {
         this.cPrice = cPrice;
     }
 }
-

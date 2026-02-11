@@ -1,7 +1,7 @@
 ﻿-- 1. Coupon Master
 CREATE TABLE coupon (
     coupon_id        INT AUTO_INCREMENT COMMENT '쿠폰ID',
-    site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     coupon_name      VARCHAR(100) NOT NULL COMMENT '쿠폰명',
     discount_type    VARCHAR(10) DEFAULT 'FIXED' NOT NULL COMMENT '할인타입(FIXED:정액, RATE:정률)',
     discount_value   INT NOT NULL COMMENT '할인값(원/%)',

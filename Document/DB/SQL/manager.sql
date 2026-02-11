@@ -4,7 +4,7 @@
 CREATE TABLE manager (
     manager_seq      INT AUTO_INCREMENT COMMENT '관리자SEQ',
     manager_code     VARCHAR(30) NOT NULL COMMENT '관리자코드(MGR+6자리)',
-    site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     manager_id       VARCHAR(20) NOT NULL COMMENT '아이디',
     password         VARCHAR(200) NOT NULL COMMENT '비밀번호',
     login_fail_count INT DEFAULT 0 NULL COMMENT '로그인실패횟수',

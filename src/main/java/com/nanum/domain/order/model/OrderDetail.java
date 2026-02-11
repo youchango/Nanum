@@ -27,7 +27,6 @@ public class OrderDetail extends BaseEntity {
     private Integer orderSeq;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Column(name = "product_id", nullable = false)

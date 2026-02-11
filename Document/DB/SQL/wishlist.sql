@@ -3,7 +3,7 @@
 -- -----------------------------------------------------
 CREATE TABLE wishlist (
     wishlist_id      INT AUTO_INCREMENT COMMENT '찜ID',
-    site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드(FK)',
     product_id       INT NOT NULL COMMENT '상품ID(FK)',
     created_at         DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',

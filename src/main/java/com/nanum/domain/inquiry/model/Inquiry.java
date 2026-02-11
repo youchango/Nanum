@@ -4,7 +4,7 @@ import com.nanum.global.common.dto.BaseEntity;
 import com.nanum.domain.member.model.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,6 @@ public class Inquiry extends BaseEntity {
     private Long id;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Enumerated(EnumType.ORDINAL) // init_db.sql defines INT. Mapping might need Code converter or just ordinal if

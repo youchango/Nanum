@@ -27,7 +27,6 @@ public class OrderMaster extends BaseEntity {
     private String orderName;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -63,7 +63,7 @@ CREATE TABLE product_site (
     ps_id            INT AUTO_INCREMENT COMMENT 'PS Key',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NOT NULL COMMENT '옵션ID',
-    site_cd          VARCHAR(100) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
     view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',

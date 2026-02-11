@@ -2,12 +2,11 @@ package com.nanum.domain.point.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.nanum.domain.member.model.Member;
-import com.nanum.domain.payment.model.PaymentMaster;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +24,6 @@ public class Point {
     private Long pointId;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Column(name = "point_use")
@@ -34,13 +32,15 @@ public class Point {
     @Column(name = "point_bigo")
     private String pointBigo;
 
+    @Column(name = "point_gubun", length = 20, nullable = false)
+    private String pointGubun; // SAVE:적립, USE:사용
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private PaymentMaster payment;
+    @Column(name = "order_no", length = 50)
+    private String orderNo;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -50,10 +50,11 @@ public class Point {
     private Long createdBy;
 
     @Builder
-    public Point(Integer pointUse, String pointBigo, Member member, PaymentMaster payment) {
+    public Point(Integer pointUse, String pointBigo, String pointGubun, Member member, String orderNo) {
         this.pointUse = pointUse;
         this.pointBigo = pointBigo;
+        this.pointGubun = pointGubun;
         this.member = member;
-        this.payment = payment;
+        this.orderNo = orderNo;
     }
 }

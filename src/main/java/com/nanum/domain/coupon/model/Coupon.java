@@ -23,7 +23,6 @@ public class Coupon {
     private Long id;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Column(name = "coupon_name", nullable = false, length = 100)

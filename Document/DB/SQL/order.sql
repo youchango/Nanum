@@ -18,7 +18,7 @@ CREATE TABLE cart (
 CREATE TABLE order_master (
     order_id         INT AUTO_INCREMENT COMMENT '주문ID',
     order_no         VARCHAR(50) NOT NULL COMMENT '주문번호(UUID)',
-    site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
     
@@ -53,7 +53,7 @@ CREATE TABLE order_detail (
     order_detail_id  INT AUTO_INCREMENT COMMENT '주문상세ID',
     order_id         INT NOT NULL COMMENT '주문ID',
     order_seq        INT NOT NULL COMMENT '주문순번',
-    site_cd          VARCHAR(20) DEFAULT 'SITECD000001' NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명(스냅샷)',

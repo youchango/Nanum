@@ -3,7 +3,7 @@ package com.nanum.domain.content.model;
 import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,6 @@ public class Content extends BaseEntity {
     private Long id;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Enumerated(EnumType.ORDINAL)

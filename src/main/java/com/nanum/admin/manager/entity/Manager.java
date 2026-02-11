@@ -27,7 +27,6 @@ public class Manager extends com.nanum.global.common.dto.BaseEntity {
     private String managerCode;
 
     @Column(name = "site_cd", length = 20)
-    @ColumnDefault("'SITECD000001'")
     private String siteCd;
 
     @Column(name = "manager_id", length = 20, nullable = false, unique = true)

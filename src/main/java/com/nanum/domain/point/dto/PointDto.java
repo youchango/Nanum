@@ -11,15 +11,17 @@ public class PointDto {
     private Integer pointUse;
     private String pointBigo;
     private String memberCode;
-    private Long paymentId;
+    private String pointGubun;
+    private String orderNo;
     private LocalDateTime createdAt;
 
     public PointDto(Point point) {
         this.pointId = point.getPointId();
         this.pointUse = point.getPointUse();
         this.pointBigo = point.getPointBigo();
+        this.pointGubun = point.getPointGubun();
+        this.orderNo = point.getOrderNo();
         this.memberCode = point.getMember().getMemberCode();
-        this.paymentId = point.getPayment() != null ? point.getPayment().getPaymentId() : null;
         this.createdAt = point.getCreatedAt();
     }
 }
