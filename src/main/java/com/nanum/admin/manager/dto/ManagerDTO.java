@@ -44,6 +44,7 @@ public class ManagerDTO {
         private String siteCd;
         private String applyYn;
         private ManagerScmDTO.Info scmInfo;
+        private String managerCode; // Added for consistency
 
         public static ManagerInfo from(Manager manager) {
             return ManagerInfo.builder()
@@ -57,6 +58,7 @@ public class ManagerDTO {
                     .siteCd(manager.getSiteCd())
                     .applyYn(manager.getApplyYn())
                     .scmInfo(manager.getManagerScm() != null ? ManagerScmDTO.Info.from(manager.getManagerScm()) : null)
+                    .managerCode(manager.getManagerCode()) // Map managerCode
                     .build();
         }
     }
