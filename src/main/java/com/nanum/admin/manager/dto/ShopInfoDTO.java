@@ -1,6 +1,6 @@
 package com.nanum.admin.manager.dto;
 
-import com.nanum.admin.manager.entity.ShopInfo;
+import com.nanum.domain.shop.model.ShopInfo;
 import lombok.*;
 import java.math.BigDecimal;
 
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class ShopInfoDTO {
-    private Integer shopKey;
+    private Long shopKey;
     private String siteCd;
     private String shopType;
     private String shopName;

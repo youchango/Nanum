@@ -63,7 +63,15 @@ public class Member {
 
     @Column(name = "member_type")
     @Enumerated(jakarta.persistence.EnumType.STRING)
-    private MemberType memberType; // 회원 유형 (M: 관리자, B: 업무자, U: 사용자)
+    private MemberType memberType; // 회원 유형 (U: 일반, B: 기업, V: 보훈)
+
+    @Column(name = "apply_yn", length = 1, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String applyYn = "N"; // 승인 여부
+
+    @Column(name = "memo", length = 2000)
+    private String memo; // 관리자 메모
 
     @Column(name = "withdraw_yn", insertable = false)
     private String withdrawYn; // 탈퇴 여부 (Y/N) - DB default 'N' case

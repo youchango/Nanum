@@ -38,7 +38,7 @@ public class ManagerDTO {
         private String id;
         private String name;
         private String email;
-        private String type; // MASTER, SCM, ADMIN
+        private com.nanum.admin.manager.entity.ManagerType type; // MASTER, SCM, ADMIN
         private Long authGroupSeq;
         private LocalDateTime lastLoginDate;
         private String siteCd;
@@ -74,7 +74,7 @@ public class ManagerDTO {
         private String name;
         private String email;
         private Long authGroupSeq;
-        private String type;
+        private com.nanum.admin.manager.entity.ManagerType type; // MASTER, SCM, ADMIN
         private String description;
         private String siteCd;
         private ManagerScmDTO.Info scmInfo;

@@ -15,6 +15,7 @@ CREATE TABLE manager (
     apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     description      VARCHAR(200) NULL COMMENT '설명',
+    memo             VARCHAR(2000) NULL COMMENT '메모',
     regist_by        VARCHAR(20) NOT NULL COMMENT '등록자',
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
     update_by        VARCHAR(20) NOT NULL COMMENT '수정자',

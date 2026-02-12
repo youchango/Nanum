@@ -1,14 +1,14 @@
-package com.nanum.domain.member.model;
+package com.nanum.admin.manager.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberType {
-    U("일반 회원"),
-    B("기업 회원"),
-    V("보훈 회원");
+public enum ManagerType {
+    MASTER("마스터"),
+    ADMIN("관리자"),
+    SCM("입점사");
 
     private final String description;
 }

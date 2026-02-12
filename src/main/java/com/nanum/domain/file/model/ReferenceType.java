@@ -11,7 +11,8 @@ public enum ReferenceType {
     BANNER("배너"),
     POPUP("팝업"),
     INQUIRY("문의"),
-    REVIEW("리뷰");
+    REVIEW("리뷰"),
+    SCM("SCM/사업자");
 
     private final String description;
 }

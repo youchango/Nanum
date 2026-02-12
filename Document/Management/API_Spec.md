@@ -12,6 +12,7 @@ Base URL: `/api/v1/auth`
 | `POST` | `/refresh` | 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
 | `POST` | `/admin/auth/login` | 관리자 로그인 | 관리자 ID/PW로 인증하여 Access/Refresh Token을 발급합니다. |
 | `POST` | `/admin/auth/refresh` | 관리자 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
+| `POST` | `/admin/auth/signup/scm` | SCM(입점사) 가입 | SCM 입점 파트너 회원가입을 요청합니다. (사업자등록증 첨부 필수) |
 
 ## 1.1 Shop (상점 관리) [Master Only]
 Base URL: `/api/v1/admin/shops`

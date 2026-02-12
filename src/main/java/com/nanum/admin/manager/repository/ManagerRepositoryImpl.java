@@ -1,9 +1,9 @@
-package com.nanum.user.member.repository;
+package com.nanum.admin.manager.repository;
 
+import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.QManager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.global.common.dto.SearchDTO;
-import com.nanum.domain.member.model.Member;
-import com.nanum.domain.member.model.QMember;
-import com.nanum.domain.member.model.MemberType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,51 +18,46 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberRepositoryImpl implements MemberRepositoryCustom {
+public class ManagerRepositoryImpl implements ManagerRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Member> searchMembers(SearchDTO searchDTO, Pageable pageable) {
-        QMember member = QMember.member;
+    public Page<Manager> searchManagers(SearchDTO searchDTO, Pageable pageable) {
+        QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(member.withdrawYn.eq("N"));
+        builder.and(manager.deleteYn.eq("N"));
 
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();
-            builder.and(member.memberName.contains(keyword)
-                    .or(member.memberId.contains(keyword)));
+            builder.and(manager.managerName.contains(keyword)
+                    .or(manager.managerId.contains(keyword)));
         }
 
-        if (StringUtils.hasText(searchDTO.getSearchType()) && StringUtils.hasText(searchDTO.getKeyword())) {
-            // 기존 searchType 로직 유지 (예: 이름, 아이디 등)
+        if (StringUtils.hasText(searchDTO.getApplyYn())) {
+            builder.and(manager.applyYn.eq(searchDTO.getApplyYn()));
         }
 
-        // New Filtering Logic
-        if (StringUtils.hasText(searchDTO.getMemberType())) {
+        if (StringUtils.hasText(searchDTO.getManagerType())) {
             try {
-                builder.and(member.memberType.eq(MemberType.valueOf(searchDTO.getMemberType())));
+                builder.and(manager.mbType.eq(ManagerType.valueOf(searchDTO.getManagerType())));
             } catch (Exception e) {
                 // Ignore
             }
         }
 
-        if (StringUtils.hasText(searchDTO.getApplyYn())) {
-            builder.and(member.applyYn.eq(searchDTO.getApplyYn()));
-        }
-
-        List<Member> content = queryFactory
-                .selectFrom(member)
+        List<Manager> content = queryFactory
+                .selectFrom(manager)
                 .where(builder)
-                .orderBy(member.createdAt.desc())
+                .orderBy(manager.loginDate.desc().nullsLast(), manager.managerSeq.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
-                .select(member.count())
-                .from(member)
+                .select(manager.count())
+                .from(manager)
                 .where(builder);
 
         Long total = countQuery.fetchOne();

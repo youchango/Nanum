@@ -3,86 +3,97 @@ package com.nanum.global.common.dto;
 import lombok.Data;
 
 /**
- * 寃??諛??섏씠吏?泥섎━瑜??꾪븳 怨듯넻 DTO ?대옒?ㅼ엯?덈떎.
+ * 검색 및 페이지 처리를 위한 공통 DTO 클래스입니다.
  */
 @Data
 public class SearchDTO {
 
-    /** ?꾩옱 ?섏씠吏 踰덊샇 (湲곕낯媛? 1) */
+    /** 현재 페이지 번호 (기본값 1) */
     private int page = 1;
 
-    /** ?섏씠吏???쒖떆???곗씠????(湲곕낯媛? 10) */
+    /** 페이지당 표시할 데이터 수 (기본값 10) */
     private int recordSize = 10;
 
-    /** ?붾㈃ ?섎떒???쒖떆???섏씠吏 ?ъ씠利?(湲곕낯媛? 10) */
+    /** 화면 하단에 표시할 페이지 사이즈 (기본값 10) */
     private int pageSize = 10;
 
-    /** 寃???ㅼ썙??(?덇굅??吏?? */
+    /** 검색 키워드 (검색어) */
     private String keyword;
-    
-    /** 寃???ㅼ썙??(?좉퇋 ?쒖?) */
+
+    /** 검색 키워드 (신규 규격) */
     private String searchKeyword;
 
-    /** 寃???좏삎 (?? ?대쫫, ?꾩씠?? 而⑦뀗痢좎쑀???? */
+    /** 검색 유형 (예: 이름, 아이디 등) */
     private String searchType;
-    
-    /** ?꾩껜 ?곗씠????*/
+
+    /** 전체 데이터 수 */
     private int totalRecordCount;
-    
-    /** ?꾩껜 ?섏씠吏 ??*/
+
+    /** 전체 페이지 수 */
     private int totalPageCount;
-    
-    /** ?섏씠吏 由ъ뒪?몄쓽 ?쒖옉 踰덊샇 */
+
+    /** 페이지 리스트의 시작 번호 */
     private int startPage;
-    
-    /** ?섏씠吏 由ъ뒪?몄쓽 ??踰덊샇 */
+
+    /** 페이지 리스트의 끝 번호 */
     private int endPage;
-    
-    /** ?댁쟾 ?섏씠吏 議댁옱 ?щ? */
+
+    /** 이전 페이지 존재 여부 */
     private boolean existPrevPage;
-    
-    /** ?ㅼ쓬 ?섏씠吏 議댁옱 ?щ? */
+
+    /** 다음 페이지 존재 여부 */
     private boolean existNextPage;
 
-    /** 寃??議곌굔 留?(異붽??곸씤 寃??議곌굔) */
+    /** 승인 여부 (Y/N) */
+    private String applyYn;
+
+    /** 회원 구분 (U/B/V) */
+    private String memberType;
+
+    /** 관리자 구분 (MASTER/ADMIN/SCM) */
+    private String managerType;
+
+    /** 검색 조건 맵 (추가적인 검색 조건) */
     private java.util.Map<String, Object> params = new java.util.HashMap<>();
 
     /**
-     * LIMIT 援щЦ???쒖옉 ?꾩튂(OFFSET)瑜?怨꾩궛?⑸땲??
-     * @return OFFSET 媛?
+     * LIMIT 구문의 시작 위치(OFFSET)를 계산합니다.
+     * 
+     * @return OFFSET 값
      */
     public int getOffset() {
         return (page - 1) * recordSize;
     }
-    
+
     /**
-     * ?꾩껜 ?곗씠???섏뿉 ?곕Ⅸ ?섏씠吏?ㅼ씠???뺣낫瑜?怨꾩궛?⑸땲??
-     * @param totalRecordCount ?꾩껜 ?곗씠????
+     * 전체 데이터 수에 따른 페이지들의 정보를 계산합니다.
+     * 
+     * @param totalRecordCount 전체 데이터 수
      */
     public void setPagination(int totalRecordCount) {
         this.totalRecordCount = totalRecordCount;
         calculation();
     }
-    
+
     private void calculation() {
-        // ?꾩껜 ?섏씠吏 ??怨꾩궛
+        // 전체 페이지 수 계산
         totalPageCount = ((totalRecordCount - 1) / recordSize) + 1;
-        
-        // ?꾩옱 ?섏씠吏媛 ?꾩껜 ?섏씠吏 ?섎낫???щ㈃ 議곗젙
+
+        // 현재 페이지가 전체 페이지 수보다 크다면 조정
         if (page > totalPageCount) {
             page = totalPageCount;
         }
-        
-        // ?쒖옉 ?섏씠吏, ???섏씠吏 怨꾩궛
+
+        // 시작 페이지, 끝 페이지 계산
         startPage = ((page - 1) / pageSize) * pageSize + 1;
         endPage = startPage + pageSize - 1;
-        
-        // ???섏씠吏媛 ?꾩껜 ?섏씠吏 ?섎낫???щ㈃ 議곗젙
+
+        // 끝 페이지가 전체 페이지 수보다 크다면 조정
         if (endPage > totalPageCount) {
             endPage = totalPageCount;
         }
-        
-        // ?댁쟾/?ㅼ쓬 ?섏씠吏 議댁옱 ?щ?
+
+        // 이전/다음 페이지 존재 여부
         existPrevPage = startPage != 1;
         existNextPage = (endPage * recordSize) < totalRecordCount;
     }

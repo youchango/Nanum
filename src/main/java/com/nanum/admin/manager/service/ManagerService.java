@@ -19,7 +19,8 @@ public class ManagerService {
     private final ManagerRepository managerRepository;
     private final CustomManagerDetailsService managerDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final com.nanum.domain.file.service.FileService fileService;
 
     private final com.nanum.domain.shop.repository.ShopInfoRepository shopInfoRepository;
 
@@ -110,13 +111,23 @@ public class ManagerService {
             throw new IllegalArgumentException("권한 그룹은 필수입니다.");
         }
 
+        // Generate Manager Code
+        // Policy: ADMIN -> ADM + 6 digits, SCM -> SCM + 6 digits (handled in
+        // AdminAuthService but duplicated here for Admin creation or SCM creation by
+        // Admin)
+        String prefix = "ADMIN".equals(request.getType() != null ? request.getType().name() : "") ? "ADM"
+                : ("SCM".equals(request.getType() != null ? request.getType().name() : "") ? "SCM" : "MGR");
+        String managerCode = generateManagerCode(prefix);
+
         Manager manager = Manager.builder()
+                .managerCode(managerCode)
                 .managerId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .managerName(request.getName())
                 .managerEmail(request.getEmail())
                 .authGroup(authGroup)
-                .mbType(request.getType() != null ? request.getType() : "ADMIN")
+                .mbType(request.getType() != null ? request.getType()
+                        : com.nanum.admin.manager.entity.ManagerType.ADMIN)
                 .siteCd(request.getSiteCd())
                 .description(request.getDescription())
                 .useYn("Y")
@@ -124,9 +135,10 @@ public class ManagerService {
                 .loginFailCount(0)
                 .build();
 
-        if ("SCM".equals(request.getType()) && request.getScmInfo() != null) {
+        if (com.nanum.admin.manager.entity.ManagerType.SCM.equals(request.getType()) && request.getScmInfo() != null) {
             ManagerScm scm = ManagerScm.builder()
                     .manager(manager)
+                    .managerCode(managerCode) // Set managerCode
                     .brandName(request.getScmInfo().getBrandName())
                     .scmCeo(request.getScmInfo().getScmCeo())
                     .scmCorp(request.getScmInfo().getScmCorp())
@@ -159,26 +171,24 @@ public class ManagerService {
         }
 
         manager = managerRepository.save(manager);
+    }
 
-        if ("SCM".equals(request.getType()) && request.getScmInfo() != null) {
-            // Re-build SCM with saved manager just in case, though object reference is
-            // enough
-            // The code block above creates 'scm' but doesn't persist it.
-            // I need to persist it.
-            // Since ManagerScmRepository exists, use it?
-            // Or add to manager.managerScm and let cascade handle it?
-            // If I add to manager, I need manager.setManagerScm(scm).
-            // Does Manager have setter for SCM? Lombok @Builder usually doesn't create
-            // setters unless @Setter is present.
-            // Manager has @Getter but no @Setter on class level?
-            // It has @NoArgsConstructor(access = AccessLevel.PROTECTED) @AllArgsConstructor
-            // @Builder
-            // So no public setters unless I added them.
-            // I did NOT add @Setter to Manager.
-            // So I must save ManagerScm explicitly using Repository.
+    private String generateManagerCode(String prefix) {
+        return managerRepository.findTopByManagerCodeStartingWithOrderByManagerCodeDesc(prefix)
+                .map(m -> {
+                    String lastCode = m.getManagerCode();
+                    if (lastCode.length() < prefix.length() + 6)
+                        return prefix + "000001";
 
-            // I need to inject ManagerScmRepository.
-        }
+                    String numberPart = lastCode.substring(prefix.length());
+                    try {
+                        long number = Long.parseLong(numberPart);
+                        return String.format("%s%06d", prefix, number + 1);
+                    } catch (NumberFormatException e) {
+                        return prefix + "000001";
+                    }
+                })
+                .orElse(prefix + "000001");
     }
 
     @Transactional
@@ -189,15 +199,131 @@ public class ManagerService {
         manager.approve();
     }
 
-    public java.util.List<ManagerDTO.ManagerInfo> getManagers(String applyYn) {
-        java.util.List<Manager> managers;
-        if (applyYn != null && !applyYn.isEmpty()) {
-            managers = managerRepository.findAllByApplyYn(applyYn);
-        } else {
-            managers = managerRepository.findAll();
+    @Transactional(readOnly = true)
+    public ManagerDTO.ManagerInfo getManager(Long managerSeq) {
+        Manager manager = managerRepository.findById(managerSeq)
+                .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+        return ManagerDTO.ManagerInfo.from(manager);
+    }
+
+    @Transactional
+    public void updateManager(Long managerSeq, ManagerDTO.CreateRequest request) {
+        Manager manager = managerRepository.findById(managerSeq)
+                .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+
+        // Update fields (excluding Password, ID, Code)
+        ManagerAuthGroup authGroup = null;
+        if (request.getAuthGroupSeq() != null) {
+            authGroup = managerAuthGroupRepository.findById(request.getAuthGroupSeq())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 권한 그룹입니다."));
         }
-        return managers.stream()
-                .map(ManagerDTO.ManagerInfo::from)
-                .collect(java.util.stream.Collectors.toList());
+
+        manager.updateInfo(
+                request.getName(),
+                request.getEmail(),
+                request.getDescription(),
+                request.getSiteCd(),
+                request.getType(),
+                authGroup);
+
+        // ApplyYn is handled by approveManager, UseYn/DeleteYn by deleteManager (not
+        // yet impl)
+    }
+
+    public org.springframework.data.domain.Page<ManagerDTO.ManagerInfo> getManagers(
+            com.nanum.global.common.dto.SearchDTO searchDTO) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                searchDTO.getPage() - 1,
+                searchDTO.getRecordSize());
+        return managerRepository.searchManagers(searchDTO, pageable)
+                .map(ManagerDTO.ManagerInfo::from);
+    }
+
+    @Transactional
+    public void signupScm(com.nanum.admin.manager.dto.ScmSignupRequest request) {
+        // 1. Check ID Duplicate
+        if (managerRepository.findByManagerId(request.getManagerId()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+
+        // 2. Generate Manager Code
+        String managerCode = generateManagerCode("SCM");
+
+        // 3. Set Audit Context (Temporary)
+        setTemporaryAuditContext(managerCode);
+
+        try {
+            // 4. File Upload (Business License)
+            if (request.getBusinessLicense() != null && !request.getBusinessLicense().isEmpty()) {
+                fileService.uploadFile(request.getBusinessLicense(), com.nanum.domain.file.model.ReferenceType.SCM,
+                        managerCode, true);
+            }
+
+            // 5. Create Manager
+            // Find default SCM Auth Group (fallback to ID 1)
+            ManagerAuthGroup authGroup = managerAuthGroupRepository.findAll().stream()
+                    .filter(g -> "SCM".equals(g.getAuthGroupName()))
+                    .findFirst()
+                    .orElse(managerAuthGroupRepository.findById(1L)
+                            .orElseThrow(() -> new IllegalArgumentException("기본 권한 그룹을 찾을 수 없습니다.")));
+
+            Manager manager = Manager.builder()
+                    .managerCode(managerCode)
+                    .managerId(request.getManagerId())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .managerName(request.getManagerName())
+                    .managerEmail(request.getManagerEmail())
+                    .authGroup(authGroup)
+                    .mbType(com.nanum.admin.manager.entity.ManagerType.SCM)
+                    .useYn("Y")
+                    .applyYn("N")
+                    .loginFailCount(0)
+                    .build();
+
+            managerRepository.save(manager);
+
+            // 6. Create ManagerScm
+            ManagerScm scm = ManagerScm.builder()
+                    .manager(manager)
+                    .managerCode(managerCode)
+                    .brandName(request.getBrandName())
+                    .scmCeo(request.getScmCeo())
+                    .scmCorp(request.getScmCorp())
+                    .scmType(request.getScmType())
+                    .scmBsn(request.getScmBsn())
+                    .scmPsn(request.getScmPsn())
+                    .scmUptae(request.getScmUptae())
+                    .scmUpjong(request.getScmUpjong())
+                    .scmZipcode(request.getScmZipcode())
+                    .scmAddr1(request.getScmAddr1())
+                    .scmAddr2(request.getScmAddr2())
+                    .scmPhone(request.getScmPhone())
+                    .scmFax(request.getScmFax())
+                    .scmDamName(request.getScmDamName())
+                    .scmDamPosition(request.getScmDamPosition())
+                    .scmDamPhone(request.getScmDamPhone())
+                    .scmDamEmail(request.getScmDamEmail())
+                    .scmBankName(request.getScmBankName())
+                    .scmBankAccountNum(request.getScmBankAccountNum())
+                    .scmBankAccountName(request.getScmBankAccountName())
+                    .shippingZipcode(request.getShippingZipcode())
+                    .shippingAddr1(request.getShippingAddr1())
+                    .shippingAddr2(request.getShippingAddr2())
+                    .returnZipcode(request.getReturnZipcode())
+                    .returnAddr1(request.getReturnAddr1())
+                    .returnAddr2(request.getReturnAddr2())
+                    .build();
+
+            managerScmRepository.save(scm);
+        } finally {
+            // 7. Clear Context
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        }
+    }
+
+    private void setTemporaryAuditContext(String managerCode) {
+        org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                managerCode, null, java.util.Collections.emptyList());
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }

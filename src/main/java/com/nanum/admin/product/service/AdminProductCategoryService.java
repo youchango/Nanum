@@ -95,7 +95,7 @@ public class AdminProductCategoryService {
             throw new IllegalStateException("하위 카테고리가 존재하여 삭제할 수 없습니다.");
         }
 
-        if (productRepository.existsByCategoryAndDeleteYn(category, "N")) {
+        if (productRepository.existsByCategoriesContainsAndDeleteYn(category, "N")) {
             throw new IllegalStateException("해당 카테고리에 속한 상품이 존재하여 삭제할 수 없습니다.");
         }
 

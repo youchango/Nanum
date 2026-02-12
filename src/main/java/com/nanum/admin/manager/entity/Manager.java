@@ -68,12 +68,33 @@ public class Manager extends com.nanum.global.common.dto.BaseEntity {
     @Column(name = "login_date")
     private LocalDateTime loginDate;
 
+    @Column(name = "memo", length = 2000)
+    private String memo;
+
     @Column(name = "mb_type", length = 20, nullable = false)
-    @ColumnDefault("''")
-    private String mbType; // MASTER, SCM, ADMIN
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ADMIN'")
+    private ManagerType mbType; // MASTER, SCM, ADMIN
 
     public void approve() {
         this.applyYn = "Y";
         this.useYn = "Y";
     }
+
+    public void updateInfo(String managerName, String managerEmail, String description, String siteCd,
+            ManagerType mbType, ManagerAuthGroup authGroup) {
+        if (managerName != null)
+            this.managerName = managerName;
+        if (managerEmail != null)
+            this.managerEmail = managerEmail;
+        if (description != null)
+            this.description = description;
+        if (siteCd != null)
+            this.siteCd = siteCd;
+        if (mbType != null)
+            this.mbType = mbType;
+        if (authGroup != null)
+            this.authGroup = authGroup;
+    }
+
 }

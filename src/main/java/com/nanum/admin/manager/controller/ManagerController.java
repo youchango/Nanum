@@ -2,6 +2,7 @@ package com.nanum.admin.manager.controller;
 
 import com.nanum.admin.manager.dto.ManagerDTO;
 import com.nanum.admin.manager.service.ManagerService;
+import com.nanum.global.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +17,6 @@ public class ManagerController {
 
     private final ManagerService managerService;
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<ManagerDTO.LoginResponse> login(@RequestBody ManagerDTO.LoginRequest request) {
-        return ResponseEntity.ok(managerService.login(request));
-    }
-
     @PostMapping("/managers")
     public ResponseEntity<Void> createManager(@RequestBody ManagerDTO.CreateRequest request) {
         managerService.createManager(request);
@@ -28,9 +24,30 @@ public class ManagerController {
     }
 
     @org.springframework.web.bind.annotation.GetMapping("/managers")
-    public ResponseEntity<java.util.List<ManagerDTO.ManagerInfo>> getManagers(
-            @org.springframework.web.bind.annotation.RequestParam(required = false) String applyYn) {
-        return ResponseEntity.ok(managerService.getManagers(applyYn));
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<java.util.Map<String, Object>>> getManagers(
+            @org.springframework.web.bind.annotation.ModelAttribute com.nanum.global.common.dto.SearchDTO searchDTO) {
+        org.springframework.data.domain.Page<ManagerDTO.ManagerInfo> managerPage = managerService
+                .getManagers(searchDTO);
+
+        java.util.Map<String, Object> responseData = new java.util.HashMap<>();
+        responseData.put("managerList", managerPage.getContent());
+        responseData.put("totalCount", managerPage.getTotalElements());
+
+        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(responseData));
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping("/managers/{id}")
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<ManagerDTO.ManagerInfo>> getManager(
+            @org.springframework.web.bind.annotation.PathVariable Long id) {
+        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(managerService.getManager(id)));
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/managers/{id}")
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<Void>> updateManager(
+            @org.springframework.web.bind.annotation.PathVariable Long id,
+            @RequestBody ManagerDTO.CreateRequest request) {
+        managerService.updateManager(id, request);
+        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(null));
     }
 
     @PostMapping("/managers/{id}/approve")
@@ -40,25 +57,4 @@ public class ManagerController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/auth/refresh")
-    public ResponseEntity<ManagerDTO.LoginResponse> refresh(jakarta.servlet.http.HttpServletRequest request,
-            jakarta.servlet.http.HttpServletResponse response) {
-        String refreshToken = null;
-        if (request.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
-                if ("refreshToken".equals(cookie.getName())) {
-                    refreshToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        // If not in cookie, check body or header (optional context)
-        // For now, assuming cookie or error
-        if (refreshToken == null) {
-            throw new IllegalArgumentException("Refresh token missing");
-        }
-
-        return ResponseEntity.ok(managerService.refresh(refreshToken));
-    }
 }
