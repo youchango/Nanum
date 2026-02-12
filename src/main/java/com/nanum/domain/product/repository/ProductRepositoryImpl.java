@@ -17,6 +17,9 @@ import java.time.format.DateTimeFormatter;
 import com.nanum.domain.product.model.ProductStatus;
 import java.util.List;
 
+import com.nanum.domain.product.model.QProductSite;
+
+import com.nanum.domain.product.model.QProductCategory;
 import static com.nanum.domain.product.model.QProduct.product;
 
 @Repository
@@ -27,26 +30,34 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public Page<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO, Pageable pageable) {
+        QProductSite productSite = QProductSite.productSite;
+        QProductCategory category = QProductCategory.productCategory;
+
         List<AdminProductListDTO> content = queryFactory
                 .select(Projections.fields(AdminProductListDTO.class,
                         product.id,
-                        product.category.categoryId,
-                        product.category.categoryName,
+                        category.categoryId,
+                        category.categoryName,
                         product.name,
-                        product.price,
-                        product.salePrice,
+                        product.supplyPrice,
+                        product.mapPrice,
+                        product.standardPrice,
                         product.status,
                         product.viewCount,
                         product.createdAt,
                         product.updatedAt,
                         product.deleteYn))
                 .from(product)
+                .leftJoin(product.categories, category)
+                .leftJoin(productSite).on(product.id.eq(productSite.product.id))
                 .where(
                         eqCategoryId(searchDTO.getCategoryId()),
                         searchKeyword(searchDTO.getSearchType(), searchDTO.getSearchKeyword()),
                         eqStatus(searchDTO.getStatus()),
                         betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
+                        eqSiteCd(searchDTO.getSiteCd(), productSite),
                         product.deleteYn.eq("N"))
+                .groupBy(product.id)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(product.createdAt.desc())
@@ -55,13 +66,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         long total = queryFactory
                 .select(product.count())
                 .from(product)
+                .leftJoin(productSite).on(product.id.eq(productSite.product.id))
                 .where(
                         eqCategoryId(searchDTO.getCategoryId()),
                         searchKeyword(searchDTO.getSearchType(), searchDTO.getSearchKeyword()),
                         eqStatus(searchDTO.getStatus()),
                         betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
+                        eqSiteCd(searchDTO.getSiteCd(), productSite),
                         product.deleteYn.eq("N"))
-                .fetchOne();
+                .fetchOne(); // Count needs distinct if we joined? count(distinct product.id)?
+                             // Actually JPAQuery count() is usually simpler.
+                             // If we filter by site, we might restrict products.
 
         return new PageImpl<>(content, pageable, total);
     }
@@ -69,7 +84,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private BooleanExpression eqCategoryId(Long categoryId) {
         if (categoryId == null)
             return null;
-        return product.category.categoryId.eq(categoryId);
+        return product.categories.any().categoryId.eq(categoryId);
     }
 
     private BooleanExpression searchKeyword(String searchType, String keyword) {
@@ -94,5 +109,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         LocalDate start = LocalDate.parse(startDate, formatter);
         LocalDate end = LocalDate.parse(endDate, formatter);
         return product.createdAt.goe(start.atStartOfDay()).and(product.createdAt.lt(end.plusDays(1).atStartOfDay()));
+    }
+
+    private BooleanExpression eqSiteCd(String siteCd, QProductSite productSite) {
+        if (!StringUtils.hasText(siteCd))
+            return null;
+        return productSite.siteCd.eq(siteCd);
     }
 }

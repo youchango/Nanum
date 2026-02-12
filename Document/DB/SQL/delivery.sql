@@ -1,15 +1,23 @@
--- 1. Delivery
+﻿-- 1. Delivery
 CREATE TABLE delivery (
     delivery_id      INT AUTO_INCREMENT COMMENT '배송ID',
     order_id         INT NOT NULL COMMENT '주문ID',
-    courier_company  VARCHAR(20) NULL COMMENT '택배사코드',
+    order_no         VARCHAR(50) NOT NULL COMMENT '주문번호',
+    order_detail_id  INT NOT NULL COMMENT '주문상세ID',
+    delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',
     tracking_number  VARCHAR(50) NULL COMMENT '운송장번호',
     status           VARCHAR(20) DEFAULT 'READY' NOT NULL COMMENT '배송상태(READY, SHIPPING, COMPLETE)',
     
     shipped_at       DATETIME NULL COMMENT '출고일시',
     completed_at     DATETIME NULL COMMENT '배송완료일시',
+
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
     PRIMARY KEY (delivery_id),
     UNIQUE KEY uq_delivery_order (order_id),

@@ -10,6 +10,50 @@ Base URL: `/api/v1/auth`
 | `POST` | `/signup` | 회원가입 | 신규 회원을 등록합니다. |
 | `POST` | `/login` | 로그인 | Login ID/PW로 인증하여 Access/Refresh Token을 발급합니다. (Cookie) |
 | `POST` | `/refresh` | 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
+| `POST` | `/admin/auth/login` | 관리자 로그인 | 관리자 ID/PW로 인증하여 Access/Refresh Token을 발급합니다. |
+| `POST` | `/admin/auth/refresh` | 관리자 토큰 갱신 | Refresh Token을 사용하여 Access Token을 재발급합니다. |
+| `POST` | `/admin/auth/signup/scm` | SCM(입점사) 가입 | SCM 입점 파트너 회원가입을 요청합니다. (사업자등록증 첨부 필수) |
+
+## 1.1 Shop (상점 관리) [Master Only]
+Base URL: `/api/v1/admin/shops`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 상점 목록 조회 | 전체 상점 목록을 조회합니다. |
+| `POST` | `/` | 상점 등록 | 신규 상점을 등록합니다. (사이트 코드, 상점명 등) |
+| `GET` | `/{shopKey}` | 상점 상세 조회 | 상점 상세 정보를 조회합니다. |
+| `PUT` | `/{shopKey}` | 상점 수정 | 상점 정보를 수정합니다. |
+
+## 1.2 Manager (관리자 관리) [Master Only]
+Base URL: `/api/v1/admin/managers`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 관리자 목록 조회 | 전체 관리자 목록을 조회합니다. (`applyYn` 필터 가능) |
+| `POST` | `/` | 관리자 생성 | 신규 관리자 계정을 생성합니다. (승인 대기 상태로 생성됨) |
+| `POST` | `/{id}/approve` | 관리자 승인 | 승인 대기 중인 관리자 계정을 승인합니다. |
+
+### 1.2.1 Manager Auth Group (권한 그룹 관리)
+Base URL: `/api/admin/manager/auth-group`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 권한 그룹 목록 조회 | 전체 권한 그룹 목록을 조회합니다. |
+| `GET` | `/{seq}` | 권한 그룹 상세 조회 | 권한 그룹 상세 정보를 조회합니다. |
+| `POST` | `/` | 권한 그룹 생성 | 신규 권한 그룹을 생성합니다. |
+| `PUT` | `/` | 권한 그룹 수정 | 권한 그룹 정보를 수정합니다. |
+| `DELETE` | `/{seq}` | 권한 그룹 삭제 | 권한 그룹을 삭제합니다. |
+
+### 1.2.2 Manager Menu (메뉴 관리)
+Base URL: `/api/admin/manager/menu`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 메뉴 목록 조회 | 전체 메뉴 목록을 계층형으로 조회합니다. |
+| `GET` | `/{seq}` | 메뉴 상세 조회 | 메뉴 상세 정보를 조회합니다. |
+| `POST` | `/` | 메뉴 생성 | 신규 메뉴를 생성합니다. |
+| `PUT` | `/` | 메뉴 수정 | 메뉴 정보를 수정합니다. |
+| `DELETE` | `/{seq}` | 메뉴 삭제 | 메뉴를 삭제합니다. |
 
 ## 2. Member (회원)
 
@@ -81,12 +125,13 @@ Base URL: `/api/v1/products`
 {
   "status": "SUCCESS",
   "data": {
+  "data": {
     "productId": 1,
-    "categoryId": 10,
+    "categoryId": [10, 12],
     "categoryName": "의류",
     "name": "나눔 티셔츠",
-    "price": 20000,
-    "salePrice": 15000,
+    "mapPrice": 20000,
+    "standardPrice": 15000,
     "status": "SALE",
 
     "files": [
@@ -95,7 +140,8 @@ Base URL: `/api/v1/products`
         "orgName": "detail_image.jpg",
         "path": "/uploads/PRODUCT/...",
         "isMain": "Y",
-        "displayOrder": 0
+        "displayOrder": 0,
+        "createdAt": "2026-02-09T10:00:00"
       }
     ],
     "options": []
@@ -180,3 +226,12 @@ Base URL: `/api/v1/wishlist`
 | `POST` | `/` | 찜하기 | 상품을 찜 목록에 추가하거나(Toggle) 등록합니다. |
 | `DELETE` | `/{productId}` | 찜 취소 | 상품을 찜 목록에서 제거합니다. |
 | `GET` | `/` | 찜 목록 조회 | 사용자의 찜 상품 목록을 상세 정보(`ProductDTO`)와 함께 페이징 조회합니다. |
+
+## 5.4 Claim Management (클레임 관리)
+Base URL: `/api/v1/admin/claims`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 클레임 목록 조회 | 클레임 목록을 조회합니다. |
+| `GET` | `/{id}` | 클레임 상세 조회 | 클레임 상세 정보를 조회합니다. |
+| `PUT` | `/{id}/status` | 클레임 상태 변경 | 클레임 상태(승인/반려/환불 등)를 변경합니다. |

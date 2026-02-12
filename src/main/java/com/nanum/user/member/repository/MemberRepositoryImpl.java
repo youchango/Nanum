@@ -35,12 +35,21 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
                     .or(member.memberId.contains(keyword)));
         }
 
-        if (StringUtils.hasText(searchDTO.getSearchType())) {
+        if (StringUtils.hasText(searchDTO.getSearchType()) && StringUtils.hasText(searchDTO.getKeyword())) {
+            // 기존 searchType 로직 유지 (예: 이름, 아이디 등)
+        }
+
+        // New Filtering Logic
+        if (StringUtils.hasText(searchDTO.getMemberType())) {
             try {
-                builder.and(member.memberType.eq(MemberType.valueOf(searchDTO.getSearchType())));
+                builder.and(member.memberType.eq(MemberType.valueOf(searchDTO.getMemberType())));
             } catch (Exception e) {
-                // Ignore invalid type
+                // Ignore
             }
+        }
+
+        if (StringUtils.hasText(searchDTO.getApplyYn())) {
+            builder.and(member.applyYn.eq(searchDTO.getApplyYn()));
         }
 
         List<Member> content = queryFactory

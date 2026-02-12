@@ -170,7 +170,6 @@ public class CodeService {
         }
 
         Code code = convertToEntity(codeDTO);
-        code.setCreatedBy(createdBy);
         code.setUseYn("Y");
         // deleteYn is handled by @PrePersist
 
@@ -183,12 +182,11 @@ public class CodeService {
     /**
      * 코드를 수정합니다.
      *
-     * @param codeDTO   코드 정보
-     * @param updatedBy 수정자 ID
+     * @param codeDTO 코드 정보
      */
     @Transactional
-    public void updateCode(CodeDTO codeDTO, String updatedBy) {
-        log.info("코드 수정 - codeDTO: {}, updatedBy: {}", codeDTO, updatedBy);
+    public void updateCode(CodeDTO codeDTO) {
+        log.info("코드 수정 - codeDTO: {}", codeDTO);
 
         Code code = codeRepository.findById(codeDTO.getCodeId())
                 .orElseThrow(() -> new IllegalArgumentException("코드를 찾을 수 없습니다."));
@@ -196,7 +194,6 @@ public class CodeService {
         // Update fields
         code.setCodeName(codeDTO.getCodeName());
         code.setUseYn(codeDTO.getUseYn());
-        code.setUpdatedBy(updatedBy);
         // updatedAt is handled by @PreUpdate
 
         log.info("코드 수정 완료 - codeId: {}", code.getCodeId());
@@ -221,9 +218,7 @@ public class CodeService {
         Code code = codeRepository.findById(codeId)
                 .orElseThrow(() -> new IllegalArgumentException("코드를 찾을 수 없습니다."));
 
-        code.setDeleteYn("Y");
-        code.setDeletedBy(deletedBy);
-        code.setDeletedAt(java.time.LocalDateTime.now());
+        code.delete(deletedBy);
 
         log.info("코드 삭제 완료 - codeId: {}", codeId);
     }

@@ -1,9 +1,9 @@
 package com.nanum.domain.content.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
@@ -15,12 +15,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE content SET delete_yn = 'Y', deleted_at = NOW() WHERE content_id = ?")
-public class Content extends BaseTimeEntity {
+public class Content extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
     private Long id;
+
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "content_type", nullable = false)
@@ -34,23 +37,6 @@ public class Content extends BaseTimeEntity {
 
     @Column(name = "url_info")
     private String urlInfo;
-
-    @Column(name = "delete_yn", nullable = false)
-    @ColumnDefault("'N'")
-    @Builder.Default
-    private String deleteYn = "N";
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    public void delete(String memberCode) {
-        this.deleteYn = "Y";
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = memberCode;
-    }
 
     // Helper for update
     public void update(ContentType type, String subject, String contentBody, String urlInfo) {

@@ -1,6 +1,6 @@
 package com.nanum.domain.popup.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -15,12 +15,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE popup SET delete_yn = 'Y', deleted_at = NOW() WHERE popup_id = ?")
-public class Popup extends BaseTimeEntity {
+public class Popup extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "popup_id")
     private Long id;
+
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
 
     @Column(nullable = false)
     private String title;
@@ -67,23 +70,6 @@ public class Popup extends BaseTimeEntity {
     @ColumnDefault("'Y'")
     @Builder.Default
     private String useYn = "Y";
-
-    @Column(name = "delete_yn", nullable = false)
-    @ColumnDefault("'N'")
-    @Builder.Default
-    private String deleteYn = "N";
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    public void delete(String memberCode) {
-        this.deleteYn = "Y";
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = memberCode;
-    }
 
     public void update(String title, String linkUrl, int width, int height, int posX, int posY,
             PopupCloseType closeType, LocalDateTime start, LocalDateTime end, String useYn) {

@@ -7,13 +7,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "product_wishlist", uniqueConstraints = {
+@Table(name = "wishlist", uniqueConstraints = {
         @UniqueConstraint(name = "uq_wishlist_user_prod", columnNames = { "member_code", "product_id" })
 })
 @Getter
@@ -26,6 +27,9 @@ public class Wishlist {
     @Column(name = "wishlist_id")
     private Long wishlistId;
 
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code", nullable = false)
     private Member member;
@@ -35,8 +39,8 @@ public class Wishlist {
     private Product product;
 
     @CreatedDate
-    @Column(name = "reg_date", updatable = false)
-    private LocalDateTime regDate;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @Builder
     public Wishlist(Member member, Product product) {

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -29,7 +31,7 @@ public class OrderService {
                 OrderMaster order = OrderMaster.builder()
                                 .member(member)
                                 .orderName("Order by " + member.getMemberName()) // Placeholder
-                                .totalAmount(0L) // Will calc below
+                                .totalPrice(BigDecimal.ZERO) // Will calc below
                                 .status(OrderStatus.PAYMENT_WAIT)
                                 .receiverName(request.getReceiverName())
                                 .receiverPhone(request.getReceiverPhone())
@@ -60,7 +62,7 @@ public class OrderService {
                                                 .orderId(o.getOrderId())
                                                 .status(o.getStatus())
                                                 .receiverName(o.getReceiverName())
-                                                .totalAmount(o.getTotalAmount())
+                                                .totalPrice(o.getTotalPrice())
                                                 .build())
                                 .collect(java.util.stream.Collectors.toList());
         }

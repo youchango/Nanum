@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class FileStore {
+public class FileStore extends com.nanum.global.common.dto.BaseEntity {
 
     @Id
     @Column(name = "file_id", length = 36)
@@ -53,38 +53,15 @@ public class FileStore {
     @ColumnDefault("0")
     private int displayOrder;
 
-    @Column(name = "reg_date", nullable = false, updatable = false)
-    private LocalDateTime regDate;
-
     public void updateReference(ReferenceType referenceType, String referenceId) {
         this.referenceType = referenceType;
         this.referenceId = referenceId;
-    }
-
-    @Column(name = "delete_yn", nullable = false)
-    @ColumnDefault("'N'")
-    @Builder.Default
-    private String deleteYn = "N";
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy;
-
-    public void delete(String memberCode) {
-        this.deleteYn = "Y";
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = memberCode;
     }
 
     @PrePersist
     public void prePersist() {
         if (this.fileId == null) {
             this.fileId = UUID.randomUUID().toString();
-        }
-        if (this.regDate == null) {
-            this.regDate = LocalDateTime.now();
         }
     }
 }

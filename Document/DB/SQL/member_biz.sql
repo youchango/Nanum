@@ -1,4 +1,4 @@
-CREATE TABLE member_biz (
+﻿CREATE TABLE member_biz (
     member_code      VARCHAR(30) PRIMARY KEY COMMENT '회원코드(FK)',
     business_number  VARCHAR(20) NOT NULL COMMENT '사업자등록번호',
     company_name     VARCHAR(100) NOT NULL COMMENT '상호명',

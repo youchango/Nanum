@@ -1,4 +1,4 @@
-CREATE TABLE code (
+﻿CREATE TABLE code (
     code_id    INT AUTO_INCREMENT COMMENT '코드관리 PK',
     code_type  VARCHAR(20) NOT NULL COMMENT '코드타입',
     depth      INT NULL COMMENT 'depth',

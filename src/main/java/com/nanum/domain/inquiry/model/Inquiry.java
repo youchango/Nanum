@@ -1,10 +1,10 @@
 package com.nanum.domain.inquiry.model;
 
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import com.nanum.domain.member.model.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
@@ -16,12 +16,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE inquiry SET delete_yn = 'Y', deleted_at = NOW() WHERE inquiry_id = ?")
-public class Inquiry extends BaseTimeEntity {
+public class Inquiry extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inquiry_id")
     private Long id;
+
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
 
     @Enumerated(EnumType.ORDINAL) // init_db.sql defines INT. Mapping might need Code converter or just ordinal if
                                   // aligned.
@@ -32,7 +35,7 @@ public class Inquiry extends BaseTimeEntity {
     // Given the simplicity, I'll use a Code Converter later if needed?
     // Let's use INT column with a Converter or just assume Ordinal for now
     // (Product/Delivery/Order/Etc).
-    // Actually, init_db comment says '문의구분 (코드ID)'. This implies reference to a
+    // Actually, init_db comment says '臾몄쓽援щ텇 (肄붾뱶ID)'. This implies reference to a
     // Code table.
     // But for this refactor I will Map it to Enum for code clarity.
     // To be safe with INT column, I should use @Convert or EnumType.ORDINAL.
@@ -65,23 +68,6 @@ public class Inquiry extends BaseTimeEntity {
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
-
-    @Column(name = "delete_yn", nullable = false)
-    @ColumnDefault("'N'")
-    @Builder.Default
-    private String deleteYn = "N";
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private String deletedBy; // MemberCode string
-
-    public void delete(String memberCode) {
-        this.deleteYn = "Y";
-        this.deletedAt = LocalDateTime.now();
-        this.deletedBy = memberCode;
-    }
 
     public void reply(String answer, Member answerer) {
         this.answer = answer;

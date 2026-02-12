@@ -1,4 +1,4 @@
--- 1. Product Category
+﻿-- 1. Product Category
 CREATE TABLE product_category (
     category_id      INT AUTO_INCREMENT COMMENT '카테고리ID',
     parent_id        INT NULL COMMENT '상위 카테고리ID',
@@ -15,20 +15,24 @@ CREATE TABLE product_category (
 -- 2. Product Master
 CREATE TABLE product (
     product_id       INT AUTO_INCREMENT COMMENT '상품ID',
-    category_id      INT NOT NULL COMMENT '카테고리ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명',
-    price            INT DEFAULT 0 NOT NULL COMMENT '판매가',
-    sale_price       INT DEFAULT 0 NULL COMMENT '할인가(실판매가)',
+    brand_name       VARCHAR(100) NULL COMMENT '브랜드명',
+    supply_price     INT DEFAULT 0 NOT NULL COMMENT '공급가',
+    map_price        INT DEFAULT 0 NOT NULL COMMENT '지도가',
+    standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
+    
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
-    PRIMARY KEY (product_id),
-    INDEX idx_product_cat (category_id)
+    PRIMARY KEY (product_id)
 ) COMMENT '상품 마스터';
 
 -- 3. Product Option (SKU)
@@ -44,7 +48,32 @@ CREATE TABLE product_option (
     CONSTRAINT fk_option_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 옵션';
 
+-- 4. Product Category Mapping (N:M)
+CREATE TABLE product_category_by (
+    product_id       INT NOT NULL COMMENT '상품ID',
+    category_id      INT NOT NULL COMMENT '카테고리ID',
+    
+    PRIMARY KEY (product_id, category_id),
+    CONSTRAINT fk_pcb_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
+    CONSTRAINT fk_pcb_category FOREIGN KEY (category_id) REFERENCES product_category (category_id) ON DELETE CASCADE
+) COMMENT '상품-카테고리 매핑';
 
+-- 5. Product Site (Multi-site Price/Display)
+CREATE TABLE product_site (
+    ps_id            INT AUTO_INCREMENT COMMENT 'PS Key',
+    product_id       INT NOT NULL COMMENT '상품ID',
+    option_id        INT NOT NULL COMMENT '옵션ID',
+    site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
+    view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
+    a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
+    b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
+    c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
+    PRIMARY KEY (ps_id),
+    CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
+    CONSTRAINT fk_ps_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
+) COMMENT '상품 사이트별 정보';
 
 -- 5. Product Stock (Warehouse)
 CREATE TABLE product_stock (

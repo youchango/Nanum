@@ -43,7 +43,6 @@ public class AdminBannerService {
                 .startDatetime(request.getStartDatetime())
                 .endDatetime(request.getEndDatetime())
                 .useYn(request.getUseYn())
-                .deleteYn("N")
                 .build();
         bannerRepository.save(banner);
 

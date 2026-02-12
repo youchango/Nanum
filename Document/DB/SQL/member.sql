@@ -1,4 +1,4 @@
-CREATE TABLE member (
+﻿CREATE TABLE member (
     id               INT AUTO_INCREMENT COMMENT 'ID',
     member_code      VARCHAR(20) NOT NULL COMMENT '회원코드',
     member_id        VARCHAR(50) NOT NULL COMMENT '회원아이디',
@@ -13,8 +13,9 @@ CREATE TABLE member (
     email            VARCHAR(100) NULL COMMENT '이메일',
     memo             VARCHAR(2000) NULL COMMENT '메모',
     role             VARCHAR(20) NOT NULL COMMENT '권한',
-    member_type      CHAR(1) NOT NULL COMMENT '회원구분',
+    member_type      CHAR(1) NOT NULL COMMENT '회원구분 (U:일반, B:기업, V:보훈)',
     login_fail_count INT DEFAULT 0 NOT NULL COMMENT '로그인 실패횟수',
+    apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     withdraw_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '탈퇴유무',
     withdraw_at      DATETIME NULL COMMENT '탈퇴일',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',

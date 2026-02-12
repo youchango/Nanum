@@ -2,7 +2,7 @@ package com.nanum.domain.cart.model;
 
 import com.nanum.domain.member.model.Member;
 import com.nanum.domain.product.model.Product;
-import com.nanum.global.common.dto.BaseTimeEntity;
+import com.nanum.global.common.dto.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @Table(name = "cart")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cart extends BaseTimeEntity {
+public class Cart extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,3 +47,4 @@ public class Cart extends BaseTimeEntity {
         this.quantity = quantity;
     }
 }
+

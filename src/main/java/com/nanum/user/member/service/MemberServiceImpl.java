@@ -61,12 +61,13 @@ public class MemberServiceImpl implements MemberService {
         MemberType memberType = MemberType.U;
 
         String typeInput = memberDTO.getMemberType();
-        if ("M".equals(typeInput)) {
-            role = MemberRole.ROLE_MASTER;
-            memberType = MemberType.M;
-        } else if ("B".equals(typeInput)) {
+
+        if ("B".equals(typeInput)) {
             role = MemberRole.ROLE_BIZ;
             memberType = MemberType.B;
+        } else if ("V".equals(typeInput)) {
+            role = MemberRole.ROLE_USER;
+            memberType = MemberType.V;
         } else {
             // Default or "U"
             role = MemberRole.ROLE_USER;

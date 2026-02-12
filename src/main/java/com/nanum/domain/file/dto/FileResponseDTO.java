@@ -33,7 +33,7 @@ public class FileResponseDTO {
                 .size(fileStore.getSize())
                 .isMain(fileStore.getIsMain())
                 .displayOrder(fileStore.getDisplayOrder())
-                .regDate(fileStore.getRegDate())
+                .regDate(fileStore.getCreatedAt())
                 .build();
     }
 }

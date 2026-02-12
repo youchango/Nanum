@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class AdminMemberService {
      * @return 회원 수
      */
     public int getMemberCount(SearchDTO searchDTO) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(searchDTO.getPage() - 1,
+        Pageable pageable = PageRequest.of(searchDTO.getPage() - 1,
                 searchDTO.getRecordSize());
         return (int) memberRepository.searchMembers(searchDTO, pageable).getTotalElements();
     }
@@ -80,12 +80,13 @@ public class AdminMemberService {
         MemberType memberType = MemberType.U;
 
         String typeInput = memberDTO.getMemberType();
-        if ("M".equals(typeInput)) {
-            role = MemberRole.ROLE_MASTER;
-            memberType = MemberType.M;
-        } else if ("B".equals(typeInput)) {
+
+        if ("B".equals(typeInput)) {
             role = MemberRole.ROLE_BIZ;
             memberType = MemberType.B;
+        } else if ("V".equals(typeInput)) {
+            role = MemberRole.ROLE_USER;
+            memberType = MemberType.V;
         } else {
             // Default or "U"
             role = MemberRole.ROLE_USER;
@@ -145,16 +146,26 @@ public class AdminMemberService {
         // Role/Type update if provided
         if (memberDTO.getMemberType() != null && !memberDTO.getMemberType().isEmpty()) {
             String typeInput = memberDTO.getMemberType();
-            if ("M".equals(typeInput)) {
-                member.setRole(MemberRole.ROLE_MASTER);
-                member.setMemberType(MemberType.M);
-            } else if ("B".equals(typeInput)) {
+            if ("B".equals(typeInput)) {
                 member.setRole(MemberRole.ROLE_BIZ);
                 member.setMemberType(MemberType.B);
+            } else if ("V".equals(typeInput)) {
+                member.setRole(MemberRole.ROLE_USER);
+                member.setMemberType(MemberType.V);
             } else if ("U".equals(typeInput)) {
                 member.setRole(MemberRole.ROLE_USER);
                 member.setMemberType(MemberType.U);
             }
+        }
+
+        // Update applyYn
+        if (memberDTO.getApplyYn() != null && !memberDTO.getApplyYn().isEmpty()) {
+            member.setApplyYn(memberDTO.getApplyYn());
+        }
+
+        // Update memo
+        if (memberDTO.getMemo() != null) {
+            member.setMemo(memberDTO.getMemo());
         }
     }
 

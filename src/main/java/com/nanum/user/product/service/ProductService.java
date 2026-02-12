@@ -27,17 +27,21 @@ public class ProductService {
 
     @Transactional
     public Long createProduct(ProductDTO.Request request) {
-        ProductCategory category = productCategoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        if (request.getCategoryIds() == null || request.getCategoryIds().isEmpty()) {
+            throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+        }
+        List<ProductCategory> categories = productCategoryRepository.findAllById(request.getCategoryIds());
 
         Product product = Product.builder()
-                .category(category)
+                .categories(categories)
                 .name(request.getName())
-                .price(request.getPrice())
-                .salePrice(request.getSalePrice())
+                .mapPrice(request.getMapPrice())
+                .standardPrice(request.getStandardPrice())
                 .status(request.getStatus() != null ? request.getStatus() : ProductStatus.SALE)
                 .description(request.getDescription())
-                .deleteYn("N")
+                .supplyPrice(0) // Default for user side creation? Or maybe not needed if nullable? Entity says
+                                // nullable=false, default 0.
+                .viewCount(0)
                 .build();
 
         // Add Options
@@ -67,14 +71,13 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        ProductCategory category = productCategoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        List<ProductCategory> categories = productCategoryRepository.findAllById(request.getCategoryIds());
 
         product.updateInfo(
-                category,
+                categories,
                 request.getName(),
-                request.getPrice(),
-                request.getSalePrice(),
+                request.getMapPrice(),
+                request.getStandardPrice(),
                 request.getStatus(),
                 request.getDescription());
 
@@ -95,7 +98,8 @@ public class ProductService {
         // Simple implementation - should be improved with QueryDSL for paging/search
         return productRepository.findAll().stream()
                 .filter(p -> "N".equals(p.getDeleteYn()))
-                .filter(p -> categoryId == null || p.getCategory().getCategoryId().equals(categoryId))
+                .filter(p -> categoryId == null
+                        || p.getCategories().stream().anyMatch(c -> c.getCategoryId().equals(categoryId)))
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -116,13 +120,16 @@ public class ProductService {
                 .map(com.nanum.domain.file.dto.FileResponseDTO::from)
                 .collect(Collectors.toList());
 
+        ProductCategory firstCategory = product.getCategories().isEmpty() ? null : product.getCategories().get(0);
+
         return ProductDTO.Response.builder()
                 .productId(product.getId())
-                .categoryId(product.getCategory().getCategoryId())
-                .categoryName(product.getCategory().getCategoryName())
+                .categoryId(product.getCategories().stream().map(ProductCategory::getCategoryId)
+                        .collect(Collectors.toList()))
+                .categoryName(firstCategory != null ? firstCategory.getCategoryName() : null)
                 .name(product.getName())
-                .price(product.getPrice())
-                .salePrice(product.getSalePrice())
+                .mapPrice(product.getMapPrice())
+                .standardPrice(product.getStandardPrice())
                 .status(product.getStatus())
                 .files(files)
                 .build();

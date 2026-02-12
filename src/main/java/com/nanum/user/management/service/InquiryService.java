@@ -56,7 +56,6 @@ public class InquiryService {
                 .content(request.getContent())
                 .writer(writer)
                 .status(InquiryStatus.WAIT)
-                .deleteYn("N")
                 .build();
 
         inquiryRepository.save(inquiry);

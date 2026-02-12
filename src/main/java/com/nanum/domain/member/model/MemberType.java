@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MemberType {
-    M("관리자"),
-    B("업무자"),
-    U("사용자");
+    U("일반 회원"),
+    B("기업 회원"),
+    V("보훈 회원");
 
     private final String description;
 }

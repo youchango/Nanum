@@ -88,9 +88,19 @@ public class MemberDTO {
     private String email;
 
     /**
-     * 회원 유형 (U: 사용자, B: 업무자, M: 관리자)
+     * 회원 유형 (U: 사용자, B: 업무자, V: 보훈)
      */
     private String memberType;
+
+    /**
+     * 승인 여부 (Y/N)
+     */
+    private String applyYn;
+
+    /**
+     * 관리자 메모
+     */
+    private String memo;
 
     /**
      * DTO를 Member 엔티티로 변환합니다.
