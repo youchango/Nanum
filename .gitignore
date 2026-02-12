@@ -39,3 +39,7 @@ replay_pid*
 .settings/
 bin/
 Local/
+
+### Sensitive Config (Added) ###
+gradle.properties
+src/main/resources/application-local.yml
