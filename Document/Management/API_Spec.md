@@ -2,7 +2,30 @@
 
 본 문서는 `Nanum` 프로젝트의 Spring Boot Application에서 제공하는 REST API 명세서입니다.
 
-## 1. Auth (인증/인가)
+## 1. Dashboard
+### 1.1. Summary
+- **URL**: `/api/v1/admin/dashboard/summary`
+- **Method**: `GET`
+- **Description**: 쇼핑몰 통합 대시보드 요약 정보 조회 (최근 주문, 반품, 결제, 포인트, 문의, 배송 - 각 5건)
+- **Parameters**:
+    - `siteCd` (String, Optional): 사이트 코드 (관리자 권한일 경우 필수 아님, 빈 값일 경우 전체 조회)
+- **Response**: `ApiResponse<DashboardDTO>`
+    ```json
+    {
+      "success": true,
+      "data": {
+        "recentOrders": [...],
+        "recentClaims": [...],
+        "recentPayments": [...],
+        "recentPoints": [...],
+        "recentInquiries": [...],
+        "recentDeliveries": []
+      },
+      "message": null
+    }
+    ```
+
+## 2. Authentication (인증/인가)
 Base URL: `/api/v1/auth`
 
 | Method | Endpoint | Summary | Description |
@@ -24,6 +47,22 @@ Base URL: `/api/v1/admin/shops`
 | `GET` | `/{shopKey}` | 상점 상세 조회 | 상점 상세 정보를 조회합니다. |
 | `PUT` | `/{shopKey}` | 상점 수정 | 상점 정보를 수정합니다. |
 
+## 1. 개요
+본 문서는 나눔 쇼핑몰 관리자 페이지의 API 명세를 기술한다.
+Backend Server: `http://localhost:8080/api`
+Current Version: v1.0
+
+## 2. 서비스 구조 (Service Structure)
+Frontend `src/services/admin` 디렉토리 하위에 도메인별로 구분하여 관리한다.
+
+- **Member**: `admin/member/` (Member, Manager, Point)
+- **Shop**: `admin/shop/` (Shop, ShopCategory)
+- **Product**: `admin/product/` (Product, Category, Review)
+- **Order**: `admin/order/` (Order, Payment, Delivery)
+- **Display**: `admin/display/` (Banner, Popup, Recommendation)
+- **Support**: `admin/support/` (Notice, FAQ, Inquiry)
+- **System**: `admin/system/` (Code, Menu, Authority, Terms)
+- **Dashboard**: `admin/dashboard/` (Statistics, Monitoring)
 ## 1.2 Manager (관리자 관리) [Master Only]
 Base URL: `/api/v1/admin/managers`
 

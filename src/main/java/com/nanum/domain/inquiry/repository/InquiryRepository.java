@@ -10,4 +10,8 @@ import java.util.List;
 @Repository
 public interface InquiryRepository extends JpaRepository<Inquiry, Long>, InquiryRepositoryCustom {
     List<Inquiry> findByWriter(Member writer);
+
+    List<Inquiry> findTop5BySiteCdOrderByCreatedAtDesc(String siteCd);
+
+    List<Inquiry> findTop5ByOrderByCreatedAtDesc();
 }

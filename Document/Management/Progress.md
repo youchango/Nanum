@@ -19,6 +19,11 @@
 - [x] DB Schema 설계 및 구축 (PostgreSQL)
 - [x] 멀티 모듈 구조 설계
 - [ ] CI/CD 파이프라인 구축
+- [x] SCM 회원가입 (비즈니스 로직 및 통합 테스트)
+- [x] 쇼핑몰 통합 대시보드 고도화 (Backend)
+    - [x] DashboardDTO 및 Service/Controller 구현
+    - [x] 각 도메인 Repository 연결 (Top 5 조회)
+    - [x] API Spec 문서 현행화로직
 
 ### 2. 인증 및 권한 (Auth)
 - [x] JWT 기반 통합 인증 시스템
