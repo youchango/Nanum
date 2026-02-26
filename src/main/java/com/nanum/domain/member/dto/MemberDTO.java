@@ -21,6 +21,11 @@ public class MemberDTO {
     private String memberName;
 
     /**
+     * 회원 식별용 고유 코드 (Natural Key)
+     */
+    private String memberCode;
+
+    /**
      * 로그인에 사용될 아이디입니다.
      * 영문 소문자와 숫자 조합, 4~20자로 제한됩니다.
      */

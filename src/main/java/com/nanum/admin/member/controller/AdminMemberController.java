@@ -109,4 +109,21 @@ public class AdminMemberController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    /**
+     * 회원을 탈퇴(Soft Delete) 처리합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @return 성공 메시지
+     */
+    @Operation(summary = "회원 탈퇴(삭제) 처리", description = "회원의 상태를 탈퇴(withdrawYn='Y')로 변경합니다.")
+    @DeleteMapping("/{memberCode}")
+    public ResponseEntity<ApiResponse<Object>> deleteMember(@PathVariable String memberCode) {
+        try {
+            adminMemberService.deleteMember(memberCode);
+            return ResponseEntity.ok(ApiResponse.success("Member deleted (withdrawn) successfully", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

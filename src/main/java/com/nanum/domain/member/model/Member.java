@@ -59,7 +59,7 @@ public class Member {
 
     private String email; // 이메일
     @Enumerated(jakarta.persistence.EnumType.STRING)
-    private MemberRole role; // 권한 (ROLE_MASTER, ROLE_BIZ, ROLE_USER)
+    private MemberRole role; // 권한 (ROLE_BIZ, ROLE_USER, ROLE_VETERAN)
 
     @Column(name = "member_type")
     @Enumerated(jakarta.persistence.EnumType.STRING)

@@ -150,7 +150,7 @@ public class AdminMemberService {
                 member.setRole(MemberRole.ROLE_BIZ);
                 member.setMemberType(MemberType.B);
             } else if ("V".equals(typeInput)) {
-                member.setRole(MemberRole.ROLE_USER);
+                member.setRole(MemberRole.ROLE_VETERAN);
                 member.setMemberType(MemberType.V);
             } else if ("U".equals(typeInput)) {
                 member.setRole(MemberRole.ROLE_USER);
@@ -167,6 +167,18 @@ public class AdminMemberService {
         if (memberDTO.getMemo() != null) {
             member.setMemo(memberDTO.getMemo());
         }
+    }
+
+    /**
+     * 회원을 탈퇴(Soft Delete) 처리합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     */
+    @Transactional
+    public void deleteMember(String memberCode) {
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. Code: " + memberCode));
+        member.setWithdrawYn("Y");
     }
 
     // Member Code 생성 helper
