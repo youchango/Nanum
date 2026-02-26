@@ -159,6 +159,26 @@ Base URL: `/api/v1/products`
 | `GET` | `/` | 상품 목록 조회 | 카테고리 필터링 등 상품 목록을 조회합니다. (`categoryId` 포함) |
 | `GET` | `/{id}` | 상품 상세 조회 | 상품 상세 정보를 조회합니다. (`categoryId` 포함) |
 
+### 4.4 User Product Review (상품 리뷰)
+Base URL: `/api/v1/products/{productId}/reviews`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 리뷰 목록 조회 | 특정 상품의 리뷰 목록을 페이징 조회합니다. (로그인 시 본인 `isLiked` 표기) |
+| `POST` | `/` | 리뷰 작성 | 특정 상품에 리뷰를 작성합니다. |
+| `PUT` | `/{reviewId}` | 리뷰 수정 | 본인이 작성한 리뷰를 수정합니다. |
+| `DELETE` | `/{reviewId}` | 리뷰 삭제 | 본인이 작성한 리뷰를 삭제합니다. (Soft Delete) |
+| `POST` | `/{reviewId}/like` | 리뷰 좋아요 | 특정 리뷰에 좋아요를 등록합니다. |
+| `DELETE` | `/{reviewId}/like` | 리뷰 좋아요 취소 | 특정 리뷰에 등록한 좋아요를 취소합니다. |
+
+### 4.5 Admin Product Review (상품 리뷰 관리)
+Base URL: `/api/v1/admin/products/reviews`
+
+| Method | Endpoint | Summary | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | 전체 리뷰 조회 | 전체 상품의 리뷰를 모니터링하기 위해 페이징/검색 조회합니다. |
+| `DELETE` | `/{reviewId}` | 리뷰 강제 삭제 | 부적절한 리뷰를 관리자 권한으로 삭제합니다. (Soft Delete) |
+
 **Response Schema (`ProductDTO.Response`)**
 ```json
 {

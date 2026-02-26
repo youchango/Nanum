@@ -56,6 +56,11 @@
     - [x] 상품 삭제 (무결성 보장)
 - [ ] 일반/기업 전용 상품 등록 및 노출 제어 (Site Code 적용 완료)
 - [ ] 상품 옵션 및 재고 관리 시스템
+- [ ] **상품 리뷰 및 평가 (Product Review & Like)**
+    - [ ] DB 스키마 (`product_review`, `product_review_like`) 구축 완료
+    - [ ] 사용자(User) - 상품 리뷰 및 별점 등록/수정/논리삭제(Soft Delete) 기능 구현
+    - [ ] 사용자(User) - 리뷰에 대한 좋아요(Like) 기능 (Hard Delete 토글 방식) 구현
+    - [ ] 관리자(Admin) - 상품별 리뷰 내역 조회 및 권한 제어
 
 ### 5. 주문 및 결제 (Order & Pay)
 - [x] **스마트 장바구니 구현 (Smart Cart)**

@@ -6,6 +6,9 @@ import com.nanum.admin.product.service.AdminProductService;
 import com.nanum.global.common.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import com.nanum.domain.product.dto.ProductDTO;
+import com.nanum.admin.product.service.AdminProductReviewService;
+import com.nanum.domain.product.dto.AdminProductReviewDTO;
+import com.nanum.domain.product.dto.AdminProductReviewSearchDTO;
 import com.nanum.domain.product.model.ProductStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +27,7 @@ import java.util.Map;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+    private final AdminProductReviewService adminProductReviewService;
 
     @GetMapping
     @Operation(summary = "상품 목록 조회", description = "검색 조건에 따른 상품 목록을 조회합니다.")
@@ -68,6 +72,23 @@ public class AdminProductController {
         // TODO: Get actual logged-in member code
         String memberCode = "ADMIN";
         adminProductService.deleteProduct(id, memberCode);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // --- Product Review Monitoring ---
+    @GetMapping("/reviews")
+    @Operation(summary = "전체 상품 리뷰 목록 조회", description = "상품 리뷰 목록을 모니터링합니다.")
+    public ResponseEntity<ApiResponse<Page<AdminProductReviewDTO.Response>>> getReviews(
+            @ModelAttribute AdminProductReviewSearchDTO searchDTO,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(adminProductReviewService.getReviews(searchDTO, pageable)));
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    @Operation(summary = "부적절한 리뷰 논리 삭제", description = "관리자 권한으로 특정 리뷰를 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> deleteReview(
+            @PathVariable Long reviewId) {
+        adminProductReviewService.deleteReview(reviewId);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
