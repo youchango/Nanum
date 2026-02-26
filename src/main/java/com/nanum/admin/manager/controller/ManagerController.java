@@ -2,7 +2,6 @@ package com.nanum.admin.manager.controller;
 
 import com.nanum.admin.manager.dto.ManagerDTO;
 import com.nanum.admin.manager.service.ManagerService;
-import com.nanum.global.common.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,25 +35,36 @@ public class ManagerController {
         return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(responseData));
     }
 
-    @org.springframework.web.bind.annotation.GetMapping("/managers/{id}")
+    @org.springframework.web.bind.annotation.GetMapping("/managers/{managerCode}")
     public ResponseEntity<com.nanum.global.common.dto.ApiResponse<ManagerDTO.ManagerInfo>> getManager(
-            @org.springframework.web.bind.annotation.PathVariable Long id) {
-        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(managerService.getManager(id)));
+            @org.springframework.web.bind.annotation.PathVariable String managerCode) {
+        return ResponseEntity
+                .ok(com.nanum.global.common.dto.ApiResponse.success(managerService.getManager(managerCode)));
     }
 
-    @org.springframework.web.bind.annotation.PutMapping("/managers/{id}")
+    @org.springframework.web.bind.annotation.PutMapping("/managers/{managerCode}")
     public ResponseEntity<com.nanum.global.common.dto.ApiResponse<Void>> updateManager(
-            @org.springframework.web.bind.annotation.PathVariable Long id,
+            @org.springframework.web.bind.annotation.PathVariable String managerCode,
             @RequestBody ManagerDTO.CreateRequest request) {
-        managerService.updateManager(id, request);
+        managerService.updateManager(managerCode, request);
         return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(null));
     }
 
-    @PostMapping("/managers/{id}/approve")
+    @PostMapping("/managers/{managerCode}/approve")
     public ResponseEntity<Void> approveManager(
-            @org.springframework.web.bind.annotation.PathVariable Long id) {
-        managerService.approveManager(id);
+            @org.springframework.web.bind.annotation.PathVariable String managerCode) {
+        managerService.approveManager(managerCode);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 관리자를 승인 취소 또는 삭제(비활성화) 처리합니다.
+     */
+    @org.springframework.web.bind.annotation.DeleteMapping("/managers/{managerCode}")
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<Void>> deleteManager(
+            @org.springframework.web.bind.annotation.PathVariable String managerCode) {
+        managerService.deleteManager(managerCode);
+        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(null));
     }
 
 }

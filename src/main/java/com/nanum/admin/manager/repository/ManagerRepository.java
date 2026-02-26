@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ManagerRepository extends JpaRepository<Manager, Long>, ManagerRepositoryCustom {
     Optional<Manager> findByManagerId(String managerId);
 
+    Optional<Manager> findByManagerCode(String managerCode);
+
     Optional<Manager> findTopByManagerCodeStartingWithOrderByManagerCodeDesc(String prefix);
 
     List<Manager> findAllByApplyYn(String applyYn);

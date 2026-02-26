@@ -53,6 +53,9 @@ public class SearchDTO {
     /** 관리자 구분 (MASTER/ADMIN/SCM) */
     private String managerType;
 
+    /** 사용 여부 (정상: Y, 비활성/삭제: N) */
+    private String useYn;
+
     /** 검색 조건 맵 (추가적인 검색 조건) */
     private java.util.Map<String, Object> params = new java.util.HashMap<>();
 

@@ -27,7 +27,13 @@ public class ManagerRepositoryImpl implements ManagerRepositoryCustom {
         QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(manager.deleteYn.eq("N"));
+
+        if (StringUtils.hasText(searchDTO.getUseYn())) {
+            builder.and(manager.useYn.eq(searchDTO.getUseYn()));
+        } else {
+            // 기본값: 비활성화(삭제)된 계정은 보이지 않도록 함
+            builder.and(manager.useYn.eq("Y").or(manager.useYn.isNull()));
+        }
 
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();

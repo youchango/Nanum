@@ -97,4 +97,8 @@ public class Manager extends com.nanum.global.common.dto.BaseEntity {
             this.authGroup = authGroup;
     }
 
+    public void updateUseYn(String useYn) {
+        this.useYn = useYn;
+    }
+
 }

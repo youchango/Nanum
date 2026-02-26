@@ -192,23 +192,23 @@ public class ManagerService {
     }
 
     @Transactional
-    public void approveManager(Long managerSeq) {
-        Manager manager = managerRepository.findById(managerSeq)
+    public void approveManager(String managerCode) {
+        Manager manager = managerRepository.findByManagerCode(managerCode)
                 .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
 
         manager.approve();
     }
 
     @Transactional(readOnly = true)
-    public ManagerDTO.ManagerInfo getManager(Long managerSeq) {
-        Manager manager = managerRepository.findById(managerSeq)
+    public ManagerDTO.ManagerInfo getManager(String managerCode) {
+        Manager manager = managerRepository.findByManagerCode(managerCode)
                 .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
         return ManagerDTO.ManagerInfo.from(manager);
     }
 
     @Transactional
-    public void updateManager(Long managerSeq, ManagerDTO.CreateRequest request) {
-        Manager manager = managerRepository.findById(managerSeq)
+    public void updateManager(String managerCode, ManagerDTO.CreateRequest request) {
+        Manager manager = managerRepository.findByManagerCode(managerCode)
                 .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
 
         // Update fields (excluding Password, ID, Code)
@@ -228,6 +228,18 @@ public class ManagerService {
 
         // ApplyYn is handled by approveManager, UseYn/DeleteYn by deleteManager (not
         // yet impl)
+    }
+
+    /**
+     * 관리자를 탈퇴/삭제(비활성화) 처리합니다.
+     */
+    @Transactional
+    public void deleteManager(String managerCode) {
+        Manager manager = managerRepository.findByManagerCode(managerCode)
+                .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
+
+        // UseYn을 N으로 변경하여 비활성화/논리삭제
+        manager.updateUseYn("N");
     }
 
     public org.springframework.data.domain.Page<ManagerDTO.ManagerInfo> getManagers(

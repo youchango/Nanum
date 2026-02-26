@@ -27,7 +27,21 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         QMember member = QMember.member;
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(member.withdrawYn.eq("N"));
+
+        // useYn 혹은 searchStatus 등(프론트 단 조건)에 맞춰 동적 처리
+        if (StringUtils.hasText(searchDTO.getUseYn())) {
+            if ("Y".equals(searchDTO.getUseYn())) {
+                builder.and(member.withdrawYn.eq("N").or(member.withdrawYn.isNull()));
+            } else if ("N".equals(searchDTO.getUseYn())) {
+                builder.and(member.withdrawYn.eq("Y"));
+            }
+        } else {
+            // 미지정 시에도 기본적으로 탈퇴 회원 제외하는 요건이라면 다음과 같이 둠
+            // 하지만 프론트에서 "ALL" 가능하게 하려면 조건을 걸지 않음
+            // 일단 'ALL' 일 땐 전체 조회로 열어둠 (프론트에서 ACTIVE 기본값을 안주면 전체가 됨)
+            // 사이트 기획상 기본은 정상회원 조회가 맞다면 여기서 조건을 막을 수 있습니다.
+            builder.and(member.withdrawYn.eq("N").or(member.withdrawYn.isNull()));
+        }
 
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();
