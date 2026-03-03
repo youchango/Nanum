@@ -86,8 +86,6 @@ public class AdminProductService {
 
         @Transactional
         public Long createProduct(ProductDTO.Request request) {
-                Manager manager = getCurrentManager();
-
                 if (request.getCategoryIds() == null || request.getCategoryIds().isEmpty()) {
                         throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
                 }
@@ -125,15 +123,33 @@ public class AdminProductService {
                 productRepository.save(product);
                 productRepository.flush(); // Ensure IDs are generated for product and options
 
-                // 2. Save ProductSite (미노출 & 0원 초기화)
+                // 2. Save ProductSite (전체 사이트 대상 일괄 생성, 미노출 & 0원 초기화)
                 BigDecimal basePrice = BigDecimal.ZERO;
-                if (product.getOptions() != null && !product.getOptions().isEmpty()) {
-                        for (ProductOption opt : product.getOptions()) {
+                List<ShopInfo> allSites = shopInfoRepository.findAll();
+
+                for (ShopInfo site : allSites) {
+                        if (product.getOptions() != null && !product.getOptions().isEmpty()) {
+                                for (ProductOption opt : product.getOptions()) {
+                                        ProductSite ps = ProductSite.builder()
+                                                        .product(product)
+                                                        .optionId(opt.getId())
+                                                        .siteCd(site.getSiteCd())
+                                                        .viewYn("N") // 초기 미노출 처리
+                                                        .standardPrice(request.getStandardPrice()) // 기준가 적용
+                                                        .aPrice(basePrice)
+                                                        .bPrice(basePrice)
+                                                        .cPrice(basePrice)
+                                                        .pdtClick(0)
+                                                        .build();
+                                        productSiteRepository.save(ps);
+                                }
+                        } else {
                                 ProductSite ps = ProductSite.builder()
                                                 .product(product)
-                                                .optionId(opt.getId())
-                                                .siteCd(manager.getSiteCd())
+                                                .optionId(null) // No option, so optionId is null
+                                                .siteCd(site.getSiteCd())
                                                 .viewYn("N") // 초기 미노출 처리
+                                                .standardPrice(request.getStandardPrice()) // 기준가 적용
                                                 .aPrice(basePrice)
                                                 .bPrice(basePrice)
                                                 .cPrice(basePrice)
@@ -141,18 +157,6 @@ public class AdminProductService {
                                                 .build();
                                 productSiteRepository.save(ps);
                         }
-                } else {
-                        ProductSite ps = ProductSite.builder()
-                                        .product(product)
-                                        .optionId(null) // No option, so optionId is null
-                                        .siteCd(manager.getSiteCd())
-                                        .viewYn("Y")
-                                        .aPrice(basePrice)
-                                        .bPrice(basePrice)
-                                        .cPrice(basePrice)
-                                        .pdtClick(0)
-                                        .build();
-                        productSiteRepository.save(ps);
                 }
 
                 // 3. Link Files
