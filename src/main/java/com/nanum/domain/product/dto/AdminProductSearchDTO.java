@@ -10,6 +10,7 @@ import lombok.ToString;
 @ToString
 public class AdminProductSearchDTO {
     private Long categoryId;
+    private java.util.List<Long> categoryIds;
     private String searchType; // "NAME", "CODE"
     private String searchKeyword;
     private ProductStatus status; // SALE, STOP, SOLD_OUT

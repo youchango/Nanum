@@ -167,6 +167,7 @@ CREATE TABLE product_site (
     option_id        INT NOT NULL COMMENT '옵션ID',
     site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
     view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
+    standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',

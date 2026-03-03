@@ -20,6 +20,9 @@ public class AdminProductListDTO {
     private int standardPrice;
     private ProductStatus status;
 
+    // From ProductSite (1:N options mapping)
+    private java.util.List<ProductSitePriceDTO> sitePrices;
+
     private int viewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

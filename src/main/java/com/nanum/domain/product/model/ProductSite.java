@@ -39,6 +39,10 @@ public class ProductSite extends BaseEntity {
     @Builder.Default
     private String viewYn = "N";
 
+    @Column(name = "standard_price", nullable = true)
+    @ColumnDefault("0")
+    private Integer standardPrice;
+
     @Column(name = "a_price", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     private BigDecimal aPrice;
@@ -55,8 +59,9 @@ public class ProductSite extends BaseEntity {
     @ColumnDefault("0")
     private Integer pdtClick;
 
-    public void update(String viewYn, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
+    public void update(String viewYn, Integer standardPrice, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
         this.viewYn = viewYn;
+        this.standardPrice = standardPrice;
         this.aPrice = aPrice;
         this.bPrice = bPrice;
         this.cPrice = cPrice;

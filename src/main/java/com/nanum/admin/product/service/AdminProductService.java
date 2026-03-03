@@ -24,6 +24,9 @@ import com.nanum.domain.product.repository.ProductSiteRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.math.BigDecimal;
 
+import com.nanum.domain.shop.model.ShopInfo;
+import com.nanum.domain.shop.repository.ShopInfoRepository;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -32,6 +35,7 @@ public class AdminProductService {
         private final ProductRepository productRepository;
         private final ProductSiteRepository productSiteRepository; // Injected
         private final ProductCategoryRepository productCategoryRepository;
+        private final ShopInfoRepository shopInfoRepository;
         private final InventoryService inventoryService;
         private final com.nanum.domain.file.service.FileService fileService;
 
@@ -111,7 +115,7 @@ public class AdminProductService {
                                                         .product(product)
                                                         .name(opt.getName())
                                                         .extraPrice(opt.getExtraPrice())
-                                                        .stockQuantity(opt.getStockQuantity())
+                                                        .stockQuantity(0) // 무조건 재고 0으로 등록 제한
                                                         .useYn("Y")
                                                         .build())
                                         .collect(Collectors.toList());
@@ -121,18 +125,15 @@ public class AdminProductService {
                 productRepository.save(product);
                 productRepository.flush(); // Ensure IDs are generated for product and options
 
-                // 2. Save ProductSite (Current Site)
+                // 2. Save ProductSite (미노출 & 0원 초기화)
+                BigDecimal basePrice = BigDecimal.ZERO;
                 if (product.getOptions() != null && !product.getOptions().isEmpty()) {
                         for (ProductOption opt : product.getOptions()) {
-                                // Default logic: all tier prices = standardPrice + extraPrice
-                                BigDecimal basePrice = new BigDecimal(request.getStandardPrice())
-                                                .add(new BigDecimal(opt.getExtraPrice()));
-
                                 ProductSite ps = ProductSite.builder()
                                                 .product(product)
                                                 .optionId(opt.getId())
                                                 .siteCd(manager.getSiteCd())
-                                                .viewYn("Y") // Default visible for creator
+                                                .viewYn("N") // 초기 미노출 처리
                                                 .aPrice(basePrice)
                                                 .bPrice(basePrice)
                                                 .cPrice(basePrice)
@@ -141,9 +142,6 @@ public class AdminProductService {
                                 productSiteRepository.save(ps);
                         }
                 } else {
-                        // Handle no options logic if necessary, e.g., create a ProductSite for the base
-                        // product
-                        BigDecimal basePrice = new BigDecimal(request.getStandardPrice());
                         ProductSite ps = ProductSite.builder()
                                         .product(product)
                                         .optionId(null) // No option, so optionId is null
@@ -168,7 +166,7 @@ public class AdminProductService {
 
         @Transactional
         public void updateProduct(Long id, ProductDTO.Request request) {
-                Manager manager = getCurrentManager();
+                // Manager manager = getCurrentManager(); // 사용하지 않으므로 주석 처리
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
@@ -186,10 +184,7 @@ public class AdminProductService {
                                 request.getStatus(),
                                 request.getDescription());
 
-                // Options Update - Clear existing and add new ones
-                // This is a simple replacement strategy. For more complex updates (e.g.,
-                // partial updates,
-                // preserving existing options), more sophisticated logic would be needed.
+                // Options Update - 기존 옵션 클리어 및 재설정
                 product.getOptions().clear();
                 if (request.getOptions() != null) {
                         List<ProductOption> options = request.getOptions().stream()
@@ -197,25 +192,28 @@ public class AdminProductService {
                                                         .product(product)
                                                         .name(opt.getName())
                                                         .extraPrice(opt.getExtraPrice())
-                                                        .stockQuantity(opt.getStockQuantity())
+                                                        .stockQuantity(0) // 수정 시에도 강제 0 초기화 관리
                                                         .useYn("Y")
                                                         .build())
                                         .collect(Collectors.toList());
                         product.getOptions().addAll(options);
                 }
 
-                // Check if ProductSite exists for this site
-                ProductSite productSite = productSiteRepository.findByProductAndSiteCd(product, manager.getSiteCd())
-                                .orElse(null);
+                // ProductSite 권한 보존: 가격 및 노출 관련은 MASTER 등급이 관리할 영역이므로 Update 무시
+                // 필요시 이후 가격 관리 페이지를 통해 별도 설정될 수 있도록 분리함
+                // ProductSite productSite =
+                // productSiteRepository.findByProductAndSiteCd(product, manager.getSiteCd())
+                // .orElse(null);
 
-                if (productSite != null) {
-                        BigDecimal basePrice = new BigDecimal(request.getStandardPrice()); // Simplify for now
-                        productSite.update(
-                                        "Y",
-                                        basePrice,
-                                        basePrice,
-                                        basePrice);
-                }
+                // if (productSite != null) {
+                // BigDecimal basePrice = new BigDecimal(request.getStandardPrice()); //
+                // Simplify for now
+                // productSite.update(
+                // "Y",
+                // basePrice,
+                // basePrice,
+                // basePrice);
+                // }
 
                 // Files Update
                 processFiles(request.getImages(), id);
