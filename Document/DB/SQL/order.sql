@@ -39,8 +39,14 @@ CREATE TABLE order_master (
     delivery_memo     VARCHAR(200) NULL COMMENT '배송메모',
     tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
     
-    ordered_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '주문일시',
+    -- BaseEntity Information
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시(주문일시)',
+    created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
     PRIMARY KEY (order_id),
     UNIQUE KEY uq_order_no (order_no),

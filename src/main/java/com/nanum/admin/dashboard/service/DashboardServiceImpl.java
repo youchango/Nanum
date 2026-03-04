@@ -26,103 +26,105 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DashboardServiceImpl implements DashboardService {
 
-    private final OrderRepository orderRepository;
-    private final ClaimRepository claimRepository;
-    private final PaymentRepository paymentRepository;
-    private final PointRepository pointRepository;
-    private final InquiryRepository inquiryRepository;
-    private final DeliveryRepository deliveryRepository;
+        private final OrderRepository orderRepository;
+        private final ClaimRepository claimRepository;
+        private final PaymentRepository paymentRepository;
+        private final PointRepository pointRepository;
+        private final InquiryRepository inquiryRepository;
+        private final DeliveryRepository deliveryRepository;
 
-    @Override
-    public DashboardDTO getDashboardSummary(String siteCd) {
-        boolean isMaster = siteCd == null || siteCd.isEmpty();
+        @Override
+        public DashboardDTO getDashboardSummary(String siteCd) {
+                boolean isMaster = siteCd == null || siteCd.isEmpty();
 
-        // 1. Orders
-        List<OrderMaster> orders = isMaster ? orderRepository.findTop5ByOrderByCreatedAtDesc()
-                : orderRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
-        List<DashboardDTO.OrderSummary> orderSummaries = orders.stream()
-                .map(o -> DashboardDTO.OrderSummary.builder()
-                        .orderNo(o.getOrderId().toString()) // Assuming orderId is used as orderNo for now, or use
-                                                            // o.getOrderName() if preferred
-                        .productName(o.getOrderName())
-                        .ordererName(o.getMember() != null ? o.getMember().getMemberName() : "비회원")
-                        .orderStatus(o.getStatus().name())
-                        .orderDate(o.getCreatedAt())
-                        .build())
-                .toList();
+                // 1. Orders
+                List<OrderMaster> orders = isMaster ? orderRepository.findTop5ByOrderByCreatedAtDesc()
+                                : orderRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
+                List<DashboardDTO.OrderSummary> orderSummaries = orders.stream()
+                                .map(o -> DashboardDTO.OrderSummary.builder()
+                                                .orderNo(o.getOrderId().toString()) // Assuming orderId is used as
+                                                                                    // orderNo for now, or use
+                                                                                    // o.getOrderName() if preferred
+                                                .productName(o.getOrderName())
+                                                .ordererName(o.getMember() != null ? o.getMember().getMemberName()
+                                                                : "비회원")
+                                                .orderStatus(o.getStatus().name())
+                                                .orderDate(o.getCreatedAt())
+                                                .build())
+                                .toList();
 
-        // 2. Claims
-        List<Claim> claims = isMaster ? claimRepository.findTop5ByOrderByClaimDateEntryDesc()
-                : claimRepository.findTop5BySiteCdOrderByClaimDateEntryDesc(siteCd);
-        List<DashboardDTO.ClaimSummary> claimSummaries = claims.stream()
-                .map(c -> DashboardDTO.ClaimSummary.builder()
-                        .claimId(c.getClaimId())
-                        .reason(c.getClaimReason())
-                        .status(c.getClaimStatus())
-                        .requestDate(c.getClaimDateEntry())
-                        .build())
-                .toList();
+                // 2. Claims
+                List<Claim> claims = isMaster ? claimRepository.findTop5ByOrderByClaimDateEntryDesc()
+                                : claimRepository.findTop5BySiteCdOrderByClaimDateEntryDesc(siteCd);
+                List<DashboardDTO.ClaimSummary> claimSummaries = claims.stream()
+                                .map(c -> DashboardDTO.ClaimSummary.builder()
+                                                .claimId(c.getClaimId())
+                                                .reason(c.getClaimReason())
+                                                .status(c.getClaimStatus())
+                                                .requestDate(c.getClaimDateEntry())
+                                                .build())
+                                .toList();
 
-        // 3. Payments
-        List<PaymentMaster> payments = isMaster ? paymentRepository.findTop5ByOrderByPaymentDateDesc()
-                : paymentRepository.findTop5ByOrderMaster_SiteCdOrderByPaymentDateDesc(siteCd);
-        List<DashboardDTO.PaymentSummary> paymentSummaries = payments.stream()
-                .map(p -> DashboardDTO.PaymentSummary.builder()
-                        .paymentNo(p.getPaymentId().toString())
-                        .paymentMethod(p.getPaymentMethod().name())
-                        .finalPayPrice(p.getPaymentPrice() != null ? p.getPaymentPrice().longValue() : 0L)
-                        .paymentDate(p.getPaymentDate())
-                        .build())
-                .toList();
+                // 3. Payments
+                List<PaymentMaster> payments = isMaster ? paymentRepository.findTop5ByOrderByPaymentDateDesc()
+                                : paymentRepository.findTop5ByOrderMaster_SiteCdOrderByPaymentDateDesc(siteCd);
+                List<DashboardDTO.PaymentSummary> paymentSummaries = payments.stream()
+                                .map(p -> DashboardDTO.PaymentSummary.builder()
+                                                .paymentNo(p.getPaymentId().toString())
+                                                .paymentMethod(p.getPaymentMethod().name())
+                                                .finalPayPrice(p.getPaymentPrice() != null
+                                                                ? p.getPaymentPrice().longValue()
+                                                                : 0L)
+                                                .paymentDate(p.getPaymentDate())
+                                                .build())
+                                .toList();
 
-        // 4. Points
-        List<Point> points = isMaster ? pointRepository.findTop5ByOrderByCreatedAtDesc()
-                : pointRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
-        List<DashboardDTO.PointSummary> pointSummaries = points.stream()
-                .map(p -> DashboardDTO.PointSummary.builder()
-                        .memberCode(p.getMember() != null ? p.getMember().getMemberCode() : "")
-                        .point(p.getPointUse() != null ? p.getPointUse().longValue() : 0L)
-                        .type(p.getPointGubun())
-                        .processDate(p.getCreatedAt())
-                        .build())
-                .toList();
+                // 4. Points
+                List<Point> points = isMaster ? pointRepository.findTop5ByOrderByCreatedAtDesc()
+                                : pointRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
+                List<DashboardDTO.PointSummary> pointSummaries = points.stream()
+                                .map(p -> DashboardDTO.PointSummary.builder()
+                                                .memberCode(p.getMember() != null ? p.getMember().getMemberCode() : "")
+                                                .point(p.getPointUse() != null ? p.getPointUse().longValue() : 0L)
+                                                .type(p.getPointGubun())
+                                                .processDate(p.getCreatedAt())
+                                                .build())
+                                .toList();
 
-        // 5. Inquiries
-        List<Inquiry> inquiries = isMaster ? inquiryRepository.findTop5ByOrderByCreatedAtDesc()
-                : inquiryRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
-        List<DashboardDTO.InquirySummary> inquirySummaries = inquiries.stream()
-                .map(i -> DashboardDTO.InquirySummary.builder()
-                        .inquiryId(i.getId())
-                        .title(i.getTitle())
-                        .writerName(i.getWriter() != null ? i.getWriter().getMemberName() : "알수없음")
-                        .answerYn(i.getStatus().name())
-                        .regDate(i.getCreatedAt())
-                        .build())
-                .toList();
+                // 5. Inquiries
+                List<Inquiry> inquiries = isMaster ? inquiryRepository.findTop5ByOrderByCreatedAtDesc()
+                                : inquiryRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
+                List<DashboardDTO.InquirySummary> inquirySummaries = inquiries.stream()
+                                .map(i -> DashboardDTO.InquirySummary.builder()
+                                                .inquiryId(i.getId())
+                                                .title(i.getTitle())
+                                                .writerName(i.getWriter() != null ? i.getWriter().getMemberName()
+                                                                : "알수없음")
+                                                .answerYn(i.getStatus().name())
+                                                .regDate(i.getCreatedAt())
+                                                .build())
+                                .toList();
 
-        // 6. Deliveries (Filtering by siteCd handled by simple conditional or ignored
-        // if no siteCd available)
-        // Delivery currently doesn't support siteCd filtering easily without join.
-        // For now, we fetch top 5 overall if master, or if siteCd is present we might
-        // accept that it shows all deliveries (or add filtering later)
-        // Plan: Fetch top 5 normally.
-        List<Delivery> deliveries = deliveryRepository.findTop5ByOrderByCreatedAtDesc();
-        List<DashboardDTO.DeliverySummary> deliverySummaries = deliveries.stream()
-                .map(d -> DashboardDTO.DeliverySummary.builder()
-                        .trackingNo(d.getTrackingNumber())
-                        .status(d.getStatus().name())
-                        .courier(d.getDeliveryCorp())
-                        .deliveryDate(d.getShippedAt() != null ? d.getShippedAt() : d.getCreatedAt())
-                        .build())
-                .toList();
+                // 6. Deliveries (Master sees all, SCM sees their own siteCd)
+                List<Delivery> deliveries = isMaster ? deliveryRepository.findTop5ByOrderByCreatedAtDesc()
+                                : deliveryRepository.findTop5BySiteCdOrderByCreatedAtDesc(siteCd);
+                List<DashboardDTO.DeliverySummary> deliverySummaries = deliveries.stream()
+                                .map(d -> DashboardDTO.DeliverySummary.builder()
+                                                .trackingNo(d.getTrackingNumber())
+                                                .status(d.getStatus().name())
+                                                .courier(d.getDeliveryCorp())
+                                                .deliveryDate(d.getShippedAt() != null ? d.getShippedAt()
+                                                                : d.getCreatedAt())
+                                                .build())
+                                .toList();
 
-        return DashboardDTO.builder()
-                .recentOrders(orderSummaries)
-                .recentClaims(claimSummaries)
-                .recentPayments(paymentSummaries)
-                .recentPoints(pointSummaries)
-                .recentInquiries(inquirySummaries)
-                .recentDeliveries(deliverySummaries)
-                .build();
-    }
+                return DashboardDTO.builder()
+                                .recentOrders(orderSummaries)
+                                .recentClaims(claimSummaries)
+                                .recentPayments(paymentSummaries)
+                                .recentPoints(pointSummaries)
+                                .recentInquiries(inquirySummaries)
+                                .recentDeliveries(deliverySummaries)
+                                .build();
+        }
 }

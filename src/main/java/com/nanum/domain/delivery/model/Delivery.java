@@ -28,6 +28,9 @@ public class Delivery extends BaseEntity {
     @Column(name = "order_detail_id", nullable = false)
     private Long orderDetailId;
 
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
+
     @Column(name = "delivery_corp", length = 200)
     private String deliveryCorp;
 

@@ -3,6 +3,7 @@ CREATE TABLE delivery (
     delivery_id      INT AUTO_INCREMENT COMMENT '배송ID',
     order_id         INT NOT NULL COMMENT '주문ID',
     order_no         VARCHAR(50) NOT NULL COMMENT '주문번호',
+    site_cd          VARCHAR(20) NOT NULL COMMENT '사이트코드',
     order_detail_id  INT NOT NULL COMMENT '주문상세ID',
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',
     tracking_number  VARCHAR(50) NULL COMMENT '운송장번호',

@@ -8,4 +8,6 @@ import com.nanum.domain.delivery.model.Delivery;
 
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     List<Delivery> findTop5ByOrderByCreatedAtDesc();
+
+    List<Delivery> findTop5BySiteCdOrderByCreatedAtDesc(String siteCd);
 }
