@@ -13,15 +13,17 @@ CREATE TABLE manager (
     manager_email    VARCHAR(50) NOT NULL COMMENT '이메일',
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
     apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
-    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     description      VARCHAR(200) NULL COMMENT '설명',
     memo             VARCHAR(2000) NULL COMMENT '메모',
-    regist_by        VARCHAR(20) NOT NULL COMMENT '등록자',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    update_by        VARCHAR(20) NOT NULL COMMENT '수정자',
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '수정일시',
     login_date       DATETIME NULL COMMENT '최근로그인일시',
     mb_type          VARCHAR(20) DEFAULT '' NOT NULL COMMENT '관리자유형(MASTER, SCM, ADMIN)',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(20) NULL COMMENT '등록자',
+    updated_at       DATETIME NULL COMMENT '수정일시',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (manager_seq),
     UNIQUE KEY uq_manager_id (manager_id),
     UNIQUE KEY uq_manager_code (manager_code)
@@ -37,11 +39,14 @@ CREATE TABLE manager_menu (
     program_url      VARCHAR(100) NULL COMMENT '프로그램URL',
     display_yn       CHAR(1) NOT NULL COMMENT '노출여부',
     display_order    INT NULL COMMENT '표시순서',
-    regist_by        VARCHAR(200) NOT NULL COMMENT '등록자',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    update_by        VARCHAR(200) NOT NULL COMMENT '수정자',
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '수정일시',
     program_parameter VARCHAR(100) DEFAULT '' NOT NULL COMMENT '파라미터',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(200) NULL COMMENT '등록자',
+    updated_at       DATETIME NULL COMMENT '수정일시',
+    updated_by       VARCHAR(200) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(200) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (menu_seq)
 ) COMMENT '관리자 메뉴';
 
@@ -52,10 +57,13 @@ CREATE TABLE manager_auth_group (
     auth_group_seq   INT AUTO_INCREMENT COMMENT '권한그룹SEQ',
     auth_group_name  VARCHAR(100) NOT NULL COMMENT '권한그룹명',
     use_yn           CHAR(1) NOT NULL COMMENT '사용여부',
-    regist_by        VARCHAR(200) NOT NULL COMMENT '등록자',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    update_by        VARCHAR(200) NOT NULL COMMENT '수정자',
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '수정일시',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(200) NULL COMMENT '등록자',
+    updated_at       DATETIME NULL COMMENT '수정일시',
+    updated_by       VARCHAR(200) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(200) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (auth_group_seq)
 ) COMMENT '관리자 권한 그룹';
 
@@ -77,6 +85,7 @@ CREATE TABLE manager_menu_group (
 -- -----------------------------------------------------
 
 CREATE TABLE manager_scm (
+    manager_seq           INT NOT NULL COMMENT '관리자SEQ(FK)',
     manager_code          VARCHAR(20) NOT NULL COMMENT '관리자코드(MGR+6자리)',
     brand_name            VARCHAR(50) NOT NULL COMMENT '브랜드명',
     scm_ceo               VARCHAR(50) NOT NULL COMMENT '대표자명',
@@ -104,11 +113,13 @@ CREATE TABLE manager_scm (
     return_zipcode        VARCHAR(10) COMMENT '반품지우편번호',
     return_addr1          VARCHAR(200) COMMENT '반품지주소',
     return_addr2          VARCHAR(200) COMMENT '반품지상세주소',
-    created_at            DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시',
-    created_by            VARCHAR(20) NOT NULL COMMENT '생성자(manager_code)',
-    updated_at            DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '수정일시',
-    updated_by            VARCHAR(20) NOT NULL COMMENT '수정자(manager_code)',
-    delete_yn             CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    CONSTRAINT PK_MANAGER_SCM PRIMARY KEY (manager_code),
-    CONSTRAINT FK_MANAGER_SCM_BASE FOREIGN KEY (manager_code) REFERENCES manager (manager_code)
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시',
+    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    updated_at       DATETIME NULL COMMENT '수정일시',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
+    CONSTRAINT PK_MANAGER_SCM PRIMARY KEY (manager_seq),
+    CONSTRAINT FK_MANAGER_SCM_BASE FOREIGN KEY (manager_seq) REFERENCES manager (manager_seq)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SCM 관리자 상세정보';

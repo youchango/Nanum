@@ -18,12 +18,15 @@ import org.hibernate.annotations.DynamicUpdate;
 public class ManagerScm extends BaseEntity {
 
     @Id
-    @Column(name = "manager_code", length = 20)
+    @Column(name = "manager_seq")
+    private Long managerSeq;
+
+    @Column(name = "manager_code", length = 20, nullable = false)
     private String managerCode;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "manager_code")
+    @JoinColumn(name = "manager_seq")
     private Manager manager;
 
     @Column(name = "brand_name", length = 50, nullable = false)
