@@ -110,7 +110,6 @@ CREATE TABLE product_category (
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
-    
     PRIMARY KEY (category_id)
 ) COMMENT '상품 카테고리';
 
@@ -126,7 +125,6 @@ CREATE TABLE product (
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
-    
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
@@ -134,7 +132,6 @@ CREATE TABLE product (
     deleted_at       DATETIME NULL COMMENT '삭제일',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
     PRIMARY KEY (product_id)
 ) COMMENT '상품 마스터';
 
@@ -151,7 +148,6 @@ CREATE TABLE product_option (
     extra_price      INT DEFAULT 0 NOT NULL COMMENT '추가금액',
     stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량',
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
-    
     PRIMARY KEY (option_id),
     CONSTRAINT fk_option_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 옵션';
@@ -160,7 +156,6 @@ CREATE TABLE product_option (
 CREATE TABLE product_category_by (
     product_id       INT NOT NULL COMMENT '상품ID',
     category_id      INT NOT NULL COMMENT '카테고리ID',
-    
     PRIMARY KEY (product_id, category_id),
     CONSTRAINT fk_pcb_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     CONSTRAINT fk_pcb_category FOREIGN KEY (category_id) REFERENCES product_category (category_id) ON DELETE CASCADE
@@ -177,7 +172,6 @@ CREATE TABLE product_site (
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
     pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
-    
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
@@ -185,7 +179,6 @@ CREATE TABLE product_site (
     deleted_at       DATETIME NULL COMMENT '삭제일',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
     PRIMARY KEY (ps_id),
     UNIQUE KEY uq_ps_prod_site (product_id, site_cd),
     CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
@@ -199,7 +192,6 @@ CREATE TABLE product_option_site (
     a_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 추가금액',
     b_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 추가금액',
     c_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 추가금액',
-    
     PRIMARY KEY (pos_id),
     CONSTRAINT fk_pos_ps FOREIGN KEY (ps_id) REFERENCES product_site (ps_id) ON DELETE CASCADE,
     CONSTRAINT fk_pos_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
@@ -255,7 +247,6 @@ CREATE TABLE `file_store` (
     `file_id`        VARCHAR(36) NOT NULL COMMENT '파일ID (UUID)',
     `reference_type` VARCHAR(50) NOT NULL COMMENT '참조구분 (PRODUCT, CATEGORY, BANNER, POPUP, REVIEW, INQUIRY)',
     `reference_id`   VARCHAR(50) NOT NULL COMMENT '참조ID (Entity PK)',
-    
     `org_name`       VARCHAR(255) NOT NULL COMMENT '원본파일명',
     `save_name`      VARCHAR(255) NOT NULL COMMENT '저장파일명(UUID포함)',
     `path`           VARCHAR(500) NOT NULL COMMENT '전체 URL 또는 상대경로',
@@ -264,7 +255,6 @@ CREATE TABLE `file_store` (
     
     `is_main`        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '대표이미지 여부(Y/N)',
     `display_order`  INT DEFAULT 0 NOT NULL COMMENT '노출순서',
-    
     `created_at`       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
     `created_by`       VARCHAR(20) NOT NULL COMMENT '등록자',
     `updated_at`       DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
@@ -362,13 +352,11 @@ CREATE TABLE coupon (
     discount_value   INT NOT NULL COMMENT '할인값(원/%)',
     max_discount     INT NULL COMMENT '최대할인금액(정률시)',
     min_order_price  INT DEFAULT 0 NOT NULL COMMENT '최소주문금액',
-    
     valid_start_date DATETIME NOT NULL COMMENT '유효시작일시',
     valid_end_date   DATETIME NOT NULL COMMENT '유효종료일시',
     target_type      VARCHAR(20) DEFAULT 'ALL' NOT NULL COMMENT '적용대상(ALL:전체, USER:개인, BIZ:기업)',
     issue_limit      INT NULL COMMENT '발급제한수량',
     issue_count      INT DEFAULT 0 NOT NULL COMMENT '발급수량',
-    
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     created_by       INT NULL COMMENT '생성자',
     
@@ -383,10 +371,8 @@ CREATE TABLE member_coupon (
     status           VARCHAR(10) DEFAULT 'UNUSED' NOT NULL COMMENT '상태(UNUSED, USED, EXPIRED)',
     used_at          DATETIME NULL COMMENT '사용일시',
     order_id         INT NULL COMMENT '사용주문ID',
-    
     issued_at        DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '발급일시',
     expired_at       DATETIME NOT NULL COMMENT '만료일시',
-    
     PRIMARY KEY (issue_id),
     INDEX idx_mc_member (member_code),
     CONSTRAINT fk_mc_coupon FOREIGN KEY (coupon_id) REFERENCES coupon (coupon_id),
@@ -521,7 +507,6 @@ CREATE TABLE inventory_history_master (
     history_date     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '입출고일시',
     memo             VARCHAR(500) NULL COMMENT '전체비고',
     created_by       INT NULL COMMENT '담당자(관리자ID)',
-    
     PRIMARY KEY (history_id),
     INDEX idx_hist_date (history_date)
 ) COMMENT '재고 입출고 이력 마스터';
@@ -538,7 +523,6 @@ CREATE TABLE inventory_history_detail (
     prev_quantity    INT NOT NULL COMMENT '변동전재고(창고재고 기준)',
     curr_quantity    INT NOT NULL COMMENT '변동후재고(창고재고 기준)',
     memo             VARCHAR(500) NULL COMMENT '개별비고',
-    
     PRIMARY KEY (detail_id),
     CONSTRAINT fk_detail_master FOREIGN KEY (history_id) REFERENCES inventory_history_master (history_id) ON DELETE CASCADE,
     CONSTRAINT fk_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
@@ -556,7 +540,6 @@ CREATE TABLE member_biz (
     business_item    VARCHAR(100) NULL COMMENT '종목',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
-    
     CONSTRAINT fk_member_biz_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '기업회원 상세정보';
 
@@ -571,7 +554,6 @@ CREATE TABLE cart (
     quantity         INT DEFAULT 1 NOT NULL COMMENT '수량',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     updated_at       DATETIME NULL COMMENT '수정일',
-    
     PRIMARY KEY (cart_id),
     INDEX idx_cart_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
@@ -585,7 +567,6 @@ CREATE TABLE order_master (
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
-    
     -- Amount Info
     total_price      DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '총주문금액',
     discount_price   DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '할인금액',
@@ -593,7 +574,6 @@ CREATE TABLE order_master (
     used_coupon      DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '쿠폰사용액',
     delivery_price   DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '배송비',
     payment_price    DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '실결제금액',
-    
     -- Receiver Info
     receiver_name    VARCHAR(50) NOT NULL COMMENT '수령자명',
     receiver_phone   VARCHAR(20) NOT NULL COMMENT '수령자연락처',
@@ -602,10 +582,8 @@ CREATE TABLE order_master (
     receiver_detail   VARCHAR(255) NOT NULL COMMENT '상세주소',
     delivery_memo     VARCHAR(200) NULL COMMENT '배송메모',
     tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
-    
     ordered_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '주문일시',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    
     PRIMARY KEY (order_id),
     UNIQUE KEY uq_order_no (order_no),
     INDEX idx_order_member (member_code),
@@ -622,34 +600,26 @@ CREATE TABLE order_detail (
     option_id        INT NULL COMMENT '옵션ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명(스냅샷)',
     option_name      VARCHAR(100) NULL COMMENT '옵션명(스냅샷)',
-    
     product_price    DECIMAL(19,4) NOT NULL COMMENT '상품가격',
     option_price     DECIMAL(19,4) DEFAULT 0 COMMENT '옵션가격',
     quantity         INT NOT NULL COMMENT '주문수량',
     total_price      DECIMAL(19,4) NOT NULL COMMENT '총금액(구 sub_total)',
-    
     order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태',
-    
     delivery_num     VARCHAR(100) NULL COMMENT '송장번호',
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',
     delivery_date_start DATETIME NULL COMMENT '배송시작일시',
     delivery_date_end   DATETIME NULL COMMENT '배송종료일시',
-    
     claim_id         INT NULL COMMENT '문의ID',
     claim_cd         VARCHAR(10) NULL COMMENT '문의코드',
     claim_type       VARCHAR(10) NULL COMMENT '문의타입',
-    
     cancel_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '취소여부',
     cancel_date      DATETIME NULL COMMENT '취소일시',
     cancel_price     DECIMAL(19,4) NULL COMMENT '취소금액',
-    
     refund_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '환불여부',
     refund_date      DATETIME NULL COMMENT '환불일시',
     refund_price     DECIMAL(19,4) NULL COMMENT '환불금액',
-    
     pickup_date_start DATETIME NULL COMMENT '반품 수거시작일시',
     pickup_date_end   DATETIME NULL COMMENT '반품 수거종료일시',
-
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
@@ -657,7 +627,6 @@ CREATE TABLE order_detail (
     deleted_at       DATETIME NULL COMMENT '삭제일시',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
     PRIMARY KEY (order_detail_id),
     CONSTRAINT fk_detail_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
 ) COMMENT '주문 상세';
@@ -673,10 +642,8 @@ CREATE TABLE delivery (
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',
     tracking_number  VARCHAR(50) NULL COMMENT '운송장번호',
     status           VARCHAR(20) DEFAULT 'READY' NOT NULL COMMENT '배송상태(READY, SHIPPING, COMPLETE)',
-    
     shipped_at       DATETIME NULL COMMENT '출고일시',
     completed_at     DATETIME NULL COMMENT '배송완료일시',
-
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
@@ -684,7 +651,6 @@ CREATE TABLE delivery (
     deleted_at       DATETIME NULL COMMENT '삭제일',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
     PRIMARY KEY (delivery_id),
     UNIQUE KEY uq_delivery_order (order_id),
     FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
@@ -703,7 +669,6 @@ CREATE TABLE address_book (
     address_detail   VARCHAR(255) NOT NULL COMMENT '상세주소',
     is_default       CHAR(1) DEFAULT 'N' NOT NULL COMMENT '기본배송지여부',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    
     PRIMARY KEY (address_id),
     INDEX idx_addr_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
@@ -760,7 +725,6 @@ CREATE TABLE payment_master (
     payment_id             INT AUTO_INCREMENT COMMENT '결제코드',
     order_id               INT NOT NULL COMMENT '주문ID',
     member_code            VARCHAR(30) NOT NULL COMMENT '회원코드',
-    
     -- Payment Details
     total_price            DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '총주문금액',
     discount_price         DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '총할인금액',
@@ -768,23 +732,19 @@ CREATE TABLE payment_master (
     used_coupon            DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '쿠폰사용액',
     delivery_price         DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '배송비',
     payment_price          DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '실결제금액',
-
     payment_status         VARCHAR(20) NOT NULL COMMENT '결제상태',
     payment_method         VARCHAR(20) NULL COMMENT '결제수단',
-    
     -- Bank Transfer Info (Virtual Account / Bank Transfer)
     bank_name              VARCHAR(50) NULL COMMENT '은행명',
     bank_account_num       VARCHAR(50) NULL COMMENT '계좌번호',
     bank_account_name      VARCHAR(50) NULL COMMENT '예금주명',
     depositor_name         VARCHAR(50) NULL COMMENT '입금자명',
     deposit_deadline       DATETIME NULL COMMENT '입금기한',
-    
     -- Cancel / Refund Info
     cancel_total_price     DECIMAL(19,4) DEFAULT 0 NULL COMMENT '총취소금액',
     cancel_coupon_price    DECIMAL(19,4) DEFAULT 0 NULL COMMENT '취소쿠폰액',
     cancel_point_price     DECIMAL(19,4) DEFAULT 0 NULL COMMENT '취소포인트액',
     cancel_delivery_price  DECIMAL(19,4) DEFAULT 0 NULL COMMENT '취소배송비',
-
     payment_date           DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '결제일',
     created_at             DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     created_by             VARCHAR(50) NULL COMMENT '생성자',
@@ -793,7 +753,6 @@ CREATE TABLE payment_master (
     deleted_at             DATETIME NULL COMMENT '삭제일',
     deleted_by             VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
-    
     PRIMARY KEY (payment_id),
     UNIQUE KEY uq_payment_order (order_id),
     INDEX idx_payment_status (payment_status),
@@ -888,22 +847,19 @@ CREATE TABLE wishlist (
 
 -- Source: site_policy_history.sql
 CREATE TABLE site_policy_history (
-    seq            INT AUTO_INCREMENT COMMENT '?쒗??,
-    site_cd        VARCHAR(20) NOT NULL COMMENT '?ъ씠?몄퐫??,
-    
-    terms_of_use   MEDIUMTEXT NULL COMMENT '?댁슜?쎄?',
-    privacy_policy MEDIUMTEXT NULL COMMENT '媛쒖씤?뺣낫泥섎━諛⑹묠',
-    legal_notice   MEDIUMTEXT NULL COMMENT '踰뺤쟻怨좎?',
-    footer_info    TEXT NULL COMMENT '?명꽣 ?몄텧 ?뺣낫',
-    
-    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '?앹꽦??,
-    created_by     INT NULL COMMENT '?앹꽦??,
-    updated_at     DATETIME NULL COMMENT '?섏젙??,
-    updated_by     INT NULL COMMENT '?섏젙??,
-    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '??젣?좊Т',
-    
+    seq            INT AUTO_INCREMENT COMMENT '시퀀스',
+    site_cd        VARCHAR(20) NOT NULL COMMENT '사이트코드',
+    terms_of_use   MEDIUMTEXT NULL COMMENT '이용약관',
+    privacy_policy MEDIUMTEXT NULL COMMENT '개인정보처리방침',
+    legal_notice   MEDIUMTEXT NULL COMMENT '법적고지',
+    footer_info    TEXT NULL COMMENT '푸터 정보',
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by     INT NULL COMMENT '생성자',
+    updated_at     DATETIME NULL COMMENT '수정일',
+    updated_by     INT NULL COMMENT '수정자',
+    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (seq)
-) COMMENT '?ъ씠?몃퀎 ?뺤콉 ?대젰 愿由?;
+) COMMENT '사이트 정책 이력';
 
 
 -- Source: init_data.sql
