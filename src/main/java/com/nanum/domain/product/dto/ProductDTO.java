@@ -19,6 +19,7 @@ public class ProductDTO {
         private int supplyPrice;
         private int mapPrice;
         private int standardPrice;
+        private String optionYn;
         private ProductStatus status;
         private String description;
         private List<Option> options;
@@ -31,7 +32,13 @@ public class ProductDTO {
     @AllArgsConstructor
     @Builder
     public static class Option {
-        private String name;
+        private Long optionId;
+        private String title1;
+        private String name1;
+        private String title2;
+        private String name2;
+        private String title3;
+        private String name3;
         private int extraPrice;
         private int stockQuantity;
     }

@@ -23,6 +23,7 @@ import com.nanum.domain.product.dto.ProductSitePriceDTO;
 import com.nanum.domain.product.model.QProductOption;
 
 import com.nanum.domain.product.model.QProductSite;
+import com.nanum.domain.product.model.QProductOptionSite;
 
 import static com.nanum.domain.product.model.QProduct.product;
 
@@ -71,23 +72,28 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // 3. 조회된 상품 ID 목록 추출
         List<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toList());
 
-        // 4. 상품 ID들에 해당하는 ProductSite + Option 가격 일괄 조회
         QProductOption productOption = QProductOption.productOption;
+        QProductOptionSite productOptionSite = QProductOptionSite.productOptionSite;
 
         // 메모리 조합용 (상품 ID별 ProductSitePriceDTO 목록)
         List<com.querydsl.core.Tuple> siteTuples = queryFactory
                 .select(
                         productSite.product.id,
                         productOption.id,
-                        productOption.name,
+                        productOption.name1,
                         productSite.standardPrice,
                         productSite.aPrice,
                         productSite.bPrice,
-                        productSite.cPrice)
+                        productSite.cPrice,
+                        productOptionSite.aExtraPrice,
+                        productOptionSite.bExtraPrice,
+                        productOptionSite.cExtraPrice)
                 .from(productSite)
-                .leftJoin(productOption).on(productSite.optionId.eq(productOption.id))
+                .leftJoin(productOptionSite).on(productSite.psId.eq(productOptionSite.productSite.psId))
+                .leftJoin(productOption).on(productOptionSite.productOption.id.eq(productOption.id))
                 .where(
                         productSite.product.id.in(productIds),
+                        productSite.deleteYn.eq("N"),
                         StringUtils.hasText(searchDTO.getSiteCd()) ? productSite.siteCd.eq(searchDTO.getSiteCd())
                                 : null)
                 .fetch();
@@ -98,12 +104,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         t -> t.get(productSite.product.id),
                         Collectors.mapping(t -> ProductSitePriceDTO.builder()
                                 .optionId(t.get(productOption.id))
-                                .optionName(t.get(productOption.name) != null ? t.get(productOption.name) : "")
+                                .optionName(t.get(productOption.name1) != null ? t.get(productOption.name1) : "")
                                 .standardPrice(
                                         t.get(productSite.standardPrice) != null ? t.get(productSite.standardPrice) : 0)
                                 .aPrice(t.get(productSite.aPrice))
                                 .bPrice(t.get(productSite.bPrice))
                                 .cPrice(t.get(productSite.cPrice))
+                                .aExtraPrice(t.get(productOptionSite.aExtraPrice))
+                                .bExtraPrice(t.get(productOptionSite.bExtraPrice))
+                                .cExtraPrice(t.get(productOptionSite.cExtraPrice))
                                 .build(), Collectors.toList())));
 
         // 5. 최종 DTO 매핑
@@ -169,7 +178,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         QProductSite productSite = QProductSite.productSite;
         return JPAExpressions.selectOne()
                 .from(productSite)
-                .where(productSite.product.eq(product).and(productSite.siteCd.eq(siteCd)))
+                .where(productSite.product.eq(product)
+                        .and(productSite.siteCd.eq(siteCd))
+                        .and(productSite.deleteYn.eq("N")))
                 .exists();
     }
 }

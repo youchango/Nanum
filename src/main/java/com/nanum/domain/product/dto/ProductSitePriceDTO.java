@@ -16,4 +16,7 @@ public class ProductSitePriceDTO {
     private BigDecimal aPrice;
     private BigDecimal bPrice;
     private BigDecimal cPrice;
+    private BigDecimal aExtraPrice;
+    private BigDecimal bExtraPrice;
+    private BigDecimal cExtraPrice;
 }

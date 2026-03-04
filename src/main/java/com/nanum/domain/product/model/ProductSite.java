@@ -23,14 +23,6 @@ public class ProductSite extends BaseEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "option_id", nullable = false)
-    private Long optionId; // Assuming Option entity or just ID. SQL says FK to product_option.
-    // Ideally should be @ManyToOne to ProductOption if it exists.
-    // Since I didn't verify ProductOption entity existence in detail (saw
-    // ProductOption table in SQL),
-    // I check if ProductOption java entity exists.
-    // List of product dir had 20 children.
-
     @Column(name = "site_cd", length = 100)
     private String siteCd;
 

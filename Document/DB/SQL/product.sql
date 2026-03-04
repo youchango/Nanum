@@ -1,4 +1,4 @@
-﻿-- 1. Product Category
+-- 1. Product Category
 CREATE TABLE product_category (
     category_id      INT AUTO_INCREMENT COMMENT '카테고리ID',
     parent_id        INT NULL COMMENT '상위 카테고리ID',
@@ -20,6 +20,7 @@ CREATE TABLE product (
     supply_price     INT DEFAULT 0 NOT NULL COMMENT '공급가',
     map_price        INT DEFAULT 0 NOT NULL COMMENT '지도가',
     standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
+    option_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '옵션여부',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
@@ -39,7 +40,12 @@ CREATE TABLE product (
 CREATE TABLE product_option (
     option_id        INT AUTO_INCREMENT COMMENT '옵션ID',
     product_id       INT NOT NULL COMMENT '상품ID',
-    option_name      VARCHAR(100) NOT NULL COMMENT '옵션명',
+    option_title1    VARCHAR(50) NULL COMMENT '옵션분류1(예:색상)',
+    option_name1     VARCHAR(100) NULL COMMENT '옵션값1(예:블랙)',
+    option_title2    VARCHAR(50) NULL COMMENT '옵션분류2(예:사이즈)',
+    option_name2     VARCHAR(100) NULL COMMENT '옵션값2(예:XL)',
+    option_title3    VARCHAR(50) NULL COMMENT '옵션분류3(예:추가항목)',
+    option_name3     VARCHAR(100) NULL COMMENT '옵션값3(예:각인)',
     extra_price      INT DEFAULT 0 NOT NULL COMMENT '추가금액',
     stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량',
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
@@ -62,21 +68,42 @@ CREATE TABLE product_category_by (
 CREATE TABLE product_site (
     ps_id            INT AUTO_INCREMENT COMMENT 'PS Key',
     product_id       INT NOT NULL COMMENT '상품ID',
-    option_id        INT NOT NULL COMMENT '옵션ID',
     site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
     view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
     standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
+    
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    updated_at       DATETIME NULL COMMENT '수정일',
+    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
+    
     PRIMARY KEY (ps_id),
-    CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
-    CONSTRAINT fk_ps_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
+    UNIQUE KEY uq_ps_prod_site (product_id, site_cd),
+    CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 사이트별 정보';
 
--- 5. Product Stock (Warehouse)
+-- 6. Product Option Site (Multi-site Option Price)
+CREATE TABLE product_option_site (
+    pos_id           INT AUTO_INCREMENT COMMENT 'POS Key',
+    ps_id            INT NOT NULL COMMENT '상품 사이트 Key',
+    option_id        INT NOT NULL COMMENT '옵션ID',
+    a_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 추가금액',
+    b_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 추가금액',
+    c_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 추가금액',
+    
+    PRIMARY KEY (pos_id),
+    CONSTRAINT fk_pos_ps FOREIGN KEY (ps_id) REFERENCES product_site (ps_id) ON DELETE CASCADE,
+    CONSTRAINT fk_pos_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
+) COMMENT '상품 사이트 옵션별 추가금액';
+
+-- 7. Product Stock (Warehouse)
 CREATE TABLE product_stock (
     stock_id         INT AUTO_INCREMENT COMMENT '재고ID',
     product_id       INT NOT NULL COMMENT '상품ID',

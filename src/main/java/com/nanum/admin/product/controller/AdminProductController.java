@@ -67,11 +67,16 @@ public class AdminProductController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "상품 삭제", description = "상품을 삭제합니다. (Soft Delete)")
-    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
-        // TODO: Get actual logged-in member code
-        String memberCode = "ADMIN";
-        adminProductService.deleteProduct(id, memberCode);
+    @Operation(summary = "상품 사이트별 삭제", description = "상품을 선택한 사이트에서만 제외(논리 삭제)합니다.")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id, @RequestParam String siteCd) {
+        adminProductService.deleteProduct(id, siteCd);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @DeleteMapping("/{id}/master")
+    @Operation(summary = "상품 원본(마스터) 완전 삭제", description = "상품 원본을 모든 쇼핑몰 환경에서 영구적으로 제외합니다. (Soft Delete)")
+    public ResponseEntity<ApiResponse<Void>> deleteMasterProduct(@PathVariable Long id) {
+        adminProductService.deleteMasterProduct(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

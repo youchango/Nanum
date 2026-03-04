@@ -47,6 +47,11 @@ public class Product extends BaseEntity {
     @ColumnDefault("0")
     private int standardPrice;
 
+    @Column(name = "option_yn", nullable = false, length = 1)
+    @ColumnDefault("'N'")
+    @Builder.Default
+    private String optionYn = "N";
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -74,11 +79,12 @@ public class Product extends BaseEntity {
     }
 
     public void updateInfo(List<ProductCategory> categories, String name, int mapPrice, int standardPrice,
-            ProductStatus status, String description) {
+            String optionYn, ProductStatus status, String description) {
         this.categories = categories;
         this.name = name;
         this.mapPrice = mapPrice;
         this.standardPrice = standardPrice;
+        this.optionYn = optionYn;
         this.status = status;
         this.description = description;
     }
