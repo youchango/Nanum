@@ -6,7 +6,9 @@ import com.nanum.admin.manager.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/admin/auth")
@@ -57,7 +59,7 @@ public class ManagerAuthController {
         }
 
         if (refreshToken == null) {
-            throw new IllegalArgumentException("Refresh token missing");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is missing or invalid");
         }
 
         return ResponseEntity.ok(managerService.refresh(refreshToken));

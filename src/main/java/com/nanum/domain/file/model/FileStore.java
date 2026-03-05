@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import com.nanum.global.common.dto.BaseEntity;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class FileStore extends com.nanum.global.common.dto.BaseEntity {
+public class FileStore extends BaseEntity {
 
     @Id
     @Column(name = "file_id", length = 36)

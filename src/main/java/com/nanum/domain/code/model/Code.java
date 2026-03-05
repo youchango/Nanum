@@ -10,7 +10,9 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import com.nanum.global.common.dto.BaseEntity;
 
 import java.time.LocalDateTime;
 
@@ -19,11 +21,12 @@ import java.time.LocalDateTime;
  * 2Depth 계층 구조로 관리되는 시스템 코드
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "code")
-public class Code extends com.nanum.global.common.dto.BaseEntity {
+public class Code extends BaseEntity {
 
     /**
      * 코드 ID (PK)

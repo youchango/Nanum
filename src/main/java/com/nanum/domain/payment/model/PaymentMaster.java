@@ -7,6 +7,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.nanum.global.common.dto.BaseEntity;
 import com.nanum.domain.member.model.Member;
 
 import com.nanum.domain.order.model.OrderMaster;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "payment_master")
-public class PaymentMaster extends com.nanum.global.common.dto.BaseEntity {
+public class PaymentMaster extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
