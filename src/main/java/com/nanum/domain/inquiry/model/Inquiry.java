@@ -41,7 +41,7 @@ public class Inquiry extends BaseEntity {
     // To be safe with INT column, I should use @Convert or EnumType.ORDINAL.
     // I will use @Enumerated(EnumType.ORDINAL) assuming strict order provided in
     // Enum.
-    @Column(name = "inquiry_type", nullable = false)
+    @Column(name = "inquiry_type", nullable = false) // 1:상품문의, 2:배송문의, 3:주문문의, 99:기타문의
     private InquiryType type;
 
     @Column(nullable = false)

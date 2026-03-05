@@ -21,7 +21,7 @@ CREATE TABLE order_master (
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
-    
+    order_name 		 VARCHAR(200) NULL COMMENT '주문명',
     -- Amount Info
     total_price      DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '총주문금액',
     discount_price   DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '할인금액',
@@ -29,7 +29,6 @@ CREATE TABLE order_master (
     used_coupon      DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '쿠폰사용액',
     delivery_price   DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '배송비',
     payment_price    DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '실결제금액',
-    
     -- Receiver Info
     receiver_name    VARCHAR(50) NOT NULL COMMENT '수령자명',
     receiver_phone   VARCHAR(20) NOT NULL COMMENT '수령자연락처',
@@ -38,7 +37,6 @@ CREATE TABLE order_master (
     receiver_detail   VARCHAR(255) NOT NULL COMMENT '상세주소',
     delivery_memo     VARCHAR(200) NULL COMMENT '배송메모',
     tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
-    
     -- BaseEntity Information
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시(주문일시)',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
@@ -47,7 +45,6 @@ CREATE TABLE order_master (
     deleted_at       DATETIME NULL COMMENT '삭제일시',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
     PRIMARY KEY (order_id),
     UNIQUE KEY uq_order_no (order_no),
     INDEX idx_order_member (member_code),

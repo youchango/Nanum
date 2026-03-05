@@ -29,6 +29,9 @@ public class OrderService {
                                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
                 OrderMaster order = OrderMaster.builder()
+                                .orderNo(java.time.LocalDateTime.now()
+                                                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+                                                + "-" + java.util.UUID.randomUUID().toString().substring(0, 6))
                                 .member(member)
                                 .orderName("Order by " + member.getMemberName()) // Placeholder
                                 .totalPrice(BigDecimal.ZERO) // Will calc below

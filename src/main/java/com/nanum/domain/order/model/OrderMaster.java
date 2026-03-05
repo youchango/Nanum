@@ -23,6 +23,9 @@ public class OrderMaster extends BaseEntity {
     @Column(name = "order_id")
     private Long orderId;
 
+    @Column(name = "order_no")
+    private String orderNo;
+
     @Column(name = "order_name")
     private String orderName;
 
