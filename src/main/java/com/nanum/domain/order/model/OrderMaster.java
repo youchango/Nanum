@@ -78,8 +78,8 @@ public class OrderMaster extends BaseEntity {
     @Column(name = "receiver_zipcode")
     private String receiverZipcode;
 
-    @Column(name = "delivery_msg")
-    private String deliveryMsg;
+    @Column(name = "delivery_memo")
+    private String deliveryMemo;
 
     @Column(name = "tracking_number")
     private String trackingNumber;

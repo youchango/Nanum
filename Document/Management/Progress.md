@@ -24,6 +24,7 @@
     - [x] DashboardDTO 및 Service/Controller 구현
     - [x] 각 도메인 Repository 연결 (Top 5 조회)
     - [x] API Spec 문서 현행화로직
+    - [x] OrderMaster 엔티티 DB 컬럼 불일치(delivery_msg) 버그 수정
 
 ### 2. 인증 및 권한 (Auth)
 - [x] JWT 기반 통합 인증 시스템

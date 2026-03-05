@@ -38,7 +38,7 @@ public class OrderService {
                                 .receiverAddress(request.getReceiverAddress())
                                 .receiverDetail(request.getReceiverDetail())
                                 .receiverZipcode(request.getReceiverZipcode())
-                                .deliveryMsg(request.getDeliveryMsg())
+                                .deliveryMemo(request.getDeliveryMemo())
                                 .build();
 
                 // Items logic (Need OrderDetail repository and Product repository)

@@ -19,7 +19,7 @@ public class OrderDTO {
         private String receiverAddress;
         private String receiverDetail;
         private String receiverZipcode;
-        private String deliveryMsg;
+        private String deliveryMemo;
         private List<OrderDetailItem> items;
     }
 
