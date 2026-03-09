@@ -65,6 +65,26 @@ public class AdminProductService {
                 ProductCategory firstCategory = product.getCategories().isEmpty() ? null
                                 : product.getCategories().get(0);
 
+                List<ProductDTO.Image> images = files.stream()
+                                .map(f -> ProductDTO.Image.builder()
+                                                .fileId(f.getFileId())
+                                                .imageUrl(f.getPath())
+                                                .type(f.getReferenceType())
+                                                .displayOrder(f.getDisplayOrder())
+                                                .build())
+                                .collect(Collectors.toList());
+
+                List<ProductDTO.Option> options = product.getOptions().stream()
+                                .map(opt -> ProductDTO.Option.builder()
+                                                .optionId(opt.getId())
+                                                .title1(opt.getTitle1()).name1(opt.getName1())
+                                                .title2(opt.getTitle2()).name2(opt.getName2())
+                                                .title3(opt.getTitle3()).name3(opt.getName3())
+                                                .extraPrice(opt.getExtraPrice())
+                                                .stockQuantity(opt.getStockQuantity())
+                                                .build())
+                                .collect(Collectors.toList());
+
                 return ProductDTO.Response.builder()
                                 .productId(product.getId())
                                 .categoryId(product.getCategories().stream().map(ProductCategory::getCategoryId)
@@ -75,7 +95,10 @@ public class AdminProductService {
                                 .mapPrice(product.getMapPrice())
                                 .standardPrice(product.getStandardPrice())
                                 .status(product.getStatus())
-                                .files(files)
+                                .optionYn(product.getOptionYn())
+                                .description(product.getDescription())
+                                .options(options)
+                                .images(images)
                                 .build();
         }
 

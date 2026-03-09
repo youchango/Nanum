@@ -63,11 +63,16 @@ public class WishlistService {
                 List<ProductDTO.Response> productList = wishlistPage.getContent().stream()
                                 .map(wishlist -> {
                                         Product p = wishlist.getProduct();
-                                        List<com.nanum.domain.file.dto.FileResponseDTO> files = fileService
+                                        List<ProductDTO.Image> images = fileService
                                                         .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT,
                                                                         String.valueOf(p.getId()))
                                                         .stream()
-                                                        .map(com.nanum.domain.file.dto.FileResponseDTO::from)
+                                                        .map(f -> ProductDTO.Image.builder()
+                                                                        .fileId(f.getFileId())
+                                                                        .imageUrl(f.getPath())
+                                                                        .type(f.getReferenceType().name())
+                                                                        .displayOrder(f.getDisplayOrder())
+                                                                        .build())
                                                         .collect(Collectors.toList());
 
                                         ProductCategory firstCategory = p.getCategories().isEmpty() ? null
@@ -85,7 +90,7 @@ public class WishlistService {
                                                         .mapPrice(p.getMapPrice())
                                                         .standardPrice(p.getStandardPrice())
                                                         .status(p.getStatus())
-                                                        .files(files)
+                                                        .images(images)
                                                         .build();
                                 })
                                 .collect(Collectors.toList());

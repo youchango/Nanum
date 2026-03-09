@@ -72,7 +72,9 @@ public class ProductDTO {
         private int mapPrice;
         private int standardPrice;
         private ProductStatus status;
-        private List<com.nanum.domain.file.dto.FileResponseDTO> files;
-        // options will be added separately if needed
+        private String optionYn;
+        private String description;
+        private List<Option> options;
+        private List<Image> images;
     }
 }

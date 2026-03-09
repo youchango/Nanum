@@ -20,27 +20,26 @@ public class CommonController {
     private final FileStorageService fileStorageService;
 
     /**
-     * 怨듯넻 ?뚯씪 ?낅줈??API
-     * CKEditor ???먮뵒?곗뿉???대?吏 ?낅줈?????ъ슜
+     * 파일 업로드 API
+     * CKEditor ???먮뵒?곗뿉???대?juven ?낅줈?????ъ슜
      */
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadFile(
             @RequestParam("upload") MultipartFile file,
-            @RequestParam(value = "type", required = false, defaultValue = "editor") String type
-    ) {
+            @RequestParam(value = "type", required = false, defaultValue = "editor") String type) {
         Map<String, Object> response = new HashMap<>();
         try {
             String uploadedUrl = fileStorageService.upload(file, type);
-            
+
             // CKEditor expects specific JSON response
             response.put("uploaded", true);
             response.put("url", uploadedUrl);
-            
+
             return ResponseEntity.ok(response);
         } catch (IOException e) {
             log.error("File Upload Failed", e);
             response.put("uploaded", false);
-            response.put("error", Map.of("message", "?뚯씪 ?낅줈?쒖뿉 ?ㅽ뙣?덉뒿?덈떎."));
+            response.put("error", Map.of("message", "파일 업로드에 실패했습니다."));
             return ResponseEntity.status(500).body(response);
         }
     }
