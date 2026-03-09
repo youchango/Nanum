@@ -23,13 +23,14 @@ public class ProductService {
         private final com.nanum.user.member.repository.MemberRepository memberRepository;
         private final com.nanum.domain.file.service.FileService fileService;
 
-        public List<ProductDTO.MallProductResponse> getMallProductList(Long categoryId, String siteCd,
+        public List<ProductDTO.MallProductResponse> getMallProductList(com.nanum.global.common.dto.SearchDTO searchDTO,
+                        String siteCd,
                         String memberCode) {
                 if (siteCd == null) {
                         throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
                 }
 
-                List<Product> products = productRepository.findMallProducts(siteCd, categoryId);
+                List<Product> products = productRepository.findMallProducts(siteCd, searchDTO);
                 com.nanum.domain.member.model.Member member = memberCode != null
                                 ? memberRepository.findByMemberCode(memberCode).orElse(null)
                                 : null;

@@ -26,6 +26,9 @@ public class SearchDTO {
     /** 검색 유형 (예: 이름, 아이디 등) */
     private String searchType;
 
+    /** 카테고리 ID (상품 검색용) */
+    private Long categoryId;
+
     /** 전체 데이터 수 */
     private int totalRecordCount;
 

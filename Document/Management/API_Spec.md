@@ -105,6 +105,7 @@ Base URL: `/api/v1/admin/members`
 | `POST` | `/` | 회원 생성 | 관리자가 회원을 직접 생성합니다. (Master, Biz, User) |
 | `GET` | `/{memberCode}` | 회원 상세 조회 | Member Code로 회원 상세 정보를 조회합니다. |
 | `PUT` | `/{memberCode}` | 회원 정보 수정 | 회원 정보를 수정합니다. |
+| `PATCH` | `/{memberCode}/apply-yn` | 회원 승인 상태 수정 | 회원의 승인 여부(`apply_yn`)를 수정합니다. (`applyYn` 필수) |
 
 ### 2.2 User (일반용)
 Base URL: `/api/v1/members`
@@ -177,7 +178,7 @@ Base URL: `/api/v1/products`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | 상품 목록 조회 | 사이트별(`siteCd`) 노출 상품 목록을 조회합니다. (`categoryId` 필터 가능) |
+| `GET` | `/` | 상품 목록 조회 | 사이트별(`siteCd`) 노출 상품 목록을 조회합니다. (`categoryId`, `keyword` 필터 지원) |
 | `GET` | `/{id}` | 상품 상세 조회 | 특정 사이트의 상품 상세 정보 및 옵션을 조회합니다. (`siteCd` 필수) |
 
 **User Pricing Policy**

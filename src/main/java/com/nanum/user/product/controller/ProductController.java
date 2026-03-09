@@ -26,9 +26,9 @@ public class ProductController {
     @GetMapping
     public ApiResponse<List<ProductDTO.MallProductResponse>> getProducts(
             @RequestParam String siteCd,
-            @RequestParam(required = false) Long categoryId) {
+            com.nanum.global.common.dto.SearchDTO searchDTO) {
         String memberCode = getCurrentMemberCode();
-        return ApiResponse.success(productService.getMallProductList(categoryId, siteCd, memberCode));
+        return ApiResponse.success(productService.getMallProductList(searchDTO, siteCd, memberCode));
     }
 
     @GetMapping("/{id}")

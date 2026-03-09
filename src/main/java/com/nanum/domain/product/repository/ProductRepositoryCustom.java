@@ -3,6 +3,7 @@ package com.nanum.domain.product.repository;
 import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.domain.product.model.Product;
+import com.nanum.global.common.dto.SearchDTO;
 import java.util.List;
 
 public interface ProductRepositoryCustom {
@@ -10,5 +11,5 @@ public interface ProductRepositoryCustom {
 
     int countAdminProducts(AdminProductSearchDTO searchDTO);
 
-    List<Product> findMallProducts(String siteCd, Long categoryId);
+    List<Product> findMallProducts(String siteCd, SearchDTO searchDTO);
 }
