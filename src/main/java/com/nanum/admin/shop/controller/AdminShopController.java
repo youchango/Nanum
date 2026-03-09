@@ -35,4 +35,10 @@ public class AdminShopController {
         adminShopService.updateShop(shopKey, request);
         return ApiResponse.success("상점 정보가 수정되었습니다.");
     }
+
+    @DeleteMapping("/{shopKey}")
+    public ApiResponse<String> deleteShop(@PathVariable Long shopKey) {
+        adminShopService.deleteShop(shopKey);
+        return ApiResponse.success("상점이 삭제되었습니다.");
+    }
 }

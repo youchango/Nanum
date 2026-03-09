@@ -1,5 +1,6 @@
 package com.nanum.domain.product.dto;
 
+import com.nanum.global.common.dto.SearchDTO;
 import com.nanum.domain.product.model.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class AdminProductSearchDTO {
+public class AdminProductSearchDTO extends SearchDTO {
     private Long categoryId;
     private java.util.List<Long> categoryIds;
     private String searchType; // "NAME", "CODE"

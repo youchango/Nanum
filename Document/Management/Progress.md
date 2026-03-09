@@ -57,7 +57,10 @@
     - [x] 상품 수정 및 상태 변경 (판매중/품절/중지)
     - [x] 상품 삭제 (무결성 보장)
     - [x] 상품 및 옵션 연결 무결성 강화 및 추가금액 컬럼 로직 동기화 (`a_extra_price` 등)
-    - [x] User 측 도메인 서비스 내 Product CRUD 제거 및 Admin 일원화, 프론트엔드 가격/옵션 추가금 DTO 바인딩 일치화
+    - [x] 상품 목록 페이징(0-based Offset) 연동 버그 수정 및 상태 변경 UI 재배치
+    - [x] 상품 API 페이징 파라미터 컨벤션 마이그레이션 (SearchDTO 기반 1-based Pagination 완벽 호환)
+    - [x] 상품 목록 내 렌더링 방식 고도화: 자세히 보기(`expandable`) 데이터 출력 시, `siteCd` 기준으로 Javascript 그룹화(reduce) 및 단가표 분할 렌더링.
+    - [x] **상품 가격 상세표 UI 개편**: 기존 확장(Expandable) 뷰 방식 제거 후, `Modal` 팝업 및 사이트별 탭(`Tabs`)으로 컴포넌트 재구성 완료.
 - [ ] 일반/기업 전용 상품 등록 및 노출 제어 (Site Code 적용 완료)
 - [ ] 상품 옵션 및 재고 관리 시스템
 - [ ] **상품 리뷰 및 평가 (Product Review & Like)**
@@ -97,7 +100,7 @@
 - [x] `ShopInfo` 도메인 구축 (Entity, Repository)
 - [x] 관리자 `siteCd` 기반 데이터 격리 (Product, Order, Member 등)
 - [x] **Master 관리자 기능**
-  - [x] 상점 관리 (등록/수정/조회 API)
+  - [x] 상점 관리 (등록/수정/조회/삭제 API 완료)
   - [x] 상점별 데이터 조회 필터링 (Header Tab UI)
 - [x] 프론트엔드 상점 관리 페이지 (`Nanum_Master`)
 

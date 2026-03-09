@@ -26,12 +26,12 @@ CREATE TABLE code (
 -- -----------------------------------------------------
 CREATE TABLE shop_info (
     shop_key         INT AUTO_INCREMENT COMMENT '쇼핑몰Key',
-    site_cd          VARCHAR(10) NOT NULL COMMENT '사이트코드',
+    site_cd          VARCHAR(20) NOT NULL COMMENT '사이트코드',
     shop_type        VARCHAR(10) NOT NULL COMMENT '쇼핑몰타입',
     shop_name        VARCHAR(100) NOT NULL COMMENT '쇼핑몰명',
     shop_domain      VARCHAR(100) NULL COMMENT '도메인',
     shop_status      VARCHAR(10) DEFAULT 'R' NOT NULL COMMENT '상태(R:준비, O:운영, S:중지)',
-    shop_mode        VARCHAR(2) DEFAULT 'C' NOT NULL COMMENT '모드',
+    shop_mode        VARCHAR(10) DEFAULT 'DEV' NOT NULL COMMENT '모드',
     shop_corp        VARCHAR(100) NOT NULL COMMENT '법인명',
     shop_bsn         VARCHAR(15) NOT NULL COMMENT '사업자번호',
     shop_psn         VARCHAR(30) NULL COMMENT '통신판매업신고번호',

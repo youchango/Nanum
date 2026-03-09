@@ -99,4 +99,11 @@ public class AdminShopService {
                 request.getShopSetProductUseMaxPoint(),
                 request.getShopSetProductAccPoint());
     }
+
+    @Transactional
+    public void deleteShop(Long shopKey) {
+        ShopInfo shop = shopInfoRepository.findById(shopKey)
+                .orElseThrow(() -> new IllegalArgumentException("상점 정보를 찾을 수 없습니다."));
+        shopInfoRepository.delete(shop);
+    }
 }

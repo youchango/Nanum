@@ -1,11 +1,11 @@
 package com.nanum.admin.product.controller;
 
-import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.admin.product.service.AdminProductService;
 import com.nanum.global.common.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import com.nanum.domain.product.dto.ProductDTO;
+import com.nanum.domain.product.dto.ProductSitePriceUpdateDTO;
 import com.nanum.admin.product.service.AdminProductReviewService;
 import com.nanum.domain.product.dto.AdminProductReviewDTO;
 import com.nanum.domain.product.dto.AdminProductReviewSearchDTO;
@@ -31,10 +31,9 @@ public class AdminProductController {
 
     @GetMapping
     @Operation(summary = "상품 목록 조회", description = "검색 조건에 따른 상품 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<Page<AdminProductListDTO>>> getProducts(
-            @ModelAttribute AdminProductSearchDTO searchDTO,
-            @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(adminProductService.getProducts(searchDTO, pageable)));
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getProducts(
+            @ModelAttribute AdminProductSearchDTO searchDTO) {
+        return ResponseEntity.ok(ApiResponse.success(adminProductService.getProducts(searchDTO)));
     }
 
     @GetMapping("/{id}")
@@ -63,6 +62,16 @@ public class AdminProductController {
             @PathVariable Long id,
             @RequestBody Map<String, ProductStatus> statusMap) {
         adminProductService.updateProductStatus(id, statusMap.get("status"));
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PutMapping("/{id}/sites/{siteCd}/price")
+    @Operation(summary = "사이트별 상품 및 옵션 가격 일괄 업데이트", description = "특정 사이트에 대한 상품 기본 가격, 노출 여부, 옵션별 추가금액을 일괄 수정합니다.")
+    public ResponseEntity<ApiResponse<Void>> updateProductSitePrice(
+            @PathVariable Long id,
+            @PathVariable String siteCd,
+            @RequestBody ProductSitePriceUpdateDTO request) {
+        adminProductService.updateProductSitePrice(id, siteCd, request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

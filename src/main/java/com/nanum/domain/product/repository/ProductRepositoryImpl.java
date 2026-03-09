@@ -5,9 +5,6 @@ import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -34,7 +31,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO, Pageable pageable) {
+    public List<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO) {
         QProductSite productSite = QProductSite.productSite;
 
         // 1. 단일 Product 엔티티 페이징 조회 (조건 필터링)
@@ -47,29 +44,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
                         eqSiteCd(searchDTO.getSiteCd()),
                         product.deleteYn.eq("N"))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(searchDTO.getOffset())
+                .limit(searchDTO.getRecordSize())
                 .orderBy(product.createdAt.desc())
                 .fetch();
 
-        // 2. 전체 개수 쿼리
-        long total = queryFactory
-                .select(product.count())
-                .from(product)
-                .where(
-                        inCategoryIds(searchDTO.getCategoryIds(), searchDTO.getCategoryId()),
-                        searchKeyword(searchDTO.getSearchType(), searchDTO.getSearchKeyword()),
-                        eqStatus(searchDTO.getStatus()),
-                        betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
-                        eqSiteCd(searchDTO.getSiteCd()),
-                        product.deleteYn.eq("N"))
-                .fetchOne();
-
         if (products.isEmpty()) {
-            return new PageImpl<>(List.of(), pageable, total);
+            return List.of();
         }
 
-        // 3. 조회된 상품 ID 목록 추출
+        // 2. 조회된 상품 ID 목록 추출
         List<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toList());
 
         QProductOption productOption = QProductOption.productOption;
@@ -79,8 +63,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         List<com.querydsl.core.Tuple> siteTuples = queryFactory
                 .select(
                         productSite.product.id,
+                        productSite.siteCd,
+                        productSite.viewYn,
                         productOption.id,
                         productOption.name1,
+                        productOption.name2,
+                        productOption.name3,
                         productSite.standardPrice,
                         productSite.aPrice,
                         productSite.bPrice,
@@ -103,8 +91,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 .collect(Collectors.groupingBy(
                         t -> t.get(productSite.product.id),
                         Collectors.mapping(t -> ProductSitePriceDTO.builder()
+                                .siteCd(t.get(productSite.siteCd))
+                                .viewYn(t.get(productSite.viewYn))
                                 .optionId(t.get(productOption.id))
-                                .optionName(t.get(productOption.name1) != null ? t.get(productOption.name1) : "")
+                                .optionName1(t.get(productOption.name1) != null ? t.get(productOption.name1) : "")
+                                .optionName2(t.get(productOption.name2) != null ? t.get(productOption.name2) : "")
+                                .optionName3(t.get(productOption.name3) != null ? t.get(productOption.name3) : "")
                                 .standardPrice(
                                         t.get(productSite.standardPrice) != null ? t.get(productSite.standardPrice) : 0)
                                 .aPrice(t.get(productSite.aPrice))
@@ -136,7 +128,23 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     .build();
         }).collect(Collectors.toList());
 
-        return new PageImpl<>(content, pageable, total);
+        return content;
+    }
+
+    public int countAdminProducts(AdminProductSearchDTO searchDTO) {
+        Long total = queryFactory
+                .select(product.count())
+                .from(product)
+                .where(
+                        inCategoryIds(searchDTO.getCategoryIds(), searchDTO.getCategoryId()),
+                        searchKeyword(searchDTO.getSearchType(), searchDTO.getSearchKeyword()),
+                        eqStatus(searchDTO.getStatus()),
+                        betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
+                        eqSiteCd(searchDTO.getSiteCd()),
+                        product.deleteYn.eq("N"))
+                .fetchOne();
+
+        return total != null ? total.intValue() : 0;
     }
 
     private BooleanExpression inCategoryIds(List<Long> categoryIds, Long singleCategoryId) {

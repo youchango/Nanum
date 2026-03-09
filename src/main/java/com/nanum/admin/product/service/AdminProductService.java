@@ -6,18 +6,19 @@ import com.nanum.global.error.ErrorCode;
 import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.domain.product.dto.ProductDTO;
+import com.nanum.domain.product.dto.ProductSitePriceUpdateDTO;
 import com.nanum.domain.product.model.*;
 import com.nanum.domain.product.repository.ProductCategoryRepository;
 import com.nanum.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.nanum.admin.manager.entity.Manager;
 import com.nanum.admin.manager.service.CustomManagerDetails;
@@ -42,13 +43,23 @@ public class AdminProductService {
         private final InventoryService inventoryService;
         private final com.nanum.domain.file.service.FileService fileService;
 
-        public Page<AdminProductListDTO> getProducts(AdminProductSearchDTO searchDTO, Pageable pageable) {
+        public Map<String, Object> getProducts(AdminProductSearchDTO searchDTO) {
                 Manager manager = getCurrentManager();
                 if ("MASTER".equals(manager.getMbType())) {
                 } else {
                         searchDTO.setSiteCd(manager.getSiteCd());
                 }
-                return productRepository.findAdminProducts(searchDTO, pageable);
+
+                int totalCount = productRepository.countAdminProducts(searchDTO);
+                searchDTO.setPagination(totalCount);
+
+                List<AdminProductListDTO> productList = productRepository.findAdminProducts(searchDTO);
+
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("productList", productList);
+                responseData.put("totalCount", totalCount);
+
+                return responseData;
         }
 
         public ProductDTO.Response getProduct(Long id) {
@@ -204,6 +215,16 @@ public class AdminProductService {
                                 request.getStatus(),
                                 request.getDescription());
 
+                // 기준가(standardPrice) 변경 시 사이트별 가격도 모두 일괄 동기화 (피드백 반영)
+                List<ProductSite> sitesForSync = productSiteRepository.findByProduct(product);
+                // primitive default가 아닌 경우에 업데이트
+                if (request.getStandardPrice() > 0) {
+                        for (ProductSite ps : sitesForSync) {
+                                ps.update(ps.getViewYn(), request.getStandardPrice(), ps.getAPrice(), ps.getBPrice(),
+                                                ps.getCPrice());
+                        }
+                }
+
                 // Options Update - 기존 옵션 병합 (추가, 수정, 삭제)
                 List<ProductOption> existingOptions = product.getOptions();
                 List<ProductDTO.Option> requestOptions = request.getOptions();
@@ -338,6 +359,45 @@ public class AdminProductService {
 
                 for (ProductSite ps : sites) {
                         ps.delete(manager.getManagerId());
+                }
+        }
+
+        @Transactional
+        public void updateProductSitePrice(Long id, String siteCd, ProductSitePriceUpdateDTO request) {
+                Manager manager = getCurrentManager();
+                Product product = productRepository.findById(id)
+                                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+                // 1. 해당 상품과 사이트 매핑 정보 업데이트
+                List<ProductSite> sites = productSiteRepository.findByProductAndSiteCd(product, siteCd);
+                if (sites.isEmpty()) {
+                        throw new IllegalArgumentException("선택된 사이트의 상품 정보가 존재하지 않습니다.");
+                }
+                ProductSite productSite = sites.get(0); // 통상적으로 한 쌍이 매핑됨
+
+                // 기존 기준가(standardPrice)는 유지하면서 전달받은 가격/상태값 변경
+                productSite.update(
+                                request.getViewYn() != null ? request.getViewYn() : productSite.getViewYn(),
+                                productSite.getStandardPrice(),
+                                request.getAPrice(),
+                                request.getBPrice(),
+                                request.getCPrice());
+
+                // 2. 옵션별 가격 정보 일괄 업데이트
+                if (request.getDtoList() != null && !request.getDtoList().isEmpty()) {
+                        for (ProductSitePriceUpdateDTO.OptionPriceUpdate optionPrice : request.getDtoList()) {
+                                ProductOptionSite pos = productOptionSiteRepository
+                                                .findByProductSiteAndProductOptionId(productSite,
+                                                                optionPrice.getOptionId())
+                                                .orElseThrow(() -> new IllegalArgumentException(
+                                                                "해당 사이트의 옵션 정보를 찾을 수 없습니다. Option ID: "
+                                                                                + optionPrice.getOptionId()));
+
+                                pos.updateExtraPrices(
+                                                optionPrice.getAExtraPrice(),
+                                                optionPrice.getBExtraPrice(),
+                                                optionPrice.getCExtraPrice());
+                        }
                 }
         }
 

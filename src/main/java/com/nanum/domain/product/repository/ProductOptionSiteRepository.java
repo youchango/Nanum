@@ -1,14 +1,18 @@
 package com.nanum.domain.product.repository;
 
 import com.nanum.domain.product.model.ProductOptionSite;
+import com.nanum.domain.product.model.ProductSite;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductOptionSiteRepository extends JpaRepository<ProductOptionSite, Long> {
     List<ProductOptionSite> findByProductSitePsId(Long psId);
+
+    Optional<ProductOptionSite> findByProductSiteAndProductOptionId(ProductSite productSite, Long optionId);
 
     List<ProductOptionSite> findByProductOption(com.nanum.domain.product.model.ProductOption productOption);
 

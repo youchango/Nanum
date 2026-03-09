@@ -10,8 +10,12 @@ import java.math.BigDecimal;
 @Builder
 @ToString
 public class ProductSitePriceDTO {
+    private String siteCd;
     private Long optionId;
-    private String optionName;
+    private String optionName1;
+    private String optionName2;
+    private String optionName3;
+    private String viewYn;
     private Integer standardPrice;
     private BigDecimal aPrice;
     private BigDecimal bPrice;

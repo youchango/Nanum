@@ -19,7 +19,7 @@ public class ShopInfo {
     @Column(name = "shop_key")
     private Long shopKey;
 
-    @Column(name = "site_cd", nullable = false, length = 10)
+    @Column(name = "site_cd", nullable = false, length = 20)
     private String siteCd;
 
     @Column(name = "shop_type", nullable = false, length = 10)
@@ -35,8 +35,8 @@ public class ShopInfo {
     @ColumnDefault("'R'")
     private String shopStatus; // R:준비, O:운영, S:중지
 
-    @Column(name = "shop_mode", nullable = false, length = 2)
-    @ColumnDefault("'C'")
+    @Column(name = "shop_mode", nullable = false, length = 10)
+    @ColumnDefault("'개발'")
     private String shopMode;
 
     @Column(name = "shop_corp", nullable = false, length = 100)
