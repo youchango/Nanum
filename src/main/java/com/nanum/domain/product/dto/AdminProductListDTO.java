@@ -1,6 +1,7 @@
 package com.nanum.domain.product.dto;
 
 import com.nanum.domain.product.model.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -21,6 +22,7 @@ public class AdminProductListDTO {
     private ProductStatus status;
 
     // From ProductSite (1:N options mapping)
+    @JsonProperty("sitePrices")
     private java.util.List<ProductSitePriceDTO> sitePrices;
 
     private int viewCount;

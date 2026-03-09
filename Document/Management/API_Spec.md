@@ -148,16 +148,71 @@ Base URL: `/api/v1/admin/products`
 | `POST` | `/` | 상품 생성 | 신규 상품(기본정보, 옵션, 이미지)을 등록합니다. |
 | `GET` | `/{id}` | 상품 상세 조회 | 상품 ID로 기본정보, 옵션 목록, 이미지 목록을 상세 조회합니다. |
 | `PUT` | `/{id}` | 상품 수정 | 상품 정보를 수정합니다. (옵션/이미지 포함) |
-| `DELETE` | `/{id}` | 상품 삭제 | 상품을 삭제합니다. (Soft Delete) |
+| `PUT` | `/{id}/sites/{siteCd}/price` | 사이트별 가격 일괄 업데이트 | 특정 사이트의 상품 기본가, 노출 여부, 옵션 추가금을 수정합니다. |
+| `DELETE` | `/{id}` | 상품 사이트별 삭제 | 특정 사이트에서만 상품을 제외합니다. (`siteCd` 필수) |
+| `DELETE` | `/{id}/master` | 상품 원본 완전 삭제 | 모든 사이트에서 상품을 영구적으로 삭제합니다. (Soft Delete) |
 | `PATCH` | `/{id}/status` | 상품 상태 변경 | 상품의 상태(`SALE`, `STOP`, `SOLD_OUT`)를 변경합니다. |
+
+**Request Schema (`ProductSitePriceUpdateDTO`)**
+```json
+{
+  "viewYn": "Y",
+  "aPrice": 15000,
+  "bPrice": 16000,
+  "cPrice": 17000,
+  "dtoList": [
+    {
+      "optionId": 101,
+      "aExtraPrice": 1000,
+      "bExtraPrice": 1200,
+      "cExtraPrice": 1500
+    }
+  ]
+}
+```
+
 
 ### 4.3 User Product (쇼핑몰 상품)
 Base URL: `/api/v1/products`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | 상품 목록 조회 | 카테고리 필터링 등 상품 목록을 조회합니다. (`categoryId` 포함) |
-| `GET` | `/{id}` | 상품 상세 조회 | 상품 상세 정보를 조회합니다. (`categoryId` 포함) |
+| `GET` | `/` | 상품 목록 조회 | 사이트별(`siteCd`) 노출 상품 목록을 조회합니다. (`categoryId` 필터 가능) |
+| `GET` | `/{id}` | 상품 상세 조회 | 특정 사이트의 상품 상세 정보 및 옵션을 조회합니다. (`siteCd` 필수) |
+
+**User Pricing Policy**
+- 로그인 한 사용자의 `MemberType`과 `ROLE`에 따라 가격이 상이하게 노출됩니다.
+- 기업회원(BIZ): `price` = a_price, `extraPrice` = a_extra_price
+- 일반회원(USER): `price` = b_price, `extraPrice` = b_extra_price
+- 보훈회원(VETERAN): `price` = c_price, `extraPrice` = c_extra_price
+- 비로그인: 일반회원가 기본 적용
+
+**Response Schema (`MallProductResponse`)**
+```json
+{
+  "status": "SUCCESS",
+  "data": [
+    {
+      "productId": 1,
+      "categoryIds": [10, 12],
+      "categoryName": "의류",
+      "name": "나눔 티셔츠",
+      "price": 15000,
+      "status": "SALE",
+      "optionYn": "Y",
+      "options": [
+        {
+          "optionId": 101,
+          "name1": "Black",
+          "extraPrice": 1000,
+          "stockQuantity": 100
+        }
+      ],
+      "images": []
+    }
+  ]
+}
+```
 
 ### 4.4 User Product Review (상품 리뷰)
 Base URL: `/api/v1/products/{productId}/reviews`
@@ -183,7 +238,6 @@ Base URL: `/api/v1/admin/products/reviews`
 ```json
 {
   "status": "SUCCESS",
-  "data": {
   "data": {
     "productId": 1,
     "categoryId": [10, 12],

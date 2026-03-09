@@ -39,9 +39,20 @@ public class ProductOptionSite {
     @ColumnDefault("0.0000")
     private BigDecimal cExtraPrice;
 
+    /**
+     * 옵션 사이트별 추가 금액을 업데이트합니다.
+     * null이 전달된 경우 기존 값을 유지합니다.
+     *
+     * @param aExtraPrice 기업회원 옵션 추가금액, null이면 기존 값 유지
+     * @param bExtraPrice 일반회원 옵션 추가금액, null이면 기존 값 유지
+     * @param cExtraPrice 보훈회원 옵션 추가금액, null이면 기존 값 유지
+     */
     public void updateExtraPrices(BigDecimal aExtraPrice, BigDecimal bExtraPrice, BigDecimal cExtraPrice) {
-        this.aExtraPrice = aExtraPrice;
-        this.bExtraPrice = bExtraPrice;
-        this.cExtraPrice = cExtraPrice;
+        if (aExtraPrice != null)
+            this.aExtraPrice = aExtraPrice;
+        if (bExtraPrice != null)
+            this.bExtraPrice = bExtraPrice;
+        if (cExtraPrice != null)
+            this.cExtraPrice = cExtraPrice;
     }
 }

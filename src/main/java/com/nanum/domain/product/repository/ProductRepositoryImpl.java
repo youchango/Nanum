@@ -31,6 +31,23 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    public List<Product> findMallProducts(String siteCd, Long categoryId) {
+        QProductSite productSite = QProductSite.productSite;
+
+        return queryFactory
+                .selectFrom(product)
+                .join(productSite).on(product.id.eq(productSite.product.id))
+                .where(
+                        productSite.siteCd.eq(siteCd),
+                        productSite.viewYn.eq("Y"),
+                        productSite.deleteYn.eq("N"),
+                        product.deleteYn.eq("N"),
+                        inCategoryIds(null, categoryId))
+                .orderBy(product.createdAt.desc())
+                .fetch();
+    }
+
+    @Override
     public List<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO) {
         QProductSite productSite = QProductSite.productSite;
 

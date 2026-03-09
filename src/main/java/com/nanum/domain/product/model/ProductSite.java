@@ -51,11 +51,26 @@ public class ProductSite extends BaseEntity {
     @ColumnDefault("0")
     private Integer pdtClick;
 
+    /**
+     * 사이트별 가격 및 노출 여부를 업데이트합니다.
+     * null이 전달된 경우 기존 값을 유지합니다.
+     *
+     * @param viewYn        노출 여부 (Y/N), null이면 기존 값 유지
+     * @param standardPrice 기준가, null이면 기존 값 유지
+     * @param aPrice        기업회원가, null이면 기존 값 유지
+     * @param bPrice        일반회원가, null이면 기존 값 유지
+     * @param cPrice        보훈회원가, null이면 기존 값 유지
+     */
     public void update(String viewYn, Integer standardPrice, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
-        this.viewYn = viewYn;
-        this.standardPrice = standardPrice;
-        this.aPrice = aPrice;
-        this.bPrice = bPrice;
-        this.cPrice = cPrice;
+        if (viewYn != null)
+            this.viewYn = viewYn;
+        if (standardPrice != null)
+            this.standardPrice = standardPrice;
+        if (aPrice != null)
+            this.aPrice = aPrice;
+        if (bPrice != null)
+            this.bPrice = bPrice;
+        if (cPrice != null)
+            this.cPrice = cPrice;
     }
 }
