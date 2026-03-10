@@ -85,6 +85,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         eqStatus(searchDTO.getStatus()),
                         betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
                         eqSiteCd(searchDTO.getSiteCd()),
+                        eqApplyYn(searchDTO.getApplyYn()),
                         product.deleteYn.eq("N"))
                 .offset(searchDTO.getOffset())
                 .limit(searchDTO.getRecordSize())
@@ -180,6 +181,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         eqStatus(searchDTO.getStatus()),
                         betweenDate(searchDTO.getStartDate(), searchDTO.getEndDate()),
                         eqSiteCd(searchDTO.getSiteCd()),
+                        eqApplyYn(searchDTO.getApplyYn()),
                         product.deleteYn.eq("N"))
                 .fetchOne();
 
@@ -229,5 +231,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         .and(productSite.siteCd.eq(siteCd))
                         .and(productSite.deleteYn.eq("N")))
                 .exists();
+    }
+
+    private BooleanExpression eqApplyYn(String applyYn) {
+        if (!StringUtils.hasText(applyYn)) {
+            return null;
+        }
+        return product.applyYn.eq(applyYn);
     }
 }

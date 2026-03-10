@@ -6,8 +6,8 @@ import com.nanum.admin.product.service.AdminProductService;
 import com.nanum.global.common.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import com.nanum.domain.product.dto.ProductDTO;
-import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.domain.product.dto.ProductSitePriceUpdateDTO;
+import com.nanum.domain.product.dto.ProductSiteBulkCreateDTO;
 import com.nanum.admin.product.service.AdminProductReviewService;
 import com.nanum.domain.product.dto.AdminProductReviewDTO;
 import com.nanum.domain.product.dto.AdminProductReviewSearchDTO;
@@ -75,6 +75,15 @@ public class AdminProductController implements ResponseSupport {
             @PathVariable String siteCd,
             @RequestBody ProductSitePriceUpdateDTO request) {
         adminProductService.updateProductSitePrice(id, siteCd, request);
+        return success();
+    }
+
+    @PostMapping("/{id}/sites/bulk")
+    @Operation(summary = "사이트 가격 일괄 설정 (신규 등록)", description = "선택한 여러 사이트에 대해 동일한 가격 정보로 상품-사이트 매핑을 일괄 등록합니다. 단, 이미 등록된 사이트는 제외(Skip)합니다.")
+    public ResponseEntity<ApiResponse<Void>> createBulkProductSites(
+            @PathVariable Long id,
+            @RequestBody ProductSiteBulkCreateDTO request) {
+        adminProductService.createBulkProductSites(id, request);
         return success();
     }
 

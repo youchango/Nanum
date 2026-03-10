@@ -7,6 +7,7 @@ import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.domain.product.dto.ProductSitePriceUpdateDTO;
+import com.nanum.domain.product.dto.ProductSiteBulkCreateDTO;
 import com.nanum.domain.product.model.*;
 import com.nanum.domain.product.repository.ProductCategoryRepository;
 import com.nanum.domain.product.repository.ProductOptionRepository;
@@ -24,7 +25,6 @@ import java.util.HashMap;
 
 import com.nanum.admin.manager.entity.Manager;
 import com.nanum.admin.manager.service.CustomManagerDetails;
-import com.nanum.domain.product.repository.ProductSiteRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
@@ -287,9 +287,9 @@ public class AdminProductService {
         }
 
         @Transactional
-        public void deleteProduct(Long id, String siteCd) {
+        public void deleteProduct(Long productId, String siteCd) {
                 Manager manager = getCurrentManager();
-                Product product = productRepository.findById(id)
+                Product product = productRepository.findById(productId)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
                 List<ProductSite> sites = productSiteRepository.findByProductAndSiteCd(product, siteCd);
@@ -304,7 +304,6 @@ public class AdminProductService {
 
         @Transactional
         public void updateProductSitePrice(Long id, String siteCd, ProductSitePriceUpdateDTO request) {
-                Manager manager = getCurrentManager();
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
@@ -323,6 +322,49 @@ public class AdminProductService {
                                 request.getBPrice(),
                                 request.getCPrice());
                 // 옵션별 가격 정보 일괄 업데이트 로직 제거 완료
+        }
+
+        @Transactional
+        public void createBulkProductSites(Long productId, ProductSiteBulkCreateDTO request) {
+                Manager manager = getCurrentManager();
+                if (!"MASTER".equals(manager.getMbType())) {
+                        throw new BusinessException(ErrorCode.UNAUTHORIZED, "가격 일괄 설정 권한이 없습니다.");
+                }
+
+                Product product = productRepository.findById(productId)
+                                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+                // 기존 등록된 사이트 목록 조회 (등록 무시 용도)
+                List<String> existingSiteCds = productSiteRepository.findByProduct(product)
+                                .stream()
+                                .map(ProductSite::getSiteCd)
+                                .collect(Collectors.toList());
+
+                List<ProductSite> newSites = new ArrayList<>();
+                for (String siteCd : request.getSiteCds()) {
+                        // 피드백: 이미 등록된 사이트이면 생성하지 않고 무시
+                        if (existingSiteCds.contains(siteCd)) {
+                                continue;
+                        }
+
+                        ProductSite newSite = ProductSite.builder()
+                                        .product(product)
+                                        .siteCd(siteCd)
+                                        // 소매가(retailPrice)를 기본 판매가로 주입
+                                        .salePrice(product.getRetailPrice() != null ? product.getRetailPrice() : 0)
+                                        .aPrice(request.getAPrice())
+                                        .bPrice(request.getBPrice())
+                                        .cPrice(request.getCPrice())
+                                        .viewYn("Y") // 일괄 등록 시 기본 노출 처리
+                                        .build();
+
+                        // 공통 옵션 처리 부분 제거됨
+                        newSites.add(newSite);
+                }
+
+                if (!newSites.isEmpty()) {
+                        productSiteRepository.saveAll(newSites);
+                }
         }
 
         @Transactional
