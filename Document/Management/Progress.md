@@ -65,7 +65,8 @@
     - [x] **상품 검색 및 필터링 통합 (SearchDTO 기반 카테고리/키워드 검색 구현 완료)**
     - [x] 상품 목록 내 렌더링 방식 고도화: 자세히 보기(`expandable`) 데이터 출력 시, `siteCd` 기준으로 Javascript 그룹화(reduce) 및 단가표 분할 렌더링.
     - [x] **상품 가격 상세표 UI 개편**: 기존 확장(Expandable)뷰 방식 제거 후, `Modal` 팝업 및 사이트별 탭(`Tabs`)으로 컴포넌트 재구성 완료.
-    - [x] **가격 정보 관리(ProductSiteList) 분리**: `ROLE_MASTER` 전용 메뉴 신설 및 다중 사이트 대상 상품 단가(A/B/C) 일괄 등록(Bulk Insert) API 구현.
+    - [x] **상품 가격 관리(ProductSiteList) 분리 및 고도화**: `ROLE_MASTER` 전용 메뉴 신설. 체크박스로 선택한 사이트에 대한 동적 단가(A/B/C) 입력 표 제공 및 개별 Insert API 연동 완료, 상세 팝업 탭 명칭 ShopName 전환.
+    - [x] **백엔드/프론트엔드 빌드 오류 및 프록시 에러 해결**: 에러 코드 정합성 수리 완료 및 `application-local.yml` 8090 포트 지정으로 로그인(ECONNREFUSED) 해결.
 - [ ] 일반/기업 전용 상품 등록 및 노출 제어 (Site Code 적용 완료)
 - [ ] 상품 옵션 및 재고 관리 시스템
 - [ ] **상품 리뷰 및 평가 (Product Review & Like)**

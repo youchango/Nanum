@@ -1,5 +1,6 @@
 package com.nanum.domain.product.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,10 +12,26 @@ import java.util.List;
 @Builder
 @ToString
 public class ProductSiteBulkCreateDTO {
-    private List<String> siteCds;
+    @Schema(description = "사이트별 가격 설정 목록")
+    private List<SitePriceReq> sitePrices;
 
-    // 이 값들을 바탕으로 상품과 1:N인 product_site의 가격 데이터 세팅을 진행합니다.
-    private BigDecimal aPrice;
-    private BigDecimal bPrice;
-    private BigDecimal cPrice;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class SitePriceReq {
+        @Schema(description = "상점 코드", example = "A01")
+        private String siteCd;
+
+        @Schema(description = "기업회원가(A)")
+        private BigDecimal aPrice;
+
+        @Schema(description = "일반회원가(B)")
+        private BigDecimal bPrice;
+
+        @Schema(description = "보훈회원가(C)")
+        private BigDecimal cPrice;
+    }
 }

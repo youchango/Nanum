@@ -328,7 +328,7 @@ public class AdminProductService {
         public void createBulkProductSites(Long productId, ProductSiteBulkCreateDTO request) {
                 Manager manager = getCurrentManager();
                 if (!"MASTER".equals(manager.getMbType())) {
-                        throw new BusinessException(ErrorCode.UNAUTHORIZED, "가격 일괄 설정 권한이 없습니다.");
+                        throw new BusinessException("가격 일괄 설정 권한이 없습니다.", ErrorCode.ACCESS_DENIED);
                 }
 
                 Product product = productRepository.findById(productId)
@@ -341,7 +341,8 @@ public class AdminProductService {
                                 .collect(Collectors.toList());
 
                 List<ProductSite> newSites = new ArrayList<>();
-                for (String siteCd : request.getSiteCds()) {
+                for (ProductSiteBulkCreateDTO.SitePriceReq siteReq : request.getSitePrices()) {
+                        String siteCd = siteReq.getSiteCd();
                         // 피드백: 이미 등록된 사이트이면 생성하지 않고 무시
                         if (existingSiteCds.contains(siteCd)) {
                                 continue;
@@ -352,9 +353,9 @@ public class AdminProductService {
                                         .siteCd(siteCd)
                                         // 소매가(retailPrice)를 기본 판매가로 주입
                                         .salePrice(product.getRetailPrice() != null ? product.getRetailPrice() : 0)
-                                        .aPrice(request.getAPrice())
-                                        .bPrice(request.getBPrice())
-                                        .cPrice(request.getCPrice())
+                                        .aPrice(siteReq.getAPrice())
+                                        .bPrice(siteReq.getBPrice())
+                                        .cPrice(siteReq.getCPrice())
                                         .viewYn("Y") // 일괄 등록 시 기본 노출 처리
                                         .build();
 
