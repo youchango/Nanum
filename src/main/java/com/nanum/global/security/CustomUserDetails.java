@@ -53,6 +53,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return "N".equals(member.getWithdrawYn());
+        return "N".equals(member.getWithdrawYn()) && "Y".equals(member.getApplyYn());
     }
 }

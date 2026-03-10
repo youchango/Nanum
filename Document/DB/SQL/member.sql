@@ -4,7 +4,6 @@
     member_id        VARCHAR(50) NOT NULL COMMENT '회원아이디',
     member_name      VARCHAR(50) NOT NULL COMMENT '회원명',
     password         VARCHAR(255) NOT NULL COMMENT '비밀번호',
-    business_number  VARCHAR(20) NULL COMMENT '사업자번호',
     phone            VARCHAR(20) NULL COMMENT '전화번호',
     mobile_phone     VARCHAR(20) NOT NULL COMMENT '휴대전화',
     zipcode          VARCHAR(10) NOT NULL COMMENT '우편주소',

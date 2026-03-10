@@ -156,7 +156,6 @@ public class AdminProductService {
                 productRepository.flush(); // Ensure IDs are generated for product and options
 
                 // 2. Save ProductSite & ProductOptionSite (전체 사이트 대상 일괄 생성, 미노출 & 0원 초기화)
-                BigDecimal basePrice = BigDecimal.ZERO;
                 List<ShopInfo> allSites = shopInfoRepository.findAll();
 
                 for (ShopInfo site : allSites) {
@@ -165,9 +164,9 @@ public class AdminProductService {
                                         .siteCd(site.getSiteCd())
                                         .viewYn("N") // 초기 미노출 처리
                                         .standardPrice(request.getStandardPrice()) // 기준가 적용
-                                        .aPrice(basePrice)
-                                        .bPrice(basePrice)
-                                        .cPrice(basePrice)
+                                        .aPrice(BigDecimal.valueOf(request.getStandardPrice()))
+                                        .bPrice(BigDecimal.valueOf(request.getStandardPrice()))
+                                        .cPrice(BigDecimal.valueOf(request.getStandardPrice()))
                                         .pdtClick(0)
                                         .build();
                         productSiteRepository.save(ps);

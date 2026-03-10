@@ -18,10 +18,14 @@ public class MemberServiceImpl implements MemberService {
 
     // private final MemberMapper memberMapper; // 제거
     private final MemberRepository memberRepository;
+    private final com.nanum.user.member.repository.MemberBizRepository memberBizRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberServiceImpl(MemberRepository memberRepository,
+            com.nanum.user.member.repository.MemberBizRepository memberBizRepository,
+            PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.memberBizRepository = memberBizRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -87,6 +91,19 @@ public class MemberServiceImpl implements MemberService {
         // member.setUpdatedBy(memberCode);
 
         memberRepository.save(member);
+
+        // 기업 회원일 경우 상세 정보 저장
+        if (memberType == MemberType.B) {
+            com.nanum.domain.member.model.MemberBiz memberBiz = com.nanum.domain.member.model.MemberBiz.builder()
+                    .member(member)
+                    .businessNumber(memberDTO.getBusinessNumber())
+                    .companyName(memberDTO.getCompanyName())
+                    .ceoName(memberDTO.getCeoName())
+                    .businessType(memberDTO.getBusinessType())
+                    .businessItem(memberDTO.getBusinessItem())
+                    .build();
+            memberBizRepository.save(memberBiz);
+        }
     }
 
     private String generateMemberCode(String prefix) {

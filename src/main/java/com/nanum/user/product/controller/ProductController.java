@@ -24,13 +24,19 @@ public class ProductController {
     private final ProductReviewService productReviewService;
 
     @GetMapping
-    public ApiResponse<List<ProductDTO.Response>> getProducts(@RequestParam(required = false) Long categoryId) {
-        return ApiResponse.success(productService.getProductList(categoryId));
+    public ApiResponse<List<ProductDTO.MallProductResponse>> getProducts(
+            @RequestParam String siteCd,
+            com.nanum.global.common.dto.SearchDTO searchDTO) {
+        String memberCode = getCurrentMemberCode();
+        return ApiResponse.success(productService.getMallProductList(searchDTO, siteCd, memberCode));
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<ProductDTO.Response> getProduct(@PathVariable Long id) {
-        return ApiResponse.success(productService.getProduct(id));
+    public ApiResponse<ProductDTO.MallProductResponse> getProduct(
+            @PathVariable Long id,
+            @RequestParam String siteCd) {
+        String memberCode = getCurrentMemberCode();
+        return ApiResponse.success(productService.getMallProduct(id, siteCd, memberCode));
     }
 
     // --- Product Review & Like ---

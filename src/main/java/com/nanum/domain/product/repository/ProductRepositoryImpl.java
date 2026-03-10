@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import com.querydsl.jpa.JPAExpressions;
 import com.nanum.domain.product.model.Product;
+import com.nanum.global.common.dto.SearchDTO;
 import com.nanum.domain.product.dto.ProductSitePriceDTO;
 import com.nanum.domain.product.model.QProductOption;
 
@@ -29,6 +30,24 @@ import static com.nanum.domain.product.model.QProduct.product;
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public List<Product> findMallProducts(String siteCd, SearchDTO searchDTO) {
+        QProductSite productSite = QProductSite.productSite;
+
+        return queryFactory
+                .selectFrom(product)
+                .join(productSite).on(product.id.eq(productSite.product.id))
+                .where(
+                        productSite.siteCd.eq(siteCd),
+                        productSite.viewYn.eq("Y"),
+                        productSite.deleteYn.eq("N"),
+                        product.deleteYn.eq("N"),
+                        searchKeyword(null, searchDTO.getKeyword()),
+                        inCategoryIds(null, searchDTO.getCategoryId()))
+                .orderBy(product.createdAt.desc())
+                .fetch();
+    }
 
     @Override
     public List<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO) {

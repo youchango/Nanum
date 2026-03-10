@@ -44,8 +44,6 @@ public class Member {
 
     private String password; // 암호화된 비밀번호
 
-    // business_number는 MemberBiz 엔티티로 이전되었습니다. (B2B 구매 권한 관리를 위함)
-
     private String phone; // 일반 전화번호
 
     @Column(name = "mobile_phone")

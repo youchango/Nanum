@@ -126,4 +126,23 @@ public class AdminMemberController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    /**
+     * 회원의 승인 상태(apply_yn)를 업데이트합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @param applyYn    업데이트할 승인 상태 ('Y' 또는 'N')
+     * @return 성공 메시지
+     */
+    @Operation(summary = "회원 승인 상태 수정", description = "회원의 승인 여부(apply_yn)를 수정합니다.")
+    @PatchMapping("/{memberCode}/apply-yn")
+    public ResponseEntity<ApiResponse<Object>> updateApplyYn(@PathVariable String memberCode,
+            @RequestParam String applyYn) {
+        try {
+            adminMemberService.updateApplyYn(memberCode, applyYn);
+            return ResponseEntity.ok(ApiResponse.success("Member approval status updated successfully", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

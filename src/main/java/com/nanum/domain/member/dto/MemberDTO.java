@@ -83,6 +83,16 @@ public class MemberDTO {
     private String ceoName;
 
     /**
+     * 업태 (Biz 회원용)
+     */
+    private String businessType;
+
+    /**
+     * 종목 (Biz 회원용)
+     */
+    private String businessItem;
+
+    /**
      * 일반 전화번호
      */
     private String phone;

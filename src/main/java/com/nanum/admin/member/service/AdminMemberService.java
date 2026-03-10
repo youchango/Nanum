@@ -181,6 +181,19 @@ public class AdminMemberService {
         member.setWithdrawYn("Y");
     }
 
+    /**
+     * 회원의 승인 상태(apply_yn)를 업데이트합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @param applyYn    업데이트할 승인 상태 ('Y' 또는 'N')
+     */
+    @Transactional
+    public void updateApplyYn(String memberCode, String applyYn) {
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. Code: " + memberCode));
+        member.setApplyYn(applyYn);
+    }
+
     // Member Code 생성 helper
     private String generateMemberCode(String prefix) {
         return memberRepository.findTopByMemberCodeStartingWithOrderByMemberCodeDesc(prefix)
