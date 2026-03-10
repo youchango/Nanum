@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Tag(name = "Wishlist", description = "Wishlist API")
 @RestController
@@ -23,6 +24,7 @@ public class WishlistController {
 
     private final WishlistService wishlistService;
 
+    @Operation(summary = "찜 목록 토글", description = "특정 상품을 찜 목록에 추가하거나 이미 있을 경우 삭제 처리(Toggle)합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<Boolean>> toggleWishlist(
             @RequestBody WishlistDTO.Request request,
@@ -31,6 +33,7 @@ public class WishlistController {
         return ResponseEntity.ok(ApiResponse.success(isAdded));
     }
 
+    @Operation(summary = "찜 상품 삭제", description = "특정 상품 ID를 기반으로 찜 목록에서 해당 상품을 삭제합니다.")
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteWishlist(
             @PathVariable Long productId,
@@ -39,6 +42,7 @@ public class WishlistController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @Operation(summary = "내 찜 목록 조회", description = "현재 사용자가 찜한 모든 상품 목록을 페이징하여 조회합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductDTO.Response>>> getMyWishlist(
             @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,

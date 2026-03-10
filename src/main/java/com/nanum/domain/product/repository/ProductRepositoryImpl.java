@@ -21,7 +21,6 @@ import com.nanum.domain.product.dto.ProductSitePriceDTO;
 import com.nanum.domain.product.model.QProductOption;
 
 import com.nanum.domain.product.model.QProductSite;
-import com.nanum.domain.product.model.QProductOptionSite;
 
 import static com.nanum.domain.product.model.QProduct.product;
 
@@ -38,10 +37,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return queryFactory
                 .selectFrom(product)
                 .join(productSite).on(product.id.eq(productSite.product.id))
+                .leftJoin(product.options).fetchJoin()
                 .where(
                         productSite.siteCd.eq(siteCd),
                         productSite.viewYn.eq("Y"),
                         productSite.deleteYn.eq("N"),
+                        product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
                         searchKeyword(null, searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
@@ -56,10 +57,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return queryFactory
                 .selectFrom(product)
                 .join(productSite).on(product.id.eq(productSite.product.id))
+                .leftJoin(product.options).fetchJoin()
                 .where(
                         productSite.siteCd.eq(siteCd),
                         productSite.viewYn.eq("Y"),
                         productSite.deleteYn.eq("N"),
+                        product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
                         searchKeyword(null, searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
@@ -96,7 +99,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         List<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toList());
 
         QProductOption productOption = QProductOption.productOption;
-        QProductOptionSite productOptionSite = QProductOptionSite.productOptionSite;
 
         // 메모리 조합용 (상품 ID별 ProductSitePriceDTO 목록)
         List<com.querydsl.core.Tuple> siteTuples = queryFactory
@@ -111,10 +113,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.salePrice,
                         productSite.aPrice,
                         productSite.bPrice,
-                        productSite.cPrice)
+                        productSite.cPrice,
+                        productOption.extraPrice,
+                        productOption.stockQuantity)
                 .from(productSite)
-                .leftJoin(productOptionSite).on(productSite.psId.eq(productOptionSite.productSite.psId))
-                .leftJoin(productOption).on(productOptionSite.productOption.id.eq(productOption.id))
+                .leftJoin(productOption).on(productSite.product.id.eq(productOption.product.id))
                 .where(
                         productSite.product.id.in(productIds),
                         productSite.deleteYn.eq("N"),
@@ -138,6 +141,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 .aPrice(t.get(productSite.aPrice))
                                 .bPrice(t.get(productSite.bPrice))
                                 .cPrice(t.get(productSite.cPrice))
+                                .extraPrice(t.get(productOption.extraPrice))
+                                .stockQuantity(t.get(productOption.stockQuantity))
                                 .build(), Collectors.toList())));
 
         // 5. 최종 DTO 매핑

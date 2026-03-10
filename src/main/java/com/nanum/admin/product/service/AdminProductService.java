@@ -9,7 +9,9 @@ import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.domain.product.dto.ProductSitePriceUpdateDTO;
 import com.nanum.domain.product.model.*;
 import com.nanum.domain.product.repository.ProductCategoryRepository;
+import com.nanum.domain.product.repository.ProductOptionRepository;
 import com.nanum.domain.product.repository.ProductRepository;
+import com.nanum.domain.product.repository.ProductSiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +26,6 @@ import com.nanum.admin.manager.entity.Manager;
 import com.nanum.admin.manager.service.CustomManagerDetails;
 import com.nanum.domain.product.repository.ProductSiteRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
-import java.math.BigDecimal;
-
-import com.nanum.domain.shop.model.ShopInfo;
-import com.nanum.domain.shop.repository.ShopInfoRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class AdminProductService {
         private final ProductRepository productRepository;
         private final ProductSiteRepository productSiteRepository; // Injected
         private final ProductCategoryRepository productCategoryRepository;
-        private final ShopInfoRepository shopInfoRepository;
+        private final ProductOptionRepository productOptionRepository;
         private final InventoryService inventoryService;
         private final com.nanum.domain.file.service.FileService fileService;
 
@@ -61,7 +59,6 @@ public class AdminProductService {
         }
 
         public ProductDTO.Response getProduct(Long id) {
-                Manager manager = getCurrentManager();
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + id));
 
@@ -150,33 +147,13 @@ public class AdminProductService {
                                                         .build())
                                         .collect(Collectors.toList());
                         product.getOptions().addAll(options);
+                        productOptionRepository.saveAll(options);
                 }
 
                 productRepository.save(product);
                 productRepository.flush(); // Ensure IDs are generated for product and options
 
-                // 2. Save ProductSite (전체 사이트 대상 일괄 생성, 미노출 & 0원 초기화)
-                List<ShopInfo> allSites = shopInfoRepository.findAll();
-
-                for (ShopInfo site : allSites) {
-                        ProductSite ps = ProductSite.builder()
-                                        .product(product)
-                                        .siteCd(site.getSiteCd())
-                                        .viewYn("N") // 초기 미노출 처리
-                                        .salePrice(request.getSuggestedPrice()) // 소비자가 임시 적용
-                                        .aPrice(BigDecimal.valueOf(
-                                                        request.getRetailPrice() != null ? request.getRetailPrice()
-                                                                        : 0))
-                                        .bPrice(BigDecimal.valueOf(
-                                                        request.getRetailPrice() != null ? request.getRetailPrice()
-                                                                        : 0))
-                                        .cPrice(BigDecimal.valueOf(
-                                                        request.getRetailPrice() != null ? request.getRetailPrice()
-                                                                        : 0))
-                                        .pdtClick(0)
-                                        .build();
-                        productSiteRepository.save(ps);
-                }
+                // 2. Save ProductSite 로직 제거 (외부에서 처리하도록 변경)
 
                 // 3. Link Files
                 processFiles(request.getImages(), product.getId());
@@ -209,15 +186,7 @@ public class AdminProductService {
                                 request.getDescription(),
                                 "N"); // 수정 시 무조건 N
 
-                // salePrice 변경 시 사이트별 가격도 모두 일괄 동기화 (피드백 반영)
-                List<ProductSite> sitesForSync = productSiteRepository.findByProduct(product);
-                // primitive default가 아닌 경우에 업데이트
-                if (request.getRetailPrice() != null && request.getRetailPrice() > 0) {
-                        for (ProductSite ps : sitesForSync) {
-                                ps.update(ps.getViewYn(), request.getRetailPrice(), ps.getAPrice(), ps.getBPrice(),
-                                                ps.getCPrice());
-                        }
-                }
+                // salePrice 변경 시 사이트별 가격 일괄 동기화 로직 제거
 
                 // Options Update - 기존 옵션 병합 (추가, 수정, 삭제)
                 List<ProductOption> existingOptions = product.getOptions();
@@ -234,6 +203,7 @@ public class AdminProductService {
                                         .filter(opt -> !requestOptionIds.contains(opt.getId()))
                                         .collect(Collectors.toList());
 
+                        productOptionRepository.deleteAll(optionsToRemove);
                         for (ProductOption optToRemove : optionsToRemove) {
                                 existingOptions.remove(optToRemove);
                         }

@@ -1,11 +1,13 @@
 package com.nanum.user.management.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
+import com.nanum.global.common.support.ResponseSupport;
 import com.nanum.domain.banner.dto.BannerDTO;
 import com.nanum.domain.banner.model.BannerType;
 import com.nanum.user.management.service.BannerService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,13 +20,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/banners")
 @RequiredArgsConstructor
-public class BannerController {
+public class BannerController implements ResponseSupport {
 
     private final BannerService bannerService;
 
     @GetMapping
-    @Operation(summary = "배너 목록 조회")
-    public ApiResponse<List<BannerDTO.Response>> getBanners(@RequestParam BannerType type) {
-        return ApiResponse.success(bannerService.getBanners(type));
+    @Operation(summary = "배너 목록 조회", description = "배너 유형(BannerType: MAIN, SUB 등)에 따라 현재 활성화된 배너 목록을 조회하여 반환합니다.")
+    public ResponseEntity<ApiResponse<List<BannerDTO.Response>>> getBanners(@RequestParam BannerType type) {
+        return success(bannerService.getBanners(type));
     }
 }

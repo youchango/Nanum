@@ -127,6 +127,7 @@
   - [x] Entity 리팩토링 (`BaseEntity` 적용 및 중복 제거)
   - [x] `merge_sql.py` 스크립트 수정 및 `init_db.sql` 재생성
   - [x] SQL 파일 UTF-8 인코딩 점검 및 BOM 제거
+   - [x] **전사 API 응답 규격 표준화 (ResponseEntity<ApiResponse<T>> 통일 완료)**
 
 
 ## 프론트엔드 리팩토링 (Nanum_Master)

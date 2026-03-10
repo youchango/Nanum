@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Tag(name = "Cart", description = "Cart API")
 @RestController
@@ -21,6 +22,7 @@ public class CartController {
 
     private final CartService cartService;
 
+    @Operation(summary = "장바구니 상품 추가", description = "현재 로그인한 사용자의 장바구니에 특정 상품(CartDTO.AddRequest)을 추가합니다. 이미 존재하는 상품일 경우 예외가 발생합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<Long>> addToCart(
             @RequestBody CartDTO.AddRequest request,

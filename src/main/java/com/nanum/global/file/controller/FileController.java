@@ -5,6 +5,7 @@ import com.nanum.domain.file.model.FileStore;
 import com.nanum.domain.file.model.ReferenceType;
 import com.nanum.domain.file.service.FileService;
 import com.nanum.global.common.dto.ApiResponse;
+import com.nanum.global.common.support.ResponseSupport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
 @Tag(name = "File Management", description = "전사 공통 파일 관리 API")
-public class FileController {
+public class FileController implements ResponseSupport {
 
     private final FileService fileService;
 
@@ -29,10 +31,10 @@ public class FileController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("referenceType") ReferenceType referenceType,
             @RequestParam("referenceId") String referenceId,
-            @RequestParam(value = "isMain", defaultValue = "false") boolean isMain) {
+            @RequestParam(value = "isMain", defaultValue = "false") boolean isMain) throws IOException {
 
         FileStore fileStore = fileService.uploadFile(file, referenceType, referenceId, isMain);
-        return ResponseEntity.ok(ApiResponse.success(FileResponseDTO.from(fileStore)));
+        return success(FileResponseDTO.from(fileStore));
     }
 
     @GetMapping("/{referenceType}/{referenceId}")
@@ -41,19 +43,18 @@ public class FileController {
             @PathVariable ReferenceType referenceType,
             @PathVariable String referenceId) {
 
-        List<FileStore> files = fileService.getFiles(referenceType, referenceId);
-        List<FileResponseDTO> dtos = files.stream()
+        List<FileResponseDTO> dtos = fileService.getFiles(referenceType, referenceId).stream()
                 .map(FileResponseDTO::from)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(ApiResponse.success(dtos));
+        return success(dtos);
     }
 
     @DeleteMapping("/{fileId}")
     @Operation(summary = "파일 삭제", description = "파일을 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteFile(@PathVariable String fileId) {
         fileService.deleteFile(fileId);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return success();
     }
 
     @PatchMapping("/{fileId}/main")
@@ -64,6 +65,6 @@ public class FileController {
             @RequestParam("referenceId") String referenceId) {
 
         fileService.setMainImage(fileId, referenceType, referenceId);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return success();
     }
 }

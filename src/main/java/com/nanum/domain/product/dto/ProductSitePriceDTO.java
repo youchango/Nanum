@@ -28,4 +28,6 @@ public class ProductSitePriceDTO {
     private BigDecimal cPrice;
     @JsonProperty("extraPrice")
     private Integer extraPrice;
+    @JsonProperty("stockQuantity")
+    private Integer stockQuantity;
 }

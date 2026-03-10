@@ -19,7 +19,6 @@ public class ProductService {
 
         private final ProductRepository productRepository;
         private final com.nanum.domain.product.repository.ProductSiteRepository productSiteRepository;
-        private final com.nanum.domain.product.repository.ProductOptionSiteRepository productOptionSiteRepository;
         private final com.nanum.user.member.repository.MemberRepository memberRepository;
         private final com.nanum.domain.file.service.FileService fileService;
 
@@ -61,7 +60,7 @@ public class ProductService {
                 Product product = productRepository.findById(productId)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-                if ("Y".equals(product.getDeleteYn())) {
+                if ("Y".equals(product.getDeleteYn()) || !"Y".equals(product.getApplyYn())) {
                         throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
                 }
 
@@ -100,13 +99,10 @@ public class ProductService {
                                                 .build())
                                 .collect(Collectors.toList());
 
-                // 4. 옵션 정보 및 등급별 추가금 적용
-                List<com.nanum.domain.product.model.ProductOptionSite> optionSites = productOptionSiteRepository
-                                .findByProductSitePsId(productSite.getPsId());
-
-                List<ProductDTO.MallOptionResponse> options = optionSites.stream()
-                                .map(os -> {
-                                        com.nanum.domain.product.model.ProductOption opt = os.getProductOption();
+                // 4. 옵션 정보 (ProductOption에서 직접 조회)
+                List<ProductDTO.MallOptionResponse> options = product.getOptions().stream()
+                                .filter(opt -> "Y".equals(opt.getUseYn()))
+                                .map(opt -> {
                                         return ProductDTO.MallOptionResponse.builder()
                                                         .optionId(opt.getId())
                                                         .title1(opt.getTitle1())
@@ -115,7 +111,7 @@ public class ProductService {
                                                         .name2(opt.getName2())
                                                         .title3(opt.getTitle3())
                                                         .name3(opt.getName3())
-                                                        .extraPrice(getExtraPriceByMemberType(os, member))
+                                                        .extraPrice(opt.getExtraPrice())
                                                         .stockQuantity(opt.getStockQuantity())
                                                         .build();
                                 })
@@ -158,25 +154,6 @@ public class ProductService {
                         return ps.getCPrice().intValue();
                 } else {
                         return ps.getBPrice().intValue(); // 기본 일반회원가
-                }
-        }
-
-        private int getExtraPriceByMemberType(com.nanum.domain.product.model.ProductOptionSite os,
-                        com.nanum.domain.member.model.Member member) {
-                if (member == null)
-                        return os.getBExtraPrice().intValue();
-
-                com.nanum.domain.member.model.MemberType type = member.getMemberType();
-                com.nanum.domain.member.model.MemberRole role = member.getRole();
-
-                if (type == com.nanum.domain.member.model.MemberType.B
-                                && role == com.nanum.domain.member.model.MemberRole.ROLE_BIZ) {
-                        return os.getAExtraPrice().intValue();
-                } else if (type == com.nanum.domain.member.model.MemberType.V
-                                && role == com.nanum.domain.member.model.MemberRole.ROLE_VETERAN) {
-                        return os.getCExtraPrice().intValue();
-                } else {
-                        return os.getBExtraPrice().intValue();
                 }
         }
 

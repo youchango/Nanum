@@ -1,6 +1,7 @@
 package com.nanum.global.security.controller;
 
 import com.nanum.global.common.dto.ApiResponse;
+import com.nanum.global.common.support.ResponseSupport;
 import com.nanum.global.security.jwt.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,11 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements ResponseSupport {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final com.nanum.user.member.service.MemberService memberService;
+    // private final com.nanum.global.security.service.AuthService authService; //
+    // Removed if not used/exists
 
     @Operation(summary = "회원가입", description = "신규 회원을 등록합니다.")
     @PostMapping("/signup")
@@ -68,7 +71,7 @@ public class AuthController {
                 .getPrincipal();
         MemberInfo memberInfo = MemberInfo.from(userDetails.getMember());
 
-        return ResponseEntity.ok(ApiResponse.success(new TokenDto(accessToken, refreshToken, memberInfo)));
+        return success(new TokenDto(accessToken, refreshToken, memberInfo));
     }
 
     @Operation(summary = "토큰 갱신", description = "Refresh Token을 이용하여 새로운 Access/Refresh Token을 발급합니다.")

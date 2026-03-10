@@ -99,8 +99,8 @@ public class AdminProductOptionService {
         }
 
         // Product Option entity hard delete.
-        // Underlying ProductOptionSite & ProductStock entries will drop by Cascade
-        // constraints.
+        // Product Option entity hard delete.
+        // Underlying ProductStock entries will drop by Cascade constraints.
         productOptionRepository.delete(productOption);
     }
 }
