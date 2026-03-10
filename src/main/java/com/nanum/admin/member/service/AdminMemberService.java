@@ -33,12 +33,40 @@ public class AdminMemberService {
      * 회원 목록을 조회합니다.
      *
      * @param searchDTO 검색 및 페이징 dto
-     * @return 회원 목록 리스트
+     * @return 회원 DTO 목록
      */
-    public List<Member> getMemberList(SearchDTO searchDTO) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(searchDTO.getPage() - 1,
+    public List<MemberDTO> getMemberList(SearchDTO searchDTO) {
+        Pageable pageable = PageRequest.of(searchDTO.getPage() - 1,
                 searchDTO.getRecordSize());
-        return memberRepository.searchMembers(searchDTO, pageable).getContent();
+        List<Member> members = memberRepository.searchMembers(searchDTO, pageable).getContent();
+
+        return members.stream().map(m -> {
+            MemberDTO dto = new MemberDTO();
+            dto.setMemberCode(m.getMemberCode());
+            dto.setMemberId(m.getMemberId());
+            dto.setMemberName(m.getMemberName());
+            dto.setMobilePhone(m.getMobilePhone());
+            dto.setPhone(m.getPhone());
+            dto.setZipcode(m.getZipcode());
+            dto.setAddress(m.getAddress());
+            dto.setAddressDetail(m.getAddressDetail());
+            dto.setEmail(m.getEmail());
+            dto.setMemberType(m.getMemberType() != null ? m.getMemberType().name() : null);
+            dto.setApplyYn(m.getApplyYn());
+            dto.setMemo(m.getMemo());
+            // createdAt은 MemberDTO에 없으면 추가 필요 (현재 MemberDTO 확인 결과 없음)
+
+            if (m.getMemberType() == MemberType.B) {
+                memberBizRepository.findById(m.getMemberCode()).ifPresent(biz -> {
+                    dto.setBusinessNumber(biz.getBusinessNumber());
+                    dto.setCompanyName(biz.getCompanyName());
+                    dto.setCeoName(biz.getCeoName());
+                    dto.setBusinessType(biz.getBusinessType());
+                    dto.setBusinessItem(biz.getBusinessItem());
+                });
+            }
+            return dto;
+        }).toList();
     }
 
     /**
@@ -85,7 +113,7 @@ public class AdminMemberService {
             role = MemberRole.ROLE_BIZ;
             memberType = MemberType.B;
         } else if ("V".equals(typeInput)) {
-            role = MemberRole.ROLE_USER;
+            role = MemberRole.ROLE_VETERAN;
             memberType = MemberType.V;
         } else {
             // Default or "U"
@@ -104,36 +132,96 @@ public class AdminMemberService {
 
         memberRepository.save(member);
 
-        // ... (MemberBiz 저장 로직)
+        // 기업 회원일 경우 MemberBiz 정보 저장
+        if (memberType == MemberType.B) {
+            MemberBiz memberBiz = MemberBiz.builder()
+                    .member(member)
+                    .businessNumber(memberDTO.getBusinessNumber())
+                    .companyName(memberDTO.getCompanyName())
+                    .ceoName(memberDTO.getCeoName())
+                    .businessType(memberDTO.getBusinessType())
+                    .businessItem(memberDTO.getBusinessItem())
+                    .build();
+            memberBizRepository.save(memberBiz);
+        }
     }
 
-    // ...
-
+    /**
+     * 회원 상세 정보를 조회합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @return 회원 DTO
+     */
     @Transactional(readOnly = true)
-    public Member getMember(String memberCode) {
-        return memberRepository.findByMemberCode(memberCode)
+    public MemberDTO getMemberDetail(String memberCode) {
+        Member member = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. Code: " + memberCode));
+
+        MemberDTO dto = new MemberDTO();
+        dto.setMemberCode(member.getMemberCode());
+        dto.setMemberId(member.getMemberId());
+        dto.setMemberName(member.getMemberName());
+        dto.setMobilePhone(member.getMobilePhone());
+        dto.setPhone(member.getPhone());
+        dto.setZipcode(member.getZipcode());
+        dto.setAddress(member.getAddress());
+        dto.setAddressDetail(member.getAddressDetail());
+        dto.setEmail(member.getEmail());
+        dto.setMemberType(member.getMemberType() != null ? member.getMemberType().name() : null);
+        dto.setApplyYn(member.getApplyYn());
+        dto.setMemo(member.getMemo());
+
+        // 기업 회원인 경우 상세 정보 추가
+        if (member.getMemberType() == MemberType.B) {
+            memberBizRepository.findById(memberCode).ifPresent(biz -> {
+                dto.setBusinessNumber(biz.getBusinessNumber());
+                dto.setCompanyName(biz.getCompanyName());
+                dto.setCeoName(biz.getCeoName());
+                dto.setBusinessType(biz.getBusinessType());
+                dto.setBusinessItem(biz.getBusinessItem());
+            });
+        }
+
+        return dto;
     }
 
     @Transactional
     public void updateMember(String memberCode, MemberDTO memberDTO) {
         Member member = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. Code: " + memberCode));
-        // ... (이하 동일)
 
-        // MemberBiz 조회도 memberCode 사용 (MemberBizRepository PK가 String memberCode라면
-        // findById 사용 가능)
-        if (member.getMemberType() == MemberType.B && memberDTO.getBusinessNumber() != null) {
+        // 기본 정보 업데이트
+        if (memberDTO.getMemberName() != null)
+            member.setMemberName(memberDTO.getMemberName());
+        if (memberDTO.getMobilePhone() != null)
+            member.setMobilePhone(memberDTO.getMobilePhone());
+        if (memberDTO.getPhone() != null)
+            member.setPhone(memberDTO.getPhone());
+        if (memberDTO.getZipcode() != null)
+            member.setZipcode(memberDTO.getZipcode());
+        if (memberDTO.getAddress() != null)
+            member.setAddress(memberDTO.getAddress());
+        if (memberDTO.getAddressDetail() != null)
+            member.setAddressDetail(memberDTO.getAddressDetail());
+        if (memberDTO.getEmail() != null)
+            member.setEmail(memberDTO.getEmail());
+
+        // 기업 회원 정보 업데이트
+        if (member.getMemberType() == MemberType.B) {
             MemberBiz memberBiz = memberBizRepository.findById(memberCode)
                     .orElseGet(() -> MemberBiz.builder().member(member).build());
-            // 기업회원 상세 정보 업데이트 (MemberBiz 엔티티에 업데이트 메서드 추가 권장)
-            // 여기서는 빌더 패턴이나 직접 할당 사용
+
             MemberBiz updatedBiz = MemberBiz.builder()
                     .member(member)
-                    .businessNumber(memberDTO.getBusinessNumber())
+                    .businessNumber(memberDTO.getBusinessNumber() != null ? memberDTO.getBusinessNumber()
+                            : memberBiz.getBusinessNumber())
                     .companyName(memberDTO.getCompanyName() != null ? memberDTO.getCompanyName()
                             : memberBiz.getCompanyName())
                     .ceoName(memberDTO.getCeoName() != null ? memberDTO.getCeoName() : memberBiz.getCeoName())
+                    .businessType(memberDTO.getBusinessType() != null ? memberDTO.getBusinessType()
+                            : memberBiz.getBusinessType())
+                    .businessItem(memberDTO.getBusinessItem() != null ? memberDTO.getBusinessItem()
+                            : memberBiz.getBusinessItem())
                     .build();
             memberBizRepository.save(updatedBiz);
         }

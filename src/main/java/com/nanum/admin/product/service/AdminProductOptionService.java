@@ -3,11 +3,8 @@ package com.nanum.admin.product.service;
 import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.domain.product.model.Product;
 import com.nanum.domain.product.model.ProductOption;
-import com.nanum.domain.product.model.ProductOptionSite;
-import com.nanum.domain.product.model.ProductSite;
 import com.nanum.domain.product.model.ProductStock;
 import com.nanum.domain.product.repository.ProductOptionRepository;
-import com.nanum.domain.product.repository.ProductOptionSiteRepository;
 import com.nanum.domain.product.repository.ProductRepository;
 import com.nanum.domain.product.repository.ProductSiteRepository;
 import com.nanum.domain.product.repository.ProductStockRepository;
@@ -27,7 +24,6 @@ public class AdminProductOptionService {
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
     private final ProductSiteRepository productSiteRepository;
-    private final ProductOptionSiteRepository productOptionSiteRepository;
     private final ProductStockRepository productStockRepository;
 
     @Transactional
@@ -51,22 +47,7 @@ public class AdminProductOptionService {
         productOptionRepository.save(java.util.Objects.requireNonNull(newOption));
         productOptionRepository.flush();
 
-        // 2. Map the new option to all associated ProductSites
-        List<ProductSite> sites = productSiteRepository.findByProduct(product);
-        BigDecimal baseExtraPrice = BigDecimal.valueOf(optionRequest.getExtraPrice());
-
-        for (ProductSite ps : sites) {
-            ProductOptionSite pos = ProductOptionSite.builder()
-                    .productSite(ps)
-                    .productOption(newOption)
-                    .aExtraPrice(baseExtraPrice)
-                    .bExtraPrice(baseExtraPrice)
-                    .cExtraPrice(baseExtraPrice)
-                    .build();
-            productOptionSiteRepository.save(java.util.Objects.requireNonNull(pos));
-        }
-
-        // 3. Initialize Stock mapping for the new option (0 value)
+        // 2. Initialize Stock mapping for the new option (0 value)
         ProductStock productStock = ProductStock.builder()
                 .product(product)
                 .option(newOption)
@@ -106,16 +87,6 @@ public class AdminProductOptionService {
                 .build();
 
         productOptionRepository.save(java.util.Objects.requireNonNull(productOption));
-
-        // Update Option Sites overriding extra price only if the global extraPrice has
-        // changed
-        if (oldExtraPrice != optionRequest.getExtraPrice()) {
-            List<ProductOptionSite> sites = productOptionSiteRepository.findByProductOption(productOption);
-            BigDecimal newExtraPrice = BigDecimal.valueOf(optionRequest.getExtraPrice());
-            for (ProductOptionSite pos : sites) {
-                pos.updateExtraPrices(newExtraPrice, newExtraPrice, newExtraPrice);
-            }
-        }
     }
 
     @Transactional

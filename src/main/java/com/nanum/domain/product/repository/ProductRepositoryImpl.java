@@ -50,6 +50,26 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     }
 
     @Override
+    public List<Product> findMainProducts(String siteCd, SearchDTO searchDTO) {
+        QProductSite productSite = QProductSite.productSite;
+
+        return queryFactory
+                .selectFrom(product)
+                .join(productSite).on(product.id.eq(productSite.product.id))
+                .where(
+                        productSite.siteCd.eq(siteCd),
+                        productSite.viewYn.eq("Y"),
+                        productSite.deleteYn.eq("N"),
+                        product.deleteYn.eq("N"),
+                        searchKeyword(null, searchDTO.getKeyword()),
+                        inCategoryIds(null, searchDTO.getCategoryId()))
+                .orderBy(product.viewCount.desc(), product.createdAt.desc())
+                .offset(searchDTO.getOffset())
+                .limit(searchDTO.getRecordSize())
+                .fetch();
+    }
+
+    @Override
     public List<AdminProductListDTO> findAdminProducts(AdminProductSearchDTO searchDTO) {
         QProductSite productSite = QProductSite.productSite;
 
@@ -88,13 +108,10 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productOption.name1,
                         productOption.name2,
                         productOption.name3,
-                        productSite.standardPrice,
+                        productSite.salePrice,
                         productSite.aPrice,
                         productSite.bPrice,
-                        productSite.cPrice,
-                        productOptionSite.aExtraPrice,
-                        productOptionSite.bExtraPrice,
-                        productOptionSite.cExtraPrice)
+                        productSite.cPrice)
                 .from(productSite)
                 .leftJoin(productOptionSite).on(productSite.psId.eq(productOptionSite.productSite.psId))
                 .leftJoin(productOption).on(productOptionSite.productOption.id.eq(productOption.id))
@@ -116,14 +133,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 .optionName1(t.get(productOption.name1) != null ? t.get(productOption.name1) : "")
                                 .optionName2(t.get(productOption.name2) != null ? t.get(productOption.name2) : "")
                                 .optionName3(t.get(productOption.name3) != null ? t.get(productOption.name3) : "")
-                                .standardPrice(
-                                        t.get(productSite.standardPrice) != null ? t.get(productSite.standardPrice) : 0)
+                                .salePrice(
+                                        t.get(productSite.salePrice) != null ? t.get(productSite.salePrice) : 0)
                                 .aPrice(t.get(productSite.aPrice))
                                 .bPrice(t.get(productSite.bPrice))
                                 .cPrice(t.get(productSite.cPrice))
-                                .aExtraPrice(t.get(productOptionSite.aExtraPrice))
-                                .bExtraPrice(t.get(productOptionSite.bExtraPrice))
-                                .cExtraPrice(t.get(productOptionSite.cExtraPrice))
                                 .build(), Collectors.toList())));
 
         // 5. 최종 DTO 매핑
@@ -137,7 +151,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     .name(p.getName())
                     .supplyPrice(p.getSupplyPrice())
                     .mapPrice(p.getMapPrice())
-                    .standardPrice(p.getStandardPrice())
+                    .retailPrice(p.getRetailPrice())
+                    .suggestedPrice(p.getSuggestedPrice())
                     .status(p.getStatus())
                     .viewCount(p.getViewCount())
                     .createdAt(p.getCreatedAt())

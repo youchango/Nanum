@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Product", description = "Product API")
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -24,11 +26,21 @@ public class ProductController {
     private final ProductReviewService productReviewService;
 
     @GetMapping
+    @io.swagger.v3.oas.annotations.Operation(summary = "상품 목록 조회", description = "상품 전체 목록을 페이징하여 조회합니다.")
     public ApiResponse<List<ProductDTO.MallProductResponse>> getProducts(
             @RequestParam String siteCd,
             com.nanum.global.common.dto.SearchDTO searchDTO) {
         String memberCode = getCurrentMemberCode();
         return ApiResponse.success(productService.getMallProductList(searchDTO, siteCd, memberCode));
+    }
+
+    @GetMapping("/main")
+    @io.swagger.v3.oas.annotations.Operation(summary = "메인 페이지 상품 목록 조회", description = "메인 페이지용 상품 목록을 조회수 내림차순으로 페이징하여 조회합니다.")
+    public ApiResponse<List<ProductDTO.MallProductResponse>> getMainProducts(
+            @RequestParam String siteCd,
+            com.nanum.global.common.dto.SearchDTO searchDTO) {
+        String memberCode = getCurrentMemberCode();
+        return ApiResponse.success(productService.getMainProductList(searchDTO, siteCd, memberCode));
     }
 
     @GetMapping("/{id}")

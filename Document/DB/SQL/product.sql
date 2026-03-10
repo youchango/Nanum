@@ -18,8 +18,9 @@ CREATE TABLE product (
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명',
     brand_name       VARCHAR(100) NULL COMMENT '브랜드명',
     supply_price     INT DEFAULT 0 NOT NULL COMMENT '공급가',
-    map_price        INT DEFAULT 0 NOT NULL COMMENT '지도가',
-    standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
+    map_price        INT DEFAULT 0 NULL COMMENT '지도가',
+    retail_price     INT DEFAULT 0 NULL COMMENT '소비자가',
+    suggested_price  INT DEFAULT 0 NULL COMMENT '권장판매가',
     option_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '옵션여부',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
     description      TEXT NULL COMMENT '상품설명',
@@ -32,7 +33,7 @@ CREATE TABLE product (
     deleted_at       DATETIME NULL COMMENT '삭제일',
     deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    
+    apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     PRIMARY KEY (product_id)
 ) COMMENT '상품 마스터';
 
@@ -70,7 +71,7 @@ CREATE TABLE product_site (
     product_id       INT NOT NULL COMMENT '상품ID',
     site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
     view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
-    standard_price   INT DEFAULT 0 NULL COMMENT '판매기준가',
+    sale_price       INT DEFAULT 0 NULL COMMENT '판매가',
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
@@ -88,20 +89,6 @@ CREATE TABLE product_site (
     UNIQUE KEY uq_ps_prod_site (product_id, site_cd),
     CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
 ) COMMENT '상품 사이트별 정보';
-
--- 6. Product Option Site (Multi-site Option Price)
-CREATE TABLE product_option_site (
-    pos_id           INT AUTO_INCREMENT COMMENT 'POS Key',
-    ps_id            INT NOT NULL COMMENT '상품 사이트 Key',
-    option_id        INT NOT NULL COMMENT '옵션ID',
-    a_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 추가금액',
-    b_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 추가금액',
-    c_extra_price    DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 추가금액',
-    
-    PRIMARY KEY (pos_id),
-    CONSTRAINT fk_pos_ps FOREIGN KEY (ps_id) REFERENCES product_site (ps_id) ON DELETE CASCADE,
-    CONSTRAINT fk_pos_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
-) COMMENT '상품 사이트 옵션별 추가금액';
 
 -- 7. Product Stock (Warehouse)
 CREATE TABLE product_stock (

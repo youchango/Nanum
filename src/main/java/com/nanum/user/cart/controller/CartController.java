@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Map;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Cart", description = "Cart API")
 @RestController
 @RequestMapping("/api/v1/cart")
 @RequiredArgsConstructor

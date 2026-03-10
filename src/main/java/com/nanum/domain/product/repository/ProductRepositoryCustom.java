@@ -12,4 +12,6 @@ public interface ProductRepositoryCustom {
     int countAdminProducts(AdminProductSearchDTO searchDTO);
 
     List<Product> findMallProducts(String siteCd, SearchDTO searchDTO);
+
+    List<Product> findMainProducts(String siteCd, SearchDTO searchDTO);
 }

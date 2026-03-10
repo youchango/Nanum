@@ -10,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "AdminInquiry", description = "AdminInquiry API")
 @RestController
 @RequestMapping("/api/v1/admin/inquiries")
 @RequiredArgsConstructor

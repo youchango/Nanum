@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Inquiry", description = "Inquiry API")
 @RestController
 @RequestMapping("/api/v1/inquiries")
 @RequiredArgsConstructor

@@ -17,9 +17,11 @@ public class AdminProductListDTO {
     private String categoryName;
     private String name;
     private int supplyPrice;
-    private int mapPrice;
-    private int standardPrice;
+    private Integer mapPrice;
+    private Integer retailPrice;
+    private Integer suggestedPrice;
     private ProductStatus status;
+    private String applyYn;
 
     // From ProductSite (1:N options mapping)
     @JsonProperty("sitePrices")

@@ -13,8 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/manager/auth-group")
 @RequiredArgsConstructor
-@Tag(name = "Manager Auth Group", description = "관리자 권한 그룹 관리 API")
-public class ManagerAuthGroupController {
+@Tag(name = "Admin Manager Auth Group", description = "관리자 권한 그룹 관리 API")
+public class AdminManagerAuthGroupController {
 
     private final ManagerAuthGroupService managerAuthGroupService;
 

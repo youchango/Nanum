@@ -40,6 +40,23 @@ public class ProductService {
                                 .collect(Collectors.toList());
         }
 
+        public List<ProductDTO.MallProductResponse> getMainProductList(com.nanum.global.common.dto.SearchDTO searchDTO,
+                        String siteCd,
+                        String memberCode) {
+                if (siteCd == null) {
+                        throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+                }
+
+                List<Product> products = productRepository.findMainProducts(siteCd, searchDTO);
+                com.nanum.domain.member.model.Member member = memberCode != null
+                                ? memberRepository.findByMemberCode(memberCode).orElse(null)
+                                : null;
+
+                return products.stream()
+                                .map(p -> toMallResponse(p, siteCd, member))
+                                .collect(Collectors.toList());
+        }
+
         public ProductDTO.MallProductResponse getMallProduct(Long productId, String siteCd, String memberCode) {
                 Product product = productRepository.findById(productId)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
@@ -113,7 +130,9 @@ public class ProductService {
                                 .name(product.getName())
                                 .supplyPrice(product.getSupplyPrice())
                                 .mapPrice(product.getMapPrice())
-                                .standardPrice(product.getStandardPrice())
+                                .retailPrice(product.getRetailPrice())
+                                .suggestedPrice(product.getSuggestedPrice())
+                                .applyYn(product.getApplyYn())
                                 .price(price)
                                 .status(product.getStatus())
                                 .optionYn(product.getOptionYn())
@@ -204,8 +223,10 @@ public class ProductService {
                                 .categoryName(firstCategory != null ? firstCategory.getCategoryName() : null)
                                 .name(product.getName())
                                 .mapPrice(product.getMapPrice())
-                                .standardPrice(product.getStandardPrice())
+                                .retailPrice(product.getRetailPrice())
+                                .suggestedPrice(product.getSuggestedPrice())
                                 .status(product.getStatus())
+                                .applyYn(product.getApplyYn())
                                 .images(images)
                                 .build();
         }

@@ -4,7 +4,6 @@ import com.nanum.admin.member.service.AdminMemberService;
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.global.common.dto.SearchDTO;
 import com.nanum.domain.member.dto.MemberDTO;
-import com.nanum.domain.member.model.Member;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +37,7 @@ public class AdminMemberController {
     @Operation(summary = "회원 목록 조회", description = "검색 조건에 맞는 회원 목록을 반환합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMemberList(@ModelAttribute SearchDTO searchDTO) {
-        List<Member> memberList = adminMemberService.getMemberList(searchDTO);
+        List<MemberDTO> memberList = adminMemberService.getMemberList(searchDTO);
         int totalCount = adminMemberService.getMemberCount(searchDTO);
 
         Map<String, Object> responseData = new HashMap<>();
@@ -82,10 +81,10 @@ public class AdminMemberController {
      */
     @Operation(summary = "회원 상세 조회", description = "회원 ID로 상세 정보를 조회합니다.")
     @GetMapping("/{memberCode}")
-    public ResponseEntity<ApiResponse<Member>> getMember(@PathVariable String memberCode) {
+    public ResponseEntity<ApiResponse<MemberDTO>> getMember(@PathVariable String memberCode) {
         try {
-            Member member = adminMemberService.getMember(memberCode);
-            return ResponseEntity.ok(ApiResponse.success(member));
+            MemberDTO dto = adminMemberService.getMemberDetail(memberCode);
+            return ResponseEntity.ok(ApiResponse.success(dto));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }

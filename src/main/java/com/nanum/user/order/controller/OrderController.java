@@ -6,7 +6,9 @@ import com.nanum.user.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Order", description = "Order API")
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor

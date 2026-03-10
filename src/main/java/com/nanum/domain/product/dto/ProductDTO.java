@@ -17,10 +17,12 @@ public class ProductDTO {
         private List<Long> categoryIds; // Changed from single categoryId
         private String name;
         private int supplyPrice;
-        private int mapPrice;
-        private int standardPrice;
+        private Integer mapPrice;
+        private Integer retailPrice;
+        private Integer suggestedPrice;
         private String optionYn;
         private ProductStatus status;
+        private String applyYn;
         private String description;
         private List<Option> options;
         private List<Image> images;
@@ -69,9 +71,11 @@ public class ProductDTO {
         private String categoryName; // Representing primary or first category name for display
         private String name;
         private int supplyPrice;
-        private int mapPrice;
-        private int standardPrice;
+        private Integer mapPrice;
+        private Integer retailPrice;
+        private Integer suggestedPrice;
         private ProductStatus status;
+        private String applyYn;
         private String optionYn;
         private String description;
         private List<Option> options;
@@ -89,10 +93,12 @@ public class ProductDTO {
         private String categoryName;
         private String name;
         private int supplyPrice;
-        private int mapPrice;
-        private int standardPrice;
+        private Integer mapPrice;
+        private Integer retailPrice;
+        private Integer suggestedPrice;
         private int price; // 등급별 적용된 실제 판매가
         private ProductStatus status;
+        private String applyYn;
         private String optionYn;
         private String description;
         private List<MallOptionResponse> options;

@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import com.nanum.admin.manager.entity.Manager;
 import com.nanum.admin.manager.service.CustomManagerDetails;
-import com.nanum.domain.product.repository.ProductOptionSiteRepository;
 import com.nanum.domain.product.repository.ProductSiteRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.math.BigDecimal;
@@ -37,7 +36,6 @@ public class AdminProductService {
 
         private final ProductRepository productRepository;
         private final ProductSiteRepository productSiteRepository; // Injected
-        private final ProductOptionSiteRepository productOptionSiteRepository; // Injected
         private final ProductCategoryRepository productCategoryRepository;
         private final ShopInfoRepository shopInfoRepository;
         private final InventoryService inventoryService;
@@ -101,11 +99,12 @@ public class AdminProductService {
                                 .categoryId(product.getCategories().stream().map(ProductCategory::getCategoryId)
                                                 .collect(Collectors.toList()))
                                 .categoryName(firstCategory != null ? firstCategory.getCategoryName() : null)
-                                .name(product.getName())
                                 .supplyPrice(product.getSupplyPrice())
                                 .mapPrice(product.getMapPrice())
-                                .standardPrice(product.getStandardPrice())
+                                .retailPrice(product.getRetailPrice())
+                                .suggestedPrice(product.getSuggestedPrice())
                                 .status(product.getStatus())
+                                .applyYn(product.getApplyYn())
                                 .optionYn(product.getOptionYn())
                                 .description(product.getDescription())
                                 .options(options)
@@ -123,14 +122,15 @@ public class AdminProductService {
                         throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
                 }
 
-                // 1. Save Product
                 Product product = Product.builder()
                                 .categories(categories)
                                 .name(request.getName())
                                 .mapPrice(request.getMapPrice())
-                                .standardPrice(request.getStandardPrice())
+                                .retailPrice(request.getRetailPrice())
+                                .suggestedPrice(request.getSuggestedPrice())
                                 .optionYn(request.getOptionYn() != null ? request.getOptionYn() : "N")
                                 .status(request.getStatus())
+                                .applyYn("N") // 생성 시 무조건 N
                                 .description(request.getDescription())
                                 .supplyPrice(request.getSupplyPrice())
                                 .viewCount(0)
@@ -155,7 +155,7 @@ public class AdminProductService {
                 productRepository.save(product);
                 productRepository.flush(); // Ensure IDs are generated for product and options
 
-                // 2. Save ProductSite & ProductOptionSite (전체 사이트 대상 일괄 생성, 미노출 & 0원 초기화)
+                // 2. Save ProductSite (전체 사이트 대상 일괄 생성, 미노출 & 0원 초기화)
                 List<ShopInfo> allSites = shopInfoRepository.findAll();
 
                 for (ShopInfo site : allSites) {
@@ -163,26 +163,19 @@ public class AdminProductService {
                                         .product(product)
                                         .siteCd(site.getSiteCd())
                                         .viewYn("N") // 초기 미노출 처리
-                                        .standardPrice(request.getStandardPrice()) // 기준가 적용
-                                        .aPrice(BigDecimal.valueOf(request.getStandardPrice()))
-                                        .bPrice(BigDecimal.valueOf(request.getStandardPrice()))
-                                        .cPrice(BigDecimal.valueOf(request.getStandardPrice()))
+                                        .salePrice(request.getSuggestedPrice()) // 소비자가 임시 적용
+                                        .aPrice(BigDecimal.valueOf(
+                                                        request.getRetailPrice() != null ? request.getRetailPrice()
+                                                                        : 0))
+                                        .bPrice(BigDecimal.valueOf(
+                                                        request.getRetailPrice() != null ? request.getRetailPrice()
+                                                                        : 0))
+                                        .cPrice(BigDecimal.valueOf(
+                                                        request.getRetailPrice() != null ? request.getRetailPrice()
+                                                                        : 0))
                                         .pdtClick(0)
                                         .build();
                         productSiteRepository.save(ps);
-
-                        if (product.getOptions() != null && !product.getOptions().isEmpty()) {
-                                for (ProductOption opt : product.getOptions()) {
-                                        ProductOptionSite pos = ProductOptionSite.builder()
-                                                        .productSite(ps)
-                                                        .productOption(opt)
-                                                        .aExtraPrice(BigDecimal.valueOf(opt.getExtraPrice()))
-                                                        .bExtraPrice(BigDecimal.valueOf(opt.getExtraPrice()))
-                                                        .cExtraPrice(BigDecimal.valueOf(opt.getExtraPrice()))
-                                                        .build();
-                                        productOptionSiteRepository.save(pos);
-                                }
-                        }
                 }
 
                 // 3. Link Files
@@ -209,17 +202,19 @@ public class AdminProductService {
                                 categories,
                                 request.getName(),
                                 request.getMapPrice(),
-                                request.getStandardPrice(),
+                                request.getRetailPrice(),
+                                request.getSuggestedPrice(),
                                 request.getOptionYn() != null ? request.getOptionYn() : "N",
                                 request.getStatus(),
-                                request.getDescription());
+                                request.getDescription(),
+                                "N"); // 수정 시 무조건 N
 
-                // 기준가(standardPrice) 변경 시 사이트별 가격도 모두 일괄 동기화 (피드백 반영)
+                // salePrice 변경 시 사이트별 가격도 모두 일괄 동기화 (피드백 반영)
                 List<ProductSite> sitesForSync = productSiteRepository.findByProduct(product);
                 // primitive default가 아닌 경우에 업데이트
-                if (request.getStandardPrice() > 0) {
+                if (request.getRetailPrice() != null && request.getRetailPrice() > 0) {
                         for (ProductSite ps : sitesForSync) {
-                                ps.update(ps.getViewYn(), request.getStandardPrice(), ps.getAPrice(), ps.getBPrice(),
+                                ps.update(ps.getViewYn(), request.getRetailPrice(), ps.getAPrice(), ps.getBPrice(),
                                                 ps.getCPrice());
                         }
                 }
@@ -240,7 +235,6 @@ public class AdminProductService {
                                         .collect(Collectors.toList());
 
                         for (ProductOption optToRemove : optionsToRemove) {
-                                productOptionSiteRepository.deleteByProductOption(optToRemove);
                                 existingOptions.remove(optToRemove);
                         }
 
@@ -258,14 +252,6 @@ public class AdminProductService {
                                                                                 reqOpt.getTitle3(), reqOpt.getName3(),
                                                                                 reqOpt.getExtraPrice(),
                                                                                 reqOpt.getStockQuantity());
-                                                                List<ProductOptionSite> posList = productOptionSiteRepository
-                                                                                .findByProductOption(opt);
-                                                                BigDecimal newExtraPrice = BigDecimal
-                                                                                .valueOf(reqOpt.getExtraPrice());
-                                                                for (ProductOptionSite pos : posList) {
-                                                                        pos.updateExtraPrices(newExtraPrice,
-                                                                                        newExtraPrice, newExtraPrice);
-                                                                }
                                                         });
                                 } else {
                                         ProductOption newOpt = ProductOption.builder()
@@ -285,26 +271,10 @@ public class AdminProductService {
                         // 신규 옵션들의 ID 발급을 위해 Flush
                         if (!newlyAddedOptions.isEmpty()) {
                                 productRepository.saveAndFlush(product);
-
-                                // 3. 신규 발급된 옵션에 대해 사이트 매핑 정보 생성
-                                List<ProductSite> productSites = productSiteRepository.findByProduct(product);
-                                for (ProductOption newOpt : newlyAddedOptions) {
-                                        for (ProductSite ps : productSites) {
-                                                ProductOptionSite pos = ProductOptionSite.builder()
-                                                                .productSite(ps)
-                                                                .productOption(newOpt)
-                                                                .aExtraPrice(BigDecimal.valueOf(newOpt.getExtraPrice()))
-                                                                .bExtraPrice(BigDecimal.valueOf(newOpt.getExtraPrice()))
-                                                                .cExtraPrice(BigDecimal.valueOf(newOpt.getExtraPrice()))
-                                                                .build();
-                                                productOptionSiteRepository.save(pos);
-                                        }
-                                }
                         }
                 } else {
                         // 옵션 사용 안함 처리 시 모든 옵션 데이터 삭제
                         for (ProductOption optToRemove : new ArrayList<>(existingOptions)) {
-                                productOptionSiteRepository.deleteByProductOption(optToRemove);
                                 existingOptions.remove(optToRemove);
                         }
                 }
@@ -340,9 +310,10 @@ public class AdminProductService {
         public void updateProductStatus(Long id, ProductStatus status) {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
-                product.update(product.getName(), product.getMapPrice(), product.getStandardPrice(),
+                product.update(product.getName(), product.getMapPrice(), product.getRetailPrice(),
+                                product.getSuggestedPrice(),
                                 product.getDescription(),
-                                status);
+                                status, product.getApplyYn());
         }
 
         @Transactional
@@ -374,30 +345,14 @@ public class AdminProductService {
                 }
                 ProductSite productSite = sites.get(0); // 통상적으로 한 쌍이 매핑됨
 
-                // 기존 기준가(standardPrice)는 유지하면서 전달받은 가격/상태값 변경
+                // 기존 판매가(salePrice)는 유지하면서 전달받은 가격/상태값 변경
                 productSite.update(
                                 request.getViewYn() != null ? request.getViewYn() : productSite.getViewYn(),
-                                productSite.getStandardPrice(),
+                                request.getSalePrice() != null ? request.getSalePrice() : productSite.getSalePrice(),
                                 request.getAPrice(),
                                 request.getBPrice(),
                                 request.getCPrice());
-
-                // 2. 옵션별 가격 정보 일괄 업데이트
-                if (request.getDtoList() != null && !request.getDtoList().isEmpty()) {
-                        for (ProductSitePriceUpdateDTO.OptionPriceUpdate optionPrice : request.getDtoList()) {
-                                ProductOptionSite pos = productOptionSiteRepository
-                                                .findByProductSiteAndProductOptionId(productSite,
-                                                                optionPrice.getOptionId())
-                                                .orElseThrow(() -> new IllegalArgumentException(
-                                                                "해당 사이트의 옵션 정보를 찾을 수 없습니다. Option ID: "
-                                                                                + optionPrice.getOptionId()));
-
-                                pos.updateExtraPrices(
-                                                optionPrice.getAExtraPrice(),
-                                                optionPrice.getBExtraPrice(),
-                                                optionPrice.getCExtraPrice());
-                        }
-                }
+                // 옵션별 가격 정보 일괄 업데이트 로직 제거 완료
         }
 
         @Transactional

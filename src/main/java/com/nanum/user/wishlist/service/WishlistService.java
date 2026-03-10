@@ -88,9 +88,12 @@ public class WishlistService {
                                                                         : null)
                                                         .name(p.getName())
                                                         .mapPrice(p.getMapPrice())
-                                                        .standardPrice(p.getStandardPrice())
+                                                        .retailPrice(p.getRetailPrice())
+                                                        .suggestedPrice(p.getSuggestedPrice())
                                                         .status(p.getStatus())
-                                                        .images(images)
+                                                        .applyYn(p.getApplyYn())
+                                                        .images(new java.util.ArrayList<>())
+                                                        .status(p.getStatus())
                                                         .build();
                                 })
                                 .collect(Collectors.toList());

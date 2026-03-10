@@ -31,9 +31,9 @@ public class ProductSite extends BaseEntity {
     @Builder.Default
     private String viewYn = "N";
 
-    @Column(name = "standard_price", nullable = true)
+    @Column(name = "sale_price", nullable = true)
     @ColumnDefault("0")
-    private Integer standardPrice;
+    private Integer salePrice;
 
     @Column(name = "a_price", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
@@ -55,17 +55,17 @@ public class ProductSite extends BaseEntity {
      * 사이트별 가격 및 노출 여부를 업데이트합니다.
      * null이 전달된 경우 기존 값을 유지합니다.
      *
-     * @param viewYn        노출 여부 (Y/N), null이면 기존 값 유지
-     * @param standardPrice 기준가, null이면 기존 값 유지
-     * @param aPrice        기업회원가, null이면 기존 값 유지
-     * @param bPrice        일반회원가, null이면 기존 값 유지
-     * @param cPrice        보훈회원가, null이면 기존 값 유지
+     * @param viewYn    노출 여부 (Y/N), null이면 기존 값 유지
+     * @param salePrice 판매가, null이면 기존 값 유지
+     * @param aPrice    기업회원가, null이면 기존 값 유지
+     * @param bPrice    일반회원가, null이면 기존 값 유지
+     * @param cPrice    보훈회원가, null이면 기존 값 유지
      */
-    public void update(String viewYn, Integer standardPrice, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
+    public void update(String viewYn, Integer salePrice, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
         if (viewYn != null)
             this.viewYn = viewYn;
-        if (standardPrice != null)
-            this.standardPrice = standardPrice;
+        if (salePrice != null)
+            this.salePrice = salePrice;
         if (aPrice != null)
             this.aPrice = aPrice;
         if (bPrice != null)

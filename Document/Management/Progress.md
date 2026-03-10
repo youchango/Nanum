@@ -38,7 +38,10 @@
 - **Master (관리자)**
     - [x] 사용자 관리 (회원 조회, 상태 변경, 제재 등) - 백/프론트 명세 일치화 및 분리 완료
     - [x] 사용자 승인 (회원 가입 이후 관리자 승인 필요 - Admin UI 토글, 로그인 제한 및 전용 PATCH API 구현 완료)
-    - [x] 권한 분리 및 리팩토링 (`MemberType` 분리 및 `MemberRole` 정리 완료)
+    - [x] 권한 분리 및 리팩토링 (`MemberType` 분리 및 `MemberRole` 정리 완료 - ROLE_VETERAN 정합성 수정)
+    - [x] 매니저 할당 및 조회 기능 제거 (DB 미존재로 인한 500 에러 해결)
+    - [x] 회원 등록 시 사업자 등록번호 필드 제거 및 유형별 권한(BIZ/USER/VETERAN) 최적화
+    - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
     - [x] 공지사항 관리 (Content)
     - [x] 1:1문의 관리 (Inquiry)
@@ -130,9 +133,12 @@
 - [x] 서비스 계층 분리 (`memberService.ts`)
 - [x] 페이지 리팩토링 (`MemberListPage.tsx`)
 - [x] UI/UX 최적화 (상태 태그, 필터 기능)
+- [x] ~~**기업 회원가입 구현 (프론트/백)**~~ (완료)
+- [x] ~~**메인 상품 조회 API 및 Swagger UI 개선**~~ (완료)
+- [x] **Manager 컨트롤러 명칭 일괄 변경 (`Manager*` -> `AdminManager*`)** (완료)
 
 ---
 
-## 📅 타임라인 (Timeline)
+## 📅 주간 일정 계획 (예시)Timeline)
 - 2026.02.02: 쇼핑몰 플랫폼 전환 및 PRD 작성 시작
 - 2026.02.03: 관리자/사용자 상세 기능 명시 및 배송 로직 일반화 반영

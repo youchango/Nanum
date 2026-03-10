@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "AdminContent", description = "AdminContent API")
 @RestController
 @RequestMapping("/api/v1/admin/contents")
 @RequiredArgsConstructor

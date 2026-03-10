@@ -6,7 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,13 +38,17 @@ public class Product extends BaseEntity {
     @ColumnDefault("0")
     private int supplyPrice;
 
-    @Column(name = "map_price", nullable = false)
+    @Column(name = "map_price", nullable = true)
     @ColumnDefault("0")
-    private int mapPrice;
+    private Integer mapPrice;
 
-    @Column(name = "standard_price")
+    @Column(name = "retail_price")
     @ColumnDefault("0")
-    private int standardPrice;
+    private Integer retailPrice;
+
+    @Column(name = "suggested_price")
+    @ColumnDefault("0")
+    private Integer suggestedPrice;
 
     @Column(name = "option_yn", nullable = false, length = 1)
     @ColumnDefault("'N'")
@@ -56,6 +59,11 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private ProductStatus status = ProductStatus.SALE;
+
+    @Column(name = "apply_yn", nullable = false, length = 1)
+    @ColumnDefault("'N'")
+    @Builder.Default
+    private String applyYn = "N";
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -69,23 +77,28 @@ public class Product extends BaseEntity {
     private List<ProductOption> options = new ArrayList<>();
 
     // Business Methods
-    public void update(String name, int mapPrice, int standardPrice, String description,
-            ProductStatus status) {
+    public void update(String name, Integer mapPrice, Integer retailPrice, Integer suggestedPrice, String description,
+            ProductStatus status, String applyYn) {
         this.name = name;
         this.mapPrice = mapPrice;
-        this.standardPrice = standardPrice;
+        this.retailPrice = retailPrice;
+        this.suggestedPrice = suggestedPrice;
         this.description = description;
         this.status = status;
+        this.applyYn = applyYn != null ? applyYn : "N";
     }
 
-    public void updateInfo(List<ProductCategory> categories, String name, int mapPrice, int standardPrice,
-            String optionYn, ProductStatus status, String description) {
+    public void updateInfo(List<ProductCategory> categories, String name, Integer mapPrice, Integer retailPrice,
+            Integer suggestedPrice,
+            String optionYn, ProductStatus status, String description, String applyYn) {
         this.categories = categories;
         this.name = name;
         this.mapPrice = mapPrice;
-        this.standardPrice = standardPrice;
+        this.retailPrice = retailPrice;
+        this.suggestedPrice = suggestedPrice;
         this.optionYn = optionYn;
         this.status = status;
         this.description = description;
+        this.applyYn = applyYn != null ? applyYn : "N";
     }
 }

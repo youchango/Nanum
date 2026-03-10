@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "AdminManagerAuth", description = "AdminManagerAuth API")
 @RestController
 @RequestMapping("/api/v1/admin/auth")
 @RequiredArgsConstructor
-public class ManagerAuthController {
+public class AdminManagerAuthController {
 
     private final ManagerService managerService;
 
