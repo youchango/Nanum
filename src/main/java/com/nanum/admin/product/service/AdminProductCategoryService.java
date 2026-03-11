@@ -150,10 +150,32 @@ public class AdminProductCategoryService {
                 // Root Node
                 rootCategories.add(currentDto);
             } else {
-                // Child Node: 부모 찾아서 children에 추가
-                ProductCategoryDTO parentDto = dtoMap.get(category.getParent().getCategoryId());
+                Long parentId = category.getParent().getCategoryId();
+                ProductCategoryDTO parentDto = dtoMap.get(parentId);
+
                 if (parentDto != null) {
-                    parentDto.getChildren().add(currentDto);
+                    // 무한 순환 참조(StackOverflow) 500 에러 방어 로직
+                    boolean isCyclic = false;
+                    ProductCategoryDTO temp = parentDto;
+                    while (temp != null) {
+                        if (temp.getCategoryId().equals(currentDto.getCategoryId())) {
+                            isCyclic = true;
+                            break;
+                        }
+                        temp = temp.getParentId() != null ? dtoMap.get(temp.getParentId()) : null;
+                    }
+
+                    if (!isCyclic) {
+                        parentDto.getChildren().add(currentDto);
+                    } else {
+                        // 순환이 감지되면 끊어버리고 Root 취급
+                        currentDto.setParentId(null);
+                        rootCategories.add(currentDto);
+                    }
+                } else {
+                    // 고아 노드 방어 (부모가 DB 리스트에 없는 경우) 강제 Root 취급
+                    currentDto.setParentId(null);
+                    rootCategories.add(currentDto);
                 }
             }
         }

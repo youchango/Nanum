@@ -21,6 +21,7 @@ public class ProductDTO {
         private Integer mapPrice;
         private Integer retailPrice;
         private Integer suggestedPrice;
+        private Integer safetyStock;
         private String optionYn;
         private ProductStatus status;
         private String applyYn;
@@ -76,6 +77,8 @@ public class ProductDTO {
         private Integer mapPrice;
         private Integer retailPrice;
         private Integer suggestedPrice;
+        private Integer safetyStock;
+        private Integer stockQuantity;
         private ProductStatus status;
         private String applyYn;
         private String optionYn;
@@ -99,6 +102,8 @@ public class ProductDTO {
         private Integer mapPrice;
         private Integer retailPrice;
         private Integer suggestedPrice;
+        private Integer safetyStock;
+        private Integer stockQuantity;
         private int price; // 등급별 적용된 실제 판매가
         private ProductStatus status;
         private String applyYn;

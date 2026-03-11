@@ -25,8 +25,10 @@ public class BannerController implements ResponseSupport {
     private final BannerService bannerService;
 
     @GetMapping
-    @Operation(summary = "배너 목록 조회", description = "배너 유형(BannerType: MAIN, SUB 등)에 따라 현재 활성화된 배너 목록을 조회하여 반환합니다.")
-    public ResponseEntity<ApiResponse<List<BannerDTO.Response>>> getBanners(@RequestParam BannerType type) {
-        return success(bannerService.getBanners(type));
+    @Operation(summary = "배너 목록 조회", description = "배너 유형(BannerType)과 사이트 코드(site_cd)에 따라 동적으로 활성화된 배너를 조회합니다.")
+    public ResponseEntity<ApiResponse<List<BannerDTO.Response>>> getBanners(
+            @RequestParam BannerType type,
+            @RequestParam(name = "site_cd") String siteCd) {
+        return success(bannerService.getBanners(type, siteCd));
     }
 }

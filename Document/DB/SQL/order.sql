@@ -1,12 +1,16 @@
 ﻿-- 1. Cart (Shopping Cart)
 CREATE TABLE cart (
     cart_id          INT AUTO_INCREMENT COMMENT '장바구니ID',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     quantity         INT DEFAULT 1 NOT NULL COMMENT '수량',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
     PRIMARY KEY (cart_id),
     INDEX idx_cart_member (member_code),

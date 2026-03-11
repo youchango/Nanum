@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findByType(ContentType type);
+
+    List<Content> findByTypeAndSiteCd(ContentType type, String siteCd);
 }

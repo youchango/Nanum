@@ -111,7 +111,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productOption.name1,
                         productOption.name2,
                         productOption.name3,
-                        productSite.salePrice,
                         productSite.aPrice,
                         productSite.bPrice,
                         productSite.cPrice,
@@ -137,8 +136,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 .optionName1(t.get(productOption.name1) != null ? t.get(productOption.name1) : "")
                                 .optionName2(t.get(productOption.name2) != null ? t.get(productOption.name2) : "")
                                 .optionName3(t.get(productOption.name3) != null ? t.get(productOption.name3) : "")
-                                .salePrice(
-                                        t.get(productSite.salePrice) != null ? t.get(productSite.salePrice) : 0)
                                 .aPrice(t.get(productSite.aPrice))
                                 .bPrice(t.get(productSite.bPrice))
                                 .cPrice(t.get(productSite.cPrice))
@@ -159,11 +156,23 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     .mapPrice(p.getMapPrice())
                     .retailPrice(p.getRetailPrice())
                     .suggestedPrice(p.getSuggestedPrice())
+                    .safetyStock(p.getSafetyStock())
+                    .stockQuantity(p.getStockQuantity())
+                    .optionYn(p.getOptionYn())
                     .status(p.getStatus())
+                    .applyYn(p.getApplyYn())
                     .viewCount(p.getViewCount())
                     .createdAt(p.getCreatedAt())
                     .updatedAt(p.getUpdatedAt())
                     .deleteYn(p.getDeleteYn())
+                    .options(p.getOptions().stream().map(opt -> com.nanum.domain.product.dto.ProductDTO.Option.builder()
+                            .optionId(opt.getId())
+                            .title1(opt.getTitle1()).name1(opt.getName1())
+                            .title2(opt.getTitle2()).name2(opt.getName2())
+                            .title3(opt.getTitle3()).name3(opt.getName3())
+                            .extraPrice(opt.getExtraPrice())
+                            .stockQuantity(opt.getStockQuantity())
+                            .build()).collect(Collectors.toList()))
                     .sitePrices(sitePriceMap.getOrDefault(p.getId(), List.of()))
                     .build();
         }).collect(Collectors.toList());

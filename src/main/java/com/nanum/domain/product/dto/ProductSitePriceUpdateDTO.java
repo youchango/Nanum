@@ -21,10 +21,6 @@ public class ProductSitePriceUpdateDTO {
     @Schema(description = "쇼핑몰 노출 여부 (Y/N)", example = "Y")
     private String viewYn;
 
-    @Schema(description = "판매가", example = "10000")
-    @JsonProperty("salePrice")
-    private Integer salePrice;
-
     @Schema(description = "기업회원가 (A)", example = "10000.0000")
     @JsonProperty("aPrice")
     private BigDecimal aPrice;

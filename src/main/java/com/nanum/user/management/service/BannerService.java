@@ -1,6 +1,7 @@
 package com.nanum.user.management.service;
 
 import com.nanum.domain.banner.dto.BannerDTO;
+import com.nanum.domain.banner.model.Banner;
 import com.nanum.domain.banner.model.BannerType;
 import com.nanum.domain.banner.repository.BannerRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,11 @@ public class BannerService {
     private final BannerRepository bannerRepository;
     private final com.nanum.domain.file.service.FileService fileService;
 
-    public List<BannerDTO.Response> getBanners(BannerType type) {
+    public List<BannerDTO.Response> getBanners(BannerType type, String siteCd) {
         // Ideally filter by UseYn='Y' and Date within range via Repository Query
-        return bannerRepository.findByType(type).stream()
+        List<Banner> banners = bannerRepository.findByTypeAndSiteCd(type, siteCd);
+
+        return banners.stream()
                 .filter(b -> "N".equals(b.getDeleteYn()))
                 .filter(b -> "Y".equals(b.getUseYn()))
                 .filter(b -> {

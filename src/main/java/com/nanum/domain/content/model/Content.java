@@ -39,7 +39,8 @@ public class Content extends BaseEntity {
     private String urlInfo;
 
     // Helper for update
-    public void update(ContentType type, String subject, String contentBody, String urlInfo) {
+    public void update(String siteCd, ContentType type, String subject, String contentBody, String urlInfo) {
+        this.siteCd = siteCd;
         this.type = type;
         this.subject = subject;
         this.contentBody = contentBody;

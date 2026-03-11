@@ -55,6 +55,14 @@ public class Product extends BaseEntity {
     @Builder.Default
     private String optionYn = "N";
 
+    @Column(name = "stock_quantity", nullable = false, insertable = false, updatable = false)
+    @ColumnDefault("0")
+    private Integer stockQuantity;
+
+    @Column(name = "safety_stock")
+    @ColumnDefault("0")
+    private Integer safetyStock;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
@@ -78,7 +86,7 @@ public class Product extends BaseEntity {
 
     // Business Methods
     public void update(String name, String brandName, int supplyPrice, Integer mapPrice, Integer retailPrice,
-            Integer suggestedPrice,
+            Integer suggestedPrice, Integer safetyStock,
             String description,
             ProductStatus status, String applyYn) {
         this.name = name;
@@ -87,6 +95,7 @@ public class Product extends BaseEntity {
         this.mapPrice = mapPrice;
         this.retailPrice = retailPrice;
         this.suggestedPrice = suggestedPrice;
+        this.safetyStock = safetyStock;
         this.description = description;
         this.status = status;
         this.applyYn = applyYn != null ? applyYn : "N";
@@ -96,6 +105,7 @@ public class Product extends BaseEntity {
             Integer mapPrice,
             Integer retailPrice,
             Integer suggestedPrice,
+            Integer safetyStock,
             String optionYn, ProductStatus status, String description, String applyYn) {
         this.categories = categories;
         this.name = name;
@@ -104,6 +114,7 @@ public class Product extends BaseEntity {
         this.mapPrice = mapPrice;
         this.retailPrice = retailPrice;
         this.suggestedPrice = suggestedPrice;
+        this.safetyStock = safetyStock;
         this.optionYn = optionYn;
         this.status = status;
         this.description = description;

@@ -20,8 +20,15 @@ public class AdminProductListDTO {
     private Integer mapPrice;
     private Integer retailPrice;
     private Integer suggestedPrice;
+    private Integer safetyStock;
+    private Integer stockQuantity;
+    private String optionYn;
     private ProductStatus status;
     private String applyYn;
+
+    // To check stock level logic
+    @JsonProperty("options")
+    private java.util.List<ProductDTO.Option> options;
 
     // From ProductSite (1:N options mapping)
     @JsonProperty("sitePrices")

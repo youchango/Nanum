@@ -23,13 +23,17 @@ public class ContentController implements ResponseSupport {
 
     @GetMapping
     @Operation(summary = "게시글 목록 조회", description = "게시글 유형(ContentType: NOTICE, FAQ 등)에 따라 등록된 게시글 목록을 조회하여 반환합니다.")
-    public ResponseEntity<ApiResponse<List<ContentDTO.Response>>> getContents(@RequestParam ContentType type) {
-        return success(contentService.getContents(type));
+    public ResponseEntity<ApiResponse<List<ContentDTO.Response>>> getContents(
+            @RequestParam ContentType type,
+            @RequestParam(name = "site_cd") String siteCd) {
+        return success(contentService.getContents(type, siteCd));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "게시글 상세 조회", description = "게시글 ID를 식별자로 하여 특정 게시글의 상세 내용을 조회하고 반환합니다.")
-    public ResponseEntity<ApiResponse<ContentDTO.Response>> getContent(@PathVariable Long id) {
-        return success(contentService.getContent(id));
+    public ResponseEntity<ApiResponse<ContentDTO.Response>> getContent(
+            @PathVariable Long id,
+            @RequestParam(name = "site_cd") String siteCd) {
+        return success(contentService.getContent(id, siteCd));
     }
 }

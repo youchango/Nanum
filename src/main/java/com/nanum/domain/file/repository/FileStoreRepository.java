@@ -11,15 +11,18 @@ import java.util.List;
 
 public interface FileStoreRepository extends JpaRepository<FileStore, String> {
 
-    List<FileStore> findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(ReferenceType referenceType,
-            String referenceId);
+        List<FileStore> findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(ReferenceType referenceType,
+                        String referenceId);
 
-    @Modifying
-    @Query("UPDATE FileStore f SET f.isMain = :isMain WHERE f.referenceType = :referenceType AND f.referenceId = :referenceId")
-    void updateMainStatus(@Param("referenceType") ReferenceType referenceType, @Param("referenceId") String referenceId,
-            @Param("isMain") String isMain);
+        List<FileStore> findByReferenceTypeAndReferenceIdIn(ReferenceType referenceType, List<String> referenceIds);
 
-    @Modifying
-    @Query("UPDATE FileStore f SET f.isMain = :isMain WHERE f.fileId = :fileId")
-    void updateMainStatusById(@Param("fileId") String fileId, @Param("isMain") String isMain);
+        @Modifying
+        @Query("UPDATE FileStore f SET f.isMain = :isMain WHERE f.referenceType = :referenceType AND f.referenceId = :referenceId")
+        void updateMainStatus(@Param("referenceType") ReferenceType referenceType,
+                        @Param("referenceId") String referenceId,
+                        @Param("isMain") String isMain);
+
+        @Modifying
+        @Query("UPDATE FileStore f SET f.isMain = :isMain WHERE f.fileId = :fileId")
+        void updateMainStatusById(@Param("fileId") String fileId, @Param("isMain") String isMain);
 }

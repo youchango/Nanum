@@ -170,7 +170,6 @@ CREATE TABLE product_site (
     product_id       INT NOT NULL COMMENT '상품ID',
     site_cd          VARCHAR(100) NULL COMMENT '사이트코드',
     view_yn          CHAR(1) DEFAULT 'N' NOT NULL COMMENT '노출여부',
-    sale_price       INT DEFAULT 0 NULL COMMENT '판매가',
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
@@ -292,11 +291,11 @@ CREATE TABLE content (
     subject      VARCHAR(200) NOT NULL COMMENT '제목',
     content_body LONGTEXT NOT NULL COMMENT '내용',
     url_info     VARCHAR(255) NULL COMMENT 'URL 정보',
-    updated_by   BIGINT NULL COMMENT '수정자',
-    updated_at   DATETIME NULL COMMENT '수정일',
+    delete_yn    CHAR(1) DEFAULT 'N' COMMENT '삭제유무',
     created_by   BIGINT NULL COMMENT '생성자',
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    deleted_yn   CHAR(1) DEFAULT 'N' COMMENT '삭제 여부',
+    updated_by   BIGINT NULL COMMENT '수정자',
+    updated_at   DATETIME NULL COMMENT '수정일',
     deleted_at   DATETIME NULL COMMENT '삭제일',
     deleted_by   BIGINT NULL COMMENT '삭제자',
     PRIMARY KEY (content_id)
@@ -549,12 +548,16 @@ CREATE TABLE member_biz (
 -- 1. Cart (Shopping Cart)
 CREATE TABLE cart (
     cart_id          INT AUTO_INCREMENT COMMENT '장바구니ID',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     quantity         INT DEFAULT 1 NOT NULL COMMENT '수량',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (cart_id),
     INDEX idx_cart_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
@@ -850,7 +853,11 @@ CREATE TABLE wishlist (
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드(FK)',
     product_id       INT NOT NULL COMMENT '상품ID(FK)',
-    created_at         DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
+    updated_at       DATETIME NULL DEFAULT NULL COMMENT '수정일',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (wishlist_id),
     UNIQUE KEY uq_wishlist_user_prod (member_code, product_id),
     CONSTRAINT fk_wishlist_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
@@ -909,12 +916,12 @@ INSERT INTO product_category (parent_id, category_name, depth, display_order) VA
 
 -- 5. Products
 -- Public Product
-INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
-VALUES (3, 'Gaming Laptop', 1500000, 1350000, 'SALE', 'High performance gaming laptop', '/uploads/laptop.jpg');
+INSERT INTO product (category_id, product_name, retail_price, status, description, thumbnail_url)
+VALUES (3, 'Gaming Laptop', 1500000, 'SALE', 'High performance gaming laptop', '/uploads/laptop.jpg');
 
 -- Biz Only Product (Only mapped users can see discount? Or mapping logic)
-INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
-VALUES (4, 'Biz Smartphone', 1000000, 900000, 'SALE', 'Corporate optimized phone', '/uploads/phone.jpg');
+INSERT INTO product (category_id, product_name, retail_price, status, description, thumbnail_url)
+VALUES (4, 'Biz Smartphone', 1000000, 'SALE', 'Corporate optimized phone', '/uploads/phone.jpg');
 
 -- 6. Product Options
 INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)

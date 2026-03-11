@@ -1,6 +1,5 @@
 package com.nanum.user.wishlist.controller;
 
-import com.nanum.domain.product.dto.ProductDTO;
 import com.nanum.domain.wishlist.dto.WishlistDTO;
 import com.nanum.user.wishlist.service.WishlistService;
 import com.nanum.global.common.dto.ApiResponse;
@@ -44,10 +43,10 @@ public class WishlistController {
 
     @Operation(summary = "내 찜 목록 조회", description = "현재 사용자가 찜한 모든 상품 목록을 페이징하여 조회합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ProductDTO.Response>>> getMyWishlist(
-            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<ApiResponse<Page<WishlistDTO.Response>>> getMyWishlist(
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Principal principal) {
-        Page<ProductDTO.Response> wishlist = wishlistService.getMyWishlist(principal.getName(), pageable);
+        Page<WishlistDTO.Response> wishlist = wishlistService.getMyWishlist(principal.getName(), pageable);
         return ResponseEntity.ok(ApiResponse.success(wishlist));
     }
 }

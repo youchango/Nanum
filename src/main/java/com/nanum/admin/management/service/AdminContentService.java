@@ -32,6 +32,7 @@ public class AdminContentService {
     @Transactional
     public Long createContent(ContentDTO.Request request) {
         Content content = Content.builder()
+                .siteCd(request.getSiteCd())
                 .type(request.getType())
                 .subject(request.getSubject())
                 .contentBody(request.getContentBody())
@@ -45,7 +46,8 @@ public class AdminContentService {
     public void updateContent(Long id, ContentDTO.Request request) {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        content.update(request.getType(), request.getSubject(), request.getContentBody(), request.getUrlInfo());
+        content.update(request.getSiteCd(), request.getType(), request.getSubject(), request.getContentBody(),
+                request.getUrlInfo());
     }
 
     @Transactional

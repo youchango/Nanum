@@ -53,8 +53,9 @@ public class Banner extends BaseEntity {
     @Builder.Default
     private String useYn = "Y";
 
-    public void update(BannerType type, String linkUrl, int sortOrder, String useYn,
+    public void update(String siteCd, BannerType type, String linkUrl, int sortOrder, String useYn,
             LocalDateTime start, LocalDateTime end) {
+        this.siteCd = siteCd;
         this.type = type;
         this.linkUrl = linkUrl;
         this.sortOrder = sortOrder;

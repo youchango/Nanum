@@ -102,6 +102,8 @@ public class AdminProductService {
                                 .mapPrice(product.getMapPrice())
                                 .retailPrice(product.getRetailPrice())
                                 .suggestedPrice(product.getSuggestedPrice())
+                                .safetyStock(product.getSafetyStock())
+                                .stockQuantity(product.getStockQuantity())
                                 .status(product.getStatus())
                                 .applyYn(product.getApplyYn())
                                 .optionYn(product.getOptionYn())
@@ -128,6 +130,7 @@ public class AdminProductService {
                                 .mapPrice(request.getMapPrice())
                                 .retailPrice(request.getRetailPrice())
                                 .suggestedPrice(request.getSuggestedPrice())
+                                .safetyStock(request.getSafetyStock() != null ? request.getSafetyStock() : 0)
                                 .optionYn(request.getOptionYn() != null ? request.getOptionYn() : "N")
                                 .status(request.getStatus())
                                 .applyYn("N") // 생성 시 무조건 N
@@ -186,6 +189,7 @@ public class AdminProductService {
                                 request.getMapPrice(),
                                 request.getRetailPrice(),
                                 request.getSuggestedPrice(),
+                                request.getSafetyStock() != null ? request.getSafetyStock() : 0,
                                 request.getOptionYn() != null ? request.getOptionYn() : "N",
                                 request.getStatus(),
                                 request.getDescription(),
@@ -289,6 +293,7 @@ public class AdminProductService {
                                 product.getMapPrice(),
                                 product.getRetailPrice(),
                                 product.getSuggestedPrice(),
+                                product.getSafetyStock(),
                                 product.getDescription(),
                                 status, product.getApplyYn());
         }
@@ -324,7 +329,6 @@ public class AdminProductService {
                 // 기존 판매가(salePrice)는 유지하면서 전달받은 가격/상태값 변경
                 productSite.update(
                                 request.getViewYn() != null ? request.getViewYn() : productSite.getViewYn(),
-                                request.getSalePrice() != null ? request.getSalePrice() : productSite.getSalePrice(),
                                 request.getAPrice(),
                                 request.getBPrice(),
                                 request.getCPrice());
@@ -358,8 +362,6 @@ public class AdminProductService {
                         ProductSite newSite = ProductSite.builder()
                                         .product(product)
                                         .siteCd(siteCd)
-                                        // 소매가(retailPrice)를 기본 판매가로 주입
-                                        .salePrice(product.getRetailPrice() != null ? product.getRetailPrice() : 0)
                                         .aPrice(siteReq.getAPrice())
                                         .bPrice(siteReq.getBPrice())
                                         .cPrice(siteReq.getCPrice())

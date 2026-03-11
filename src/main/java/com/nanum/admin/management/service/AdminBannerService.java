@@ -36,6 +36,7 @@ public class AdminBannerService {
     @Transactional
     public Long createBanner(BannerDTO.Request request, List<org.springframework.web.multipart.MultipartFile> files) {
         Banner banner = Banner.builder()
+                .siteCd(request.getSiteCd())
                 .type(request.getType())
                 .linkUrl(request.getLinkUrl())
                 .sortOrder(request.getSortOrder())
@@ -60,7 +61,7 @@ public class AdminBannerService {
             List<org.springframework.web.multipart.MultipartFile> files) {
         Banner banner = bannerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("배너를 찾을 수 없습니다."));
-        banner.update(request.getType(), request.getLinkUrl(), request.getSortOrder(),
+        banner.update(request.getSiteCd(), request.getType(), request.getLinkUrl(), request.getSortOrder(),
                 request.getUseYn(), request.getStartDatetime(), request.getEndDatetime());
 
         // 파일 추가 로직 (기존 파일 삭제 로직은 별도 API 또는 요청 플래그 필요하나, 여기서는 추가만 구현 일단)

@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface BannerRepository extends JpaRepository<Banner, Long> {
-    List<Banner> findByType(BannerType type);
+    List<Banner> findByTypeAndSiteCd(BannerType type, String siteCd);
 }

@@ -18,8 +18,7 @@ public class ProductSitePriceDTO {
     private String optionName3;
     @JsonProperty("viewYn")
     private String viewYn;
-    @JsonProperty("salePrice")
-    private Integer salePrice;
+
     @JsonProperty("aPrice")
     private BigDecimal aPrice;
     @JsonProperty("bPrice")

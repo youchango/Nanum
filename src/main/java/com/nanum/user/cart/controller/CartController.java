@@ -31,6 +31,43 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("장바구니에 상품이 담겼습니다.", cartId));
     }
 
+    @Operation(summary = "장바구니 목록 조회", description = "현재 로그인한 사용자의 장바구니 리스트를 옵션 및 권한별 계산된 가격 형식으로 반환합니다.")
+    @GetMapping
+    public ResponseEntity<ApiResponse<java.util.List<CartDTO.Response>>> getCartList(Principal principal) {
+        // 회원 권한은 Service에서 내부 조회 또는 Authentication 객체 사용 시 principal을 통해 추출
+        // 임의 편의상 서비스단 조회 후 로직 처리로 연계
+        return ResponseEntity.ok(ApiResponse.success("장바구니 목록 조회 성공",
+                cartService.getCartList(principal.getName(), null))); // Service에서 auth 연동 후 Role 조회하도록 추후 보강
+    }
+
+    @Operation(summary = "장바구니 수량 변경", description = "특정 장바구니 항목의 수량을 업데이트합니다.")
+    @PutMapping("/{cartId}")
+    public ResponseEntity<ApiResponse<Void>> updateCartQuantity(
+            @PathVariable("cartId") Long cartId,
+            @RequestBody CartDTO.Request request,
+            Principal principal) {
+        cartService.updateCartQuantity(cartId, request.getQuantity(), principal.getName());
+        return ResponseEntity.ok(ApiResponse.success("수량이 변경되었습니다.", null));
+    }
+
+    @Operation(summary = "장바구니 단건 삭제", description = "특정 장바구니 항목을 삭제합니다.")
+    @DeleteMapping("/{cartId}")
+    public ResponseEntity<ApiResponse<Void>> deleteCartItem(
+            @PathVariable("cartId") Long cartId,
+            Principal principal) {
+        cartService.deleteCartItem(cartId, principal.getName());
+        return ResponseEntity.ok(ApiResponse.success("삭제되었습니다.", null));
+    }
+
+    @Operation(summary = "장바구니 선택 삭제", description = "여러 장바구니 항목을 배열로 받아 일괄 삭제합니다.")
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteCartItems(
+            @RequestBody java.util.List<Long> cartIds,
+            Principal principal) {
+        cartService.deleteCartItems(cartIds, principal.getName());
+        return ResponseEntity.ok(ApiResponse.success("선택한 상품이 삭제되었습니다.", null));
+    }
+
     @ExceptionHandler(DuplicateCartItemException.class)
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> handleDuplicateCartItemException(
             DuplicateCartItemException e) {

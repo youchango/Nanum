@@ -18,6 +18,7 @@ public class BannerDTO {
     @Builder
     public static class Request {
         private BannerType type;
+        private String siteCd;
         private String linkUrl;
         private int sortOrder;
         private String deviceType;
@@ -33,6 +34,7 @@ public class BannerDTO {
     @Builder
     public static class Response {
         private Long id;
+        private String siteCd;
         private BannerType type;
         private String linkUrl;
         private int sortOrder;
@@ -45,6 +47,7 @@ public class BannerDTO {
         public static Response from(Banner banner) {
             return Response.builder()
                     .id(banner.getId())
+                    .siteCd(banner.getSiteCd())
                     .type(banner.getType())
                     .linkUrl(banner.getLinkUrl())
                     .sortOrder(banner.getSortOrder())

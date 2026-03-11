@@ -67,6 +67,10 @@
     - [x] **상품 가격 상세표 UI 개편**: 기존 확장(Expandable)뷰 방식 제거 후, `Modal` 팝업 및 사이트별 탭(`Tabs`)으로 컴포넌트 재구성 완료.
     - [x] **상품 가격 관리(ProductSiteList) 분리 및 고도화**: `ROLE_MASTER` 전용 메뉴 신설. 체크박스로 선택한 사이트에 대한 동적 단가(A/B/C) 입력 표 제공 및 개별 Insert API 연동 완료, 상세 팝업 탭 명칭 ShopName 전환.
     - [x] **백엔드/프론트엔드 빌드 오류 및 프록시 에러 해결**: 에러 코드 정합성 수리 완료 및 `application-local.yml` 8090 포트 지정으로 로그인(ECONNREFUSED) 해결.
+- [x] **관심상품(Wishlist) 기능 최적화 및 리팩토링**
+    - [x] DB 엔티티 `BaseEntity` 상속을 통한 논리적 삭제(Soft Delete) 도입 완료
+    - [x] `JOIN FETCH` 및 `IN` 절 쿼리 방식 튜닝을 통해 N+1 성능 현안 해결
+    - [x] `sale_price` 필드를 완전 퇴출하고 Cart와 동일한 구조의 권한별 다중 가격 계산 로직(`unitPrice`, `retailPrice`) 이식 완료
 - [ ] 일반/기업 전용 상품 등록 및 노출 제어 (Site Code 적용 완료)
 - [ ] 상품 옵션 및 재고 관리 시스템
 - [ ] **상품 리뷰 및 평가 (Product Review & Like)**

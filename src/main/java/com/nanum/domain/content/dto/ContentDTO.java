@@ -15,6 +15,7 @@ public class ContentDTO {
     @Builder
     public static class Request {
         private ContentType type;
+        private String siteCd;
         private String subject;
         private String contentBody;
         private String urlInfo;
@@ -27,6 +28,7 @@ public class ContentDTO {
     @Builder
     public static class Response {
         private Long id;
+        private String siteCd;
         private ContentType type;
         private String typeDesc;
         private String subject;
@@ -38,6 +40,7 @@ public class ContentDTO {
         public static Response from(Content content) {
             return Response.builder()
                     .id(content.getId())
+                    .siteCd(content.getSiteCd())
                     .type(content.getType())
                     .typeDesc(content.getType().getDescription())
                     .subject(content.getSubject())
