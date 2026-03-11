@@ -23,6 +23,8 @@ CREATE TABLE product (
     suggested_price  INT DEFAULT 0 NULL COMMENT '권장판매가',
     option_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '옵션여부',
     status           VARCHAR(20) DEFAULT 'SALE' NOT NULL COMMENT '상태(SALE, STOP, SOLD_OUT)',
+    safety_stock	 INT DEFAULT 0 NULL COMMENT '적정재고',
+    stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량',
     description      TEXT NULL COMMENT '상품설명',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
     

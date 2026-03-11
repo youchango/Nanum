@@ -154,21 +154,33 @@ Base URL: `/api/v1/admin/products`
 | `DELETE` | `/{id}/master` | 상품 원본 완전 삭제 | 모든 사이트에서 상품을 영구적으로 삭제합니다. (Soft Delete) |
 | `PATCH` | `/{id}/status` | 상품 상태 변경 | 상품의 상태(`SALE`, `STOP`, `SOLD_OUT`)를 변경합니다. |
 
-**Request Schema (`ProductSitePriceUpdateDTO`)**
+**Request Schema (`ProductSiteBulkCreateDTO` - 사이트별 가격 일괄 업데이트 시)**
+```json
+{
+  "sitePrices": [
+    {
+      "siteCd": "A01",
+      "aPrice": 15000,
+      "bPrice": 16000,
+      "cPrice": 17000
+    },
+    {
+      "siteCd": "B01",
+      "aPrice": 15000,
+      "bPrice": 16000,
+      "cPrice": 17000
+    }
+  ]
+}
+```
+
+**Request Schema (`ProductSitePriceUpdateDTO` - 개별 사이트 업데이트 시)**
 ```json
 {
   "viewYn": "Y",
   "aPrice": 15000,
   "bPrice": 16000,
-  "cPrice": 17000,
-  "dtoList": [
-    {
-      "optionId": 101,
-      "aExtraPrice": 1000,
-      "bExtraPrice": 1200,
-      "cExtraPrice": 1500
-    }
-  ]
+  "cPrice": 17000
 }
 ```
 

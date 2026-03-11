@@ -77,9 +77,13 @@ public class Product extends BaseEntity {
     private List<ProductOption> options = new ArrayList<>();
 
     // Business Methods
-    public void update(String name, Integer mapPrice, Integer retailPrice, Integer suggestedPrice, String description,
+    public void update(String name, String brandName, int supplyPrice, Integer mapPrice, Integer retailPrice,
+            Integer suggestedPrice,
+            String description,
             ProductStatus status, String applyYn) {
         this.name = name;
+        this.brandName = brandName;
+        this.supplyPrice = supplyPrice;
         this.mapPrice = mapPrice;
         this.retailPrice = retailPrice;
         this.suggestedPrice = suggestedPrice;
@@ -88,11 +92,15 @@ public class Product extends BaseEntity {
         this.applyYn = applyYn != null ? applyYn : "N";
     }
 
-    public void updateInfo(List<ProductCategory> categories, String name, Integer mapPrice, Integer retailPrice,
+    public void updateInfo(List<ProductCategory> categories, String name, String brandName, int supplyPrice,
+            Integer mapPrice,
+            Integer retailPrice,
             Integer suggestedPrice,
             String optionYn, ProductStatus status, String description, String applyYn) {
         this.categories = categories;
         this.name = name;
+        this.brandName = brandName;
+        this.supplyPrice = supplyPrice;
         this.mapPrice = mapPrice;
         this.retailPrice = retailPrice;
         this.suggestedPrice = suggestedPrice;

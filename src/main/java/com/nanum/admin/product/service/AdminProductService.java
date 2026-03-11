@@ -96,6 +96,8 @@ public class AdminProductService {
                                 .categoryId(product.getCategories().stream().map(ProductCategory::getCategoryId)
                                                 .collect(Collectors.toList()))
                                 .categoryName(firstCategory != null ? firstCategory.getCategoryName() : null)
+                                .name(product.getName())
+                                .brandName(product.getBrandName())
                                 .supplyPrice(product.getSupplyPrice())
                                 .mapPrice(product.getMapPrice())
                                 .retailPrice(product.getRetailPrice())
@@ -122,6 +124,7 @@ public class AdminProductService {
                 Product product = Product.builder()
                                 .categories(categories)
                                 .name(request.getName())
+                                .brandName(request.getBrandName())
                                 .mapPrice(request.getMapPrice())
                                 .retailPrice(request.getRetailPrice())
                                 .suggestedPrice(request.getSuggestedPrice())
@@ -178,6 +181,8 @@ public class AdminProductService {
                 product.updateInfo(
                                 categories,
                                 request.getName(),
+                                request.getBrandName(),
+                                request.getSupplyPrice(),
                                 request.getMapPrice(),
                                 request.getRetailPrice(),
                                 request.getSuggestedPrice(),
@@ -280,7 +285,9 @@ public class AdminProductService {
         public void updateProductStatus(Long id, ProductStatus status) {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
-                product.update(product.getName(), product.getMapPrice(), product.getRetailPrice(),
+                product.update(product.getName(), product.getBrandName(), product.getSupplyPrice(),
+                                product.getMapPrice(),
+                                product.getRetailPrice(),
                                 product.getSuggestedPrice(),
                                 product.getDescription(),
                                 status, product.getApplyYn());
@@ -327,7 +334,7 @@ public class AdminProductService {
         @Transactional
         public void createBulkProductSites(Long productId, ProductSiteBulkCreateDTO request) {
                 Manager manager = getCurrentManager();
-                if (!"MASTER".equals(manager.getMbType())) {
+                if (com.nanum.admin.manager.entity.ManagerType.MASTER != manager.getMbType()) {
                         throw new BusinessException("가격 일괄 설정 권한이 없습니다.", ErrorCode.ACCESS_DENIED);
                 }
 

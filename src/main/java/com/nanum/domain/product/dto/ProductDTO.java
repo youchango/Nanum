@@ -16,6 +16,7 @@ public class ProductDTO {
     public static class Request {
         private List<Long> categoryIds; // Changed from single categoryId
         private String name;
+        private String brandName;
         private int supplyPrice;
         private Integer mapPrice;
         private Integer retailPrice;
@@ -70,6 +71,7 @@ public class ProductDTO {
         // 'categoryId' being a List
         private String categoryName; // Representing primary or first category name for display
         private String name;
+        private String brandName;
         private int supplyPrice;
         private Integer mapPrice;
         private Integer retailPrice;
@@ -92,6 +94,7 @@ public class ProductDTO {
         private List<Long> categoryIds;
         private String categoryName;
         private String name;
+        private String brandName;
         private int supplyPrice;
         private Integer mapPrice;
         private Integer retailPrice;
