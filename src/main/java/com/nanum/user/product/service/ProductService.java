@@ -35,7 +35,7 @@ public class ProductService {
                                 : null;
 
                 return products.stream()
-                                .map(p -> toMallResponse(p, siteCd, member))
+                                .map(p -> toMallResponse(p, siteCd, member, false))
                                 .collect(Collectors.toList());
         }
 
@@ -52,7 +52,7 @@ public class ProductService {
                                 : null;
 
                 return products.stream()
-                                .map(p -> toMallResponse(p, siteCd, member))
+                                .map(p -> toMallResponse(p, siteCd, member, false))
                                 .collect(Collectors.toList());
         }
 
@@ -68,11 +68,20 @@ public class ProductService {
                                 ? memberRepository.findByMemberCode(memberCode).orElse(null)
                                 : null;
 
-                return toMallResponse(product, siteCd, member);
+                return toMallResponse(product, siteCd, member, true); // 상세 조회 시 모든 이미지 포함
         }
 
+        /**
+         * 상품 정보를 쇼핑몰용 응답 DTO로 변환합니다.
+         * 
+         * @param product             상품 엔티티
+         * @param siteCd              사이트 코드
+         * @param member              회원 정보 (로그인 여부에 따른 가격 계산용)
+         * @param includeDetailImages 상세 이미지 포함 여부 (상세 조회 시 true, 리스트 조회 시 false)
+         * @return 쇼핑몰용 상품 응답 DTO
+         */
         private ProductDTO.MallProductResponse toMallResponse(Product product, String siteCd,
-                        com.nanum.domain.member.model.Member member) {
+                        com.nanum.domain.member.model.Member member, boolean includeDetailImages) {
                 // 1. 해당 사이트의 상품 가격 정보 조회
                 com.nanum.domain.product.model.ProductSite productSite = productSiteRepository
                                 .findByProductAndSiteCd(product, siteCd)
@@ -86,15 +95,17 @@ public class ProductService {
                 // 2. 회원 등급별 가격 결정
                 int price = getBasePriceByMemberType(productSite, member);
 
-                // 3. 이미지 정보
+                // 3. 이미지 정보 처리
                 List<ProductDTO.Image> images = fileService
                                 .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT,
                                                 String.valueOf(product.getId()))
                                 .stream()
+                                .filter(f -> includeDetailImages || "Y".equals(f.getIsMain())) // 리스트 조회 시 MAIN만, 상세 시
+                                                                                               // 전체
                                 .map(f -> ProductDTO.Image.builder()
                                                 .fileId(f.getFileId())
-                                                .imageUrl(f.getPath())
-                                                .type(f.getReferenceType().name())
+                                                .imageUrl(fileService.getFullUrl(f.getPath())) // Full URL 변환
+                                                .type("Y".equals(f.getIsMain()) ? "MAIN" : "DETAIL") // 타입 구분 명확화
                                                 .displayOrder(f.getDisplayOrder())
                                                 .build())
                                 .collect(Collectors.toList());
@@ -124,6 +135,7 @@ public class ProductService {
                                 .categoryName(product.getCategories().isEmpty() ? null
                                                 : product.getCategories().get(0).getCategoryName())
                                 .name(product.getName())
+                                .brandName(product.getBrandName())
                                 .supplyPrice(product.getSupplyPrice())
                                 .mapPrice(product.getMapPrice())
                                 .retailPrice(product.getRetailPrice())
@@ -184,8 +196,8 @@ public class ProductService {
                                 .stream()
                                 .map(f -> ProductDTO.Image.builder()
                                                 .fileId(f.getFileId())
-                                                .imageUrl(f.getPath())
-                                                .type(f.getReferenceType().name())
+                                                .imageUrl(fileService.getFullUrl(f.getPath())) // Full URL 변환
+                                                .type("Y".equals(f.getIsMain()) ? "MAIN" : "DETAIL") // 타입 구분
                                                 .displayOrder(f.getDisplayOrder())
                                                 .build())
                                 .collect(Collectors.toList());
@@ -199,6 +211,7 @@ public class ProductService {
                                                 .collect(Collectors.toList()))
                                 .categoryName(firstCategory != null ? firstCategory.getCategoryName() : null)
                                 .name(product.getName())
+                                .brandName(product.getBrandName())
                                 .mapPrice(product.getMapPrice())
                                 .retailPrice(product.getRetailPrice())
                                 .suggestedPrice(product.getSuggestedPrice())

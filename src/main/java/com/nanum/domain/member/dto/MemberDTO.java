@@ -98,6 +98,11 @@ public class MemberDTO {
     private String phone;
 
     /**
+     * 사업자 등록증 이미지 URL (Full URL)
+     */
+    private String businessLicenseImage;
+
+    /**
      * 이메일 주소입니다. 선택 입력 항목입니다.
      */
     private String email;

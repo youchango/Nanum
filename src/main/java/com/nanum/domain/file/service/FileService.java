@@ -94,19 +94,37 @@ public class FileService {
         return files;
     }
 
-    // Helper method to generate full URL
+    /**
+     * 파일의 전체 접근 URL을 생성합니다.
+     * 
+     * @param dbPath DB에 저장된 상대 경로
+     * @return 전체 접근 가능한 URL
+     */
     public String getFullUrl(String dbPath) {
         if (StringUtils.hasText(dbPath) && !dbPath.startsWith("http")) {
             if ("SERVER".equalsIgnoreCase(storageType)) {
                 return serverDomain + dbPath;
             } else {
-                // LOCAL: /uploads + dbPath -> http://host/uploads... but actually
-                // usually LOCAL means sending relative path or static resource mapping.
-                // If we want absolute URL even for LOCAL:
-                return serverDomain + "/uploads" + dbPath;
+                // LOCAL: WebMvcConfig의 정적 자원 매핑 경로(/resources/upload)와 일치시킴
+                return serverDomain + "/resources/upload" + dbPath;
             }
         }
         return dbPath;
+    }
+
+    /**
+     * 특정 참조 대상의 대표(MAIN) 이미지만 조회합니다.
+     * 
+     * @param type 참조 타입 (예: PRODUCT)
+     * @param refId 참조 ID (예: 상품 식별자)
+     * @return 대표 이미지 정보 (없을 경우 null)
+     */
+    public FileStore getMainFile(ReferenceType type, String refId) {
+        return fileStoreRepository.findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(type, refId)
+                .stream()
+                .filter(f -> "Y".equals(f.getIsMain()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

@@ -28,6 +28,7 @@ public class AdminMemberService {
     private final MemberRepository memberRepository;
     private final MemberBizRepository memberBizRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.nanum.domain.file.service.FileService fileService;
 
     /**
      * 회원 목록을 조회합니다.
@@ -64,6 +65,13 @@ public class AdminMemberService {
                     dto.setBusinessType(biz.getBusinessType());
                     dto.setBusinessItem(biz.getBusinessItem());
                 });
+
+                // 사업자 등록증 이미지 (BIZ 타입)
+                com.nanum.domain.file.model.FileStore licenseFile = fileService.getMainFile(
+                        com.nanum.domain.file.model.ReferenceType.BIZ, m.getMemberCode());
+                if (licenseFile != null) {
+                    dto.setBusinessLicenseImage(fileService.getFullUrl(licenseFile.getPath()));
+                }
             }
             return dto;
         }).toList();
@@ -180,6 +188,13 @@ public class AdminMemberService {
                 dto.setBusinessType(biz.getBusinessType());
                 dto.setBusinessItem(biz.getBusinessItem());
             });
+
+            // 사업자 등록증 이미지 (BIZ 타입)
+            com.nanum.domain.file.model.FileStore licenseFile = fileService.getMainFile(
+                    com.nanum.domain.file.model.ReferenceType.BIZ, memberCode);
+            if (licenseFile != null) {
+                dto.setBusinessLicenseImage(fileService.getFullUrl(licenseFile.getPath()));
+            }
         }
 
         return dto;
