@@ -12,7 +12,7 @@ public class ManagerScmDTO {
     @Builder
     public static class Info {
         private String managerCode;
-        private String brandName;
+        private String supplierName;
         private String scmCeo;
         private String scmCorp;
         private String scmType;
@@ -38,11 +38,12 @@ public class ManagerScmDTO {
         private String returnZipcode;
         private String returnAddr1;
         private String returnAddr2;
+        private String businessLicenseUrl;
 
         public static Info from(ManagerScm entity) {
             return Info.builder()
                     .managerCode(entity.getManagerCode())
-                    .brandName(entity.getBrandName())
+                    .supplierName(entity.getSupplierName())
                     .scmCeo(entity.getScmCeo())
                     .scmCorp(entity.getScmCorp())
                     .scmType(entity.getScmType())

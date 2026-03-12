@@ -459,7 +459,7 @@ CREATE TABLE manager_menu_group (
 CREATE TABLE manager_scm (
     manager_seq           INT NOT NULL COMMENT '관리자SEQ(FK)',
     manager_code          VARCHAR(20) NOT NULL COMMENT '관리자코드(MGR+6자리)',
-    brand_name            VARCHAR(50) NOT NULL COMMENT '브랜드명',
+    supplier_name         VARCHAR(50) NOT NULL COMMENT '공급사명',
     scm_ceo               VARCHAR(50) NOT NULL COMMENT '대표자명',
     scm_corp              VARCHAR(100) NOT NULL COMMENT '법인명',
     scm_type              VARCHAR(10) DEFAULT 'CORP' NOT NULL COMMENT '사업자구분(개인/법인)/ CORP, INDIV',

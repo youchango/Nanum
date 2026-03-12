@@ -8,7 +8,6 @@ import com.nanum.admin.manager.repository.ManagerAuthGroupRepository;
 import com.nanum.admin.manager.repository.ManagerRepository;
 import com.nanum.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,6 +85,11 @@ public class ManagerService {
     private final ManagerAuthGroupRepository managerAuthGroupRepository;
     private final com.nanum.admin.manager.repository.ManagerScmRepository managerScmRepository;
 
+    /**
+     * 신규 관리자 계정을 생성합니다.
+     * 
+     * @param request 관리자 생성 요청 정보 (ID, 비번, 유형, SCM 상세 등)
+     */
     @Transactional
     public void createManager(ManagerDTO.CreateRequest request) {
         if (managerRepository.findByManagerId(request.getId()).isPresent()) {
@@ -139,7 +143,7 @@ public class ManagerService {
             ManagerScm scm = ManagerScm.builder()
                     .manager(manager)
                     .managerCode(managerCode) // Set managerCode
-                    .brandName(request.getScmInfo().getBrandName())
+                    .supplierName(request.getScmInfo().getSupplierName())
                     .scmCeo(request.getScmInfo().getScmCeo())
                     .scmCorp(request.getScmInfo().getScmCorp())
                     .scmType(request.getScmInfo().getScmType())
@@ -199,13 +203,38 @@ public class ManagerService {
         manager.approve();
     }
 
+    /**
+     * 관리자 상세 정보를 조회합니다.
+     * SCM 유형일 경우 사업자 등록증 이미지 Full URL을 연동합니다.
+     * 
+     * @param managerCode 관리자 식별 코드
+     * @return 관리자 상세 정보 DTO
+     */
     @Transactional(readOnly = true)
     public ManagerDTO.ManagerInfo getManager(String managerCode) {
         Manager manager = managerRepository.findByManagerCode(managerCode)
                 .orElseThrow(() -> new IllegalArgumentException("관리자를 찾을 수 없습니다."));
-        return ManagerDTO.ManagerInfo.from(manager);
+        ManagerDTO.ManagerInfo info = ManagerDTO.ManagerInfo.from(manager);
+
+        // SCM인 경우 등록증 이미지 URL 추가
+        if (manager.getMbType() == com.nanum.admin.manager.entity.ManagerType.SCM && info.getScmInfo() != null) {
+            com.nanum.domain.file.model.FileStore licenseFile = fileService.getMainFile(
+                    com.nanum.domain.file.model.ReferenceType.SCM, managerCode);
+            if (licenseFile != null) {
+                info.getScmInfo().setBusinessLicenseUrl(fileService.getFullUrl(licenseFile.getPath()));
+            }
+        }
+
+        return info;
     }
 
+    /**
+     * 기존 관리자 정보를 수정합니다.
+     * SCM 유형일 경우 연동된 SCM 상세 정보도 함께 업데이트합니다.
+     * 
+     * @param managerCode 관리자 식별 코드
+     * @param request 수정할 관리자 정보
+     */
     @Transactional
     public void updateManager(String managerCode, ManagerDTO.CreateRequest request) {
         Manager manager = managerRepository.findByManagerCode(managerCode)
@@ -226,8 +255,44 @@ public class ManagerService {
                 request.getType(),
                 authGroup);
 
-        // ApplyYn is handled by approveManager, UseYn/DeleteYn by deleteManager (not
-        // yet impl)
+        // SCM 정보 업데이트
+        if (com.nanum.admin.manager.entity.ManagerType.SCM.equals(request.getType()) && request.getScmInfo() != null) {
+            ManagerScm scm = managerScmRepository.findById(manager.getManagerSeq())
+                    .orElseGet(() -> ManagerScm.builder()
+                            .manager(manager)
+                            .managerCode(managerCode)
+                            .build());
+
+            scm.update(
+                    request.getScmInfo().getSupplierName(),
+                    request.getScmInfo().getScmCeo(),
+                    request.getScmInfo().getScmCorp(),
+                    request.getScmInfo().getScmType(),
+                    request.getScmInfo().getScmBsn(),
+                    request.getScmInfo().getScmPsn(),
+                    request.getScmInfo().getScmUptae(),
+                    request.getScmInfo().getScmUpjong(),
+                    request.getScmInfo().getScmZipcode(),
+                    request.getScmInfo().getScmAddr1(),
+                    request.getScmInfo().getScmAddr2(),
+                    request.getScmInfo().getScmPhone(),
+                    request.getScmInfo().getScmFax(),
+                    request.getScmInfo().getScmDamName(),
+                    request.getScmInfo().getScmDamPosition(),
+                    request.getScmInfo().getScmDamPhone(),
+                    request.getScmInfo().getScmDamEmail(),
+                    request.getScmInfo().getScmBankName(),
+                    request.getScmInfo().getScmBankAccountNum(),
+                    request.getScmInfo().getScmBankAccountName(),
+                    request.getScmInfo().getShippingZipcode(),
+                    request.getScmInfo().getShippingAddr1(),
+                    request.getScmInfo().getShippingAddr2(),
+                    request.getScmInfo().getReturnZipcode(),
+                    request.getScmInfo().getReturnAddr1(),
+                    request.getScmInfo().getReturnAddr2());
+
+            managerScmRepository.save(scm);
+        }
     }
 
     /**
@@ -298,7 +363,7 @@ public class ManagerService {
             ManagerScm scm = ManagerScm.builder()
                     .manager(manager)
                     .managerCode(managerCode)
-                    .brandName(request.getBrandName())
+                    .supplierName(request.getSupplierName())
                     .scmCeo(request.getScmCeo())
                     .scmCorp(request.getScmCorp())
                     .scmType(request.getScmType())

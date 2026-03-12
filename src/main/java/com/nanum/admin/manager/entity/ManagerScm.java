@@ -29,8 +29,8 @@ public class ManagerScm extends BaseEntity {
     @JoinColumn(name = "manager_seq")
     private Manager manager;
 
-    @Column(name = "brand_name", length = 50, nullable = false)
-    private String brandName;
+    @Column(name = "supplier_name", length = 50, nullable = false)
+    private String supplierName;
 
     @Column(name = "scm_ceo", length = 50, nullable = false)
     private String scmCeo;
@@ -108,13 +108,13 @@ public class ManagerScm extends BaseEntity {
     @Column(name = "return_addr2", length = 200)
     private String returnAddr2;
 
-    public void update(String brandName, String scmCeo, String scmCorp, String scmType, String scmBsn, String scmPsn,
+    public void update(String supplierName, String scmCeo, String scmCorp, String scmType, String scmBsn, String scmPsn,
             String scmUptae, String scmUpjong, String scmZipcode, String scmAddr1, String scmAddr2,
             String scmPhone, String scmFax, String scmDamName, String scmDamPosition, String scmDamPhone,
             String scmDamEmail, String scmBankName, String scmBankAccountNum, String scmBankAccountName,
             String shippingZipcode, String shippingAddr1, String shippingAddr2,
             String returnZipcode, String returnAddr1, String returnAddr2) {
-        this.brandName = brandName;
+        this.supplierName = supplierName;
         this.scmCeo = scmCeo;
         this.scmCorp = scmCorp;
         this.scmType = scmType;

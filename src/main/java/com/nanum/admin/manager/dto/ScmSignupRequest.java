@@ -17,7 +17,7 @@ public class ScmSignupRequest {
     private String managerEmail;
 
     // SCM Info
-    private String brandName;
+    private String supplierName;
     private String scmCeo;
     private String scmCorp;
 
