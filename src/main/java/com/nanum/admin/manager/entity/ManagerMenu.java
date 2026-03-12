@@ -36,8 +36,8 @@ public class ManagerMenu extends BaseEntity {
     @Column(name = "menu_name", length = 100, nullable = false)
     private String menuName;
 
-    @Column(name = "program_url", length = 100)
-    private String programUrl;
+    @Column(name = "menu_url", length = 100)
+    private String menuUrl;
 
     @Column(name = "display_yn", length = 1, nullable = false)
     @ColumnDefault("'Y'")
@@ -47,18 +47,18 @@ public class ManagerMenu extends BaseEntity {
     @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Column(name = "program_parameter", length = 100, nullable = false)
+    @Column(name = "menu_parameter", length = 100, nullable = false)
     @ColumnDefault("''")
     @Builder.Default
-    private String programParameter = "";
+    private String menuParameter = "";
 
-    public void update(String menuName, String programUrl, String displayYn, Integer displayOrder,
-            String programParameter, ManagerMenu parent) {
+    public void update(String menuName, String menuUrl, String displayYn, Integer displayOrder,
+            String menuParameter, ManagerMenu parent) {
         this.menuName = menuName;
-        this.programUrl = programUrl;
+        this.menuUrl = menuUrl;
         this.displayYn = displayYn;
         this.displayOrder = displayOrder;
-        this.programParameter = programParameter;
+        this.menuParameter = menuParameter;
         this.parent = parent;
     }
 }

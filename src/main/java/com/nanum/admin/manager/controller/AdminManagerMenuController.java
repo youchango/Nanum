@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/manager/menu")
+@RequestMapping("/api/v1/admin/manager/menu")
 @RequiredArgsConstructor
 @Tag(name = "Admin Manager Menu", description = "관리자 메뉴 관리 API")
 public class AdminManagerMenuController {

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/manager/auth-group")
+@RequestMapping("/api/v1/admin/manager/auth-group")
 @RequiredArgsConstructor
 @Tag(name = "Admin Manager Auth Group", description = "관리자 권한 그룹 관리 API")
 public class AdminManagerAuthGroupController {
@@ -47,6 +47,19 @@ public class AdminManagerAuthGroupController {
     @Operation(summary = "권한 그룹 삭제")
     public ResponseEntity<Void> deleteAuthGroup(@PathVariable Long seq) {
         managerAuthGroupService.deleteAuthGroup(seq);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{seq}/menus")
+    @Operation(summary = "권한 그룹별 할당 메뉴 SEQ 목록 조회")
+    public ResponseEntity<List<Long>> getAssignedMenuSeqs(@PathVariable Long seq) {
+        return ResponseEntity.ok(managerAuthGroupService.getAssignedMenuSeqs(seq));
+    }
+
+    @PutMapping("/{seq}/menus")
+    @Operation(summary = "권한 그룹별 메뉴 할당 수정")
+    public ResponseEntity<Void> updateAuthGroupMenus(@PathVariable Long seq, @RequestBody List<Long> menuSeqs) {
+        managerAuthGroupService.updateAuthGroupMenus(seq, menuSeqs);
         return ResponseEntity.ok().build();
     }
 }

@@ -138,6 +138,11 @@
   - [x] `merge_sql.py` 스크립트 수정 및 `init_db.sql` 재생성
   - [x] SQL 파일 UTF-8 인코딩 점검 및 BOM 제거
    - [x] **전사 API 응답 규격 표준화 (ResponseEntity<ApiResponse<T>> 통일 완료)**
+- [x] **관리자 권한 및 메뉴 관리 (완료)**
+  - [x] DB 스키마 (`manager_menu`, `manager_auth_group`, `manager_menu_group`)
+  - [x] 백엔드 API (권한 CRUD, 메뉴 트리 조회, 권한별 메뉴 매핑 로직)
+  - [x] 프론트엔드 (권한 관리, 트리 구조 메뉴 권한 설정 모달, 계층형 메뉴 관리 UI)
+  - [x] `ROLE_MASTER` 전용 상시 노출 메뉴 적용
 
 
 ## 프론트엔드 리팩토링 (Nanum_Master)

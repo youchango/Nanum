@@ -73,7 +73,7 @@ Base URL: `/api/v1/admin/managers`
 | `POST` | `/{id}/approve` | 관리자 승인 | 승인 대기 중인 관리자 계정을 승인합니다. |
 
 ### 1.2.1 Manager Auth Group (권한 그룹 관리)
-Base URL: `/api/admin/manager/auth-group`
+Base URL: `/api/v1/admin/manager/auth-group`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
@@ -82,9 +82,11 @@ Base URL: `/api/admin/manager/auth-group`
 | `POST` | `/` | 권한 그룹 생성 | 신규 권한 그룹을 생성합니다. |
 | `PUT` | `/` | 권한 그룹 수정 | 권한 그룹 정보를 수정합니다. |
 | `DELETE` | `/{seq}` | 권한 그룹 삭제 | 권한 그룹을 삭제합니다. |
+| `GET` | `/{seq}/menus` | 할당 메뉴 목록 조회 | 특정 권한 그룹에 할당된 메뉴 SEQ 목록을 조회합니다. |
+| `PUT` | `/{seq}/menus` | 메뉴 권한 업데이트 | 특정 권한 그룹의 메뉴 접근 권한을 일괄 업데이트합니다. |
 
 ### 1.2.2 Manager Menu (메뉴 관리)
-Base URL: `/api/admin/manager/menu`
+Base URL: `/api/v1/admin/manager/menu`
 
 | Method | Endpoint | Summary | Description |
 | :--- | :--- | :--- | :--- |
@@ -92,7 +94,7 @@ Base URL: `/api/admin/manager/menu`
 | `GET` | `/{seq}` | 메뉴 상세 조회 | 메뉴 상세 정보를 조회합니다. |
 | `POST` | `/` | 메뉴 생성 | 신규 메뉴를 생성합니다. |
 | `PUT` | `/` | 메뉴 수정 | 메뉴 정보를 수정합니다. |
-| `DELETE` | `/{seq}` | 메뉴 삭제 | 메뉴를 삭제합니다. |
+| `DELETE` | `/{seq}` | 메뉴 삭제 | 메뉴를 삭제합니다. (Soft Delete) |
 
 ## 2. Member (회원)
 

@@ -18,15 +18,13 @@ public class ManagerMenuService {
 
     @Transactional(readOnly = true)
     public List<ManagerMenuDTO.Info> getAllMenus() {
-        // Return hierarchy or flat list?
-        // Assuming we want top-level menus and their children are fetched lazily or
-        // eager?
-        // Let's return all top-level menus (parent is null)
-        // But Repository needs findByParentIsNull()
-        // Or just findAll() and filter in memory for root, constructing hierarchy.
+        // 삭제되지 않은(deleteYn='N') 메뉴만 조회하며, 
+        // 최상위 메뉴부터 displayOrder 순으로 정렬하여 계층 구조 생성
+        List<ManagerMenu> allMenus = managerMenuRepository.findAll().stream()
+                .filter(menu -> "N".equals(menu.getDeleteYn()))
+                .sorted(java.util.Comparator.comparing(ManagerMenu::getDisplayOrder, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
+                .collect(Collectors.toList());
 
-        List<ManagerMenu> allMenus = managerMenuRepository.findAll();
-        // Return only root menus, children are inside
         return allMenus.stream()
                 .filter(menu -> menu.getParent() == null)
                 .map(ManagerMenuDTO.Info::from)
@@ -76,6 +74,10 @@ public class ManagerMenuService {
 
     @Transactional
     public void deleteMenu(Long seq) {
-        managerMenuRepository.deleteById(seq);
+        ManagerMenu menu = managerMenuRepository.findById(seq)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+        
+        // BaseEntity의 delete 메소드 사용 (Soft Delete)
+        menu.delete("SYSTEM");
     }
 }
