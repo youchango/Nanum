@@ -50,10 +50,10 @@ public class ManagerMenuService {
 
         ManagerMenu menu = ManagerMenu.builder()
                 .menuName(request.getMenuName())
-                .programUrl(request.getProgramUrl())
+                .menuUrl(request.getMenuUrl())
                 .displayYn(request.getDisplayYn())
                 .displayOrder(request.getDisplayOrder())
-                .programParameter(request.getProgramParameter())
+                .menuParameter(request.getMenuParameter())
                 .parent(parent)
                 .build();
         return managerMenuRepository.save(menu).getMenuSeq();
@@ -70,8 +70,8 @@ public class ManagerMenuService {
                     .orElseThrow(() -> new IllegalArgumentException("상위 메뉴가 존재하지 않습니다."));
         }
 
-        menu.update(request.getMenuName(), request.getProgramUrl(), request.getDisplayYn(),
-                request.getDisplayOrder(), request.getProgramParameter(), parent);
+        menu.update(request.getMenuName(), request.getMenuUrl(), request.getDisplayYn(),
+                request.getDisplayOrder(), request.getMenuParameter(), parent);
     }
 
     @Transactional

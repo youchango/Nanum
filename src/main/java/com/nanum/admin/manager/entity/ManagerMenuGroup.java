@@ -35,8 +35,8 @@ public class ManagerMenuGroup {
     private ManagerMenu menu;
 
     @CreatedBy
-    @Column(name = "regist_by", length = 200, updatable = false)
-    private String registBy;
+    @Column(name = "created_by", length = 200, updatable = false)
+    private String createdBy;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

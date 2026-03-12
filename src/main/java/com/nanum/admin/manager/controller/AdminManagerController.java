@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.nanum.admin.manager.service.CustomManagerDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -18,6 +20,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AdminManagerController {
 
     private final ManagerService managerService;
+
+    @Operation(summary = "내 프로필 정보 조회", description = "현재 로그인한 관리자의 상세 정보를 상세 정보를 반환합니다.")
+    @org.springframework.web.bind.annotation.GetMapping("/me")
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<ManagerDTO.ManagerInfo>> getMyProfile(
+            @AuthenticationPrincipal CustomManagerDetails userDetails) {
+        return ResponseEntity
+                .ok(com.nanum.global.common.dto.ApiResponse.success(managerService.getManager(userDetails.getManager().getManagerCode())));
+    }
+
+    @Operation(summary = "내 프로필 정보 수정", description = "현재 로그인한 관리자의 정보를 수정합니다. 비밀번호는 입력된 경우에만 변경됩니다.")
+    @org.springframework.web.bind.annotation.PutMapping("/me")
+    public ResponseEntity<com.nanum.global.common.dto.ApiResponse<Void>> updateMyProfile(
+            @AuthenticationPrincipal CustomManagerDetails userDetails,
+            @RequestBody ManagerDTO.CreateRequest request) {
+        managerService.updateManager(userDetails.getManager().getManagerCode(), request);
+        return ResponseEntity.ok(com.nanum.global.common.dto.ApiResponse.success(null));
+    }
 
     @Operation(summary = "신규 관리자 계정 생성", description = "요청받은 CreateRequest DTO를 기반으로 데이터베이스의 manager 테이블에 새로운 관리자 정보를 등록합니다.")
     @PostMapping("/managers")

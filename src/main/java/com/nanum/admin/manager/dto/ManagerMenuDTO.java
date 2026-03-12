@@ -17,10 +17,10 @@ public class ManagerMenuDTO {
         private Long menuSeq;
         private Long parentMenuSeq;
         private String menuName;
-        private String programUrl;
+        private String menuUrl;
         private String displayYn;
         private Integer displayOrder;
-        private String programParameter;
+        private String menuParameter;
         private List<Info> children;
 
         public static Info from(ManagerMenu entity) {
@@ -28,10 +28,10 @@ public class ManagerMenuDTO {
                     .menuSeq(entity.getMenuSeq())
                     .parentMenuSeq(entity.getParent() != null ? entity.getParent().getMenuSeq() : null)
                     .menuName(entity.getMenuName())
-                    .programUrl(entity.getProgramUrl())
+                    .menuUrl(entity.getMenuUrl())
                     .displayYn(entity.getDisplayYn())
                     .displayOrder(entity.getDisplayOrder())
-                    .programParameter(entity.getProgramParameter())
+                    .menuParameter(entity.getMenuParameter())
                     .children(entity.getChildren().stream().map(Info::from).collect(Collectors.toList()))
                     .build();
         }
@@ -45,10 +45,10 @@ public class ManagerMenuDTO {
     public static class CreateRequest {
         private Long parentMenuSeq;
         private String menuName;
-        private String programUrl;
+        private String menuUrl;
         private String displayYn;
         private Integer displayOrder;
-        private String programParameter;
+        private String menuParameter;
     }
 
     @Getter
@@ -60,9 +60,9 @@ public class ManagerMenuDTO {
         private Long menuSeq;
         private Long parentMenuSeq;
         private String menuName;
-        private String programUrl;
+        private String menuUrl;
         private String displayYn;
         private Integer displayOrder;
-        private String programParameter;
+        private String menuParameter;
     }
 }

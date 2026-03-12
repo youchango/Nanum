@@ -255,6 +255,11 @@ public class ManagerService {
                 request.getType(),
                 authGroup);
 
+        // 비밀번호가 입력된 경우에만 업데이트
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            manager.updatePassword(passwordEncoder.encode(request.getPassword()));
+        }
+
         // SCM 정보 업데이트
         if (com.nanum.admin.manager.entity.ManagerType.SCM.equals(request.getType()) && request.getScmInfo() != null) {
             ManagerScm scm = managerScmRepository.findById(manager.getManagerSeq())

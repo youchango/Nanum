@@ -36,10 +36,10 @@ CREATE TABLE manager_menu (
     menu_seq         INT AUTO_INCREMENT COMMENT '메뉴SEQ',
     parent_menu_seq  INT NULL COMMENT '상위메뉴SEQ',
     menu_name        VARCHAR(100) NOT NULL COMMENT '메뉴명',
-    program_url      VARCHAR(100) NULL COMMENT '프로그램URL',
+    menu_url         VARCHAR(100) NULL COMMENT '메뉴URL',
     display_yn       CHAR(1) NOT NULL COMMENT '노출여부',
     display_order    INT NULL COMMENT '표시순서',
-    program_parameter VARCHAR(100) DEFAULT '' NOT NULL COMMENT '파라미터',
+    menu_parameter   VARCHAR(100) DEFAULT '' NOT NULL COMMENT '파라미터',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
     created_by       VARCHAR(200) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일시',
@@ -73,8 +73,8 @@ CREATE TABLE manager_auth_group (
 CREATE TABLE manager_menu_group (
     auth_group_seq   INT NOT NULL COMMENT '권한그룹SEQ',
     menu_seq         INT NOT NULL COMMENT '메뉴SEQ',
-    regist_by        VARCHAR(200) NOT NULL COMMENT '등록자',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(200) NULL COMMENT '등록자',
     PRIMARY KEY (auth_group_seq, menu_seq),
     CONSTRAINT fk_mmg_auth FOREIGN KEY (auth_group_seq) REFERENCES manager_auth_group (auth_group_seq) ON DELETE CASCADE,
     CONSTRAINT fk_mmg_menu FOREIGN KEY (menu_seq) REFERENCES manager_menu (menu_seq) ON DELETE CASCADE
