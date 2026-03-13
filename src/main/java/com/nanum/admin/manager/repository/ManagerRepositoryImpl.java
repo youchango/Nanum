@@ -37,8 +37,20 @@ public class ManagerRepositoryImpl implements ManagerRepositoryCustom {
 
         if (StringUtils.hasText(searchDTO.getKeyword())) {
             String keyword = searchDTO.getKeyword();
-            builder.and(manager.managerName.contains(keyword)
-                    .or(manager.managerId.contains(keyword)));
+            String searchType = searchDTO.getSearchType();
+
+            if ("id".equals(searchType)) {
+                builder.and(manager.managerId.contains(keyword));
+            } else if ("name".equals(searchType)) {
+                builder.and(manager.managerName.contains(keyword));
+            } else if ("email".equals(searchType)) {
+                builder.and(manager.managerEmail.contains(keyword));
+            } else {
+                // 전체 검색 (id + name + email)
+                builder.and(manager.managerName.contains(keyword)
+                        .or(manager.managerId.contains(keyword))
+                        .or(manager.managerEmail.contains(keyword)));
+            }
         }
 
         if (StringUtils.hasText(searchDTO.getApplyYn())) {

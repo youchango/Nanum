@@ -195,6 +195,7 @@ CREATE TABLE product_stock (
 -- Product Review
 CREATE TABLE product_review (
     review_id        INT AUTO_INCREMENT PRIMARY KEY,
+    site_cd          VARCHAR(20) NOT NULL COMMENT '사이트코드',
     product_id       INT NOT NULL,
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     title            VARCHAR(255) NOT NULL COMMENT '리뷰제목',
@@ -216,36 +217,38 @@ CREATE TABLE product_review (
 CREATE TABLE product_review_like (
     like_id          INT AUTO_INCREMENT PRIMARY KEY,
     review_id        INT NOT NULL COMMENT '리뷰ID',
+    site_cd          VARCHAR(20) NOT NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (review_id) REFERENCES product_review (review_id) ON DELETE CASCADE,
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     UNIQUE KEY uq_review_like (review_id, member_code)
 ) COMMENT '상품리뷰 좋아요';
+
 -- Source: file_store.sql
-CREATE TABLE `file_store` (
-    `file_id`        VARCHAR(36) NOT NULL COMMENT '파일ID (UUID)',
-    `reference_type` VARCHAR(50) NOT NULL COMMENT '참조구분 (PRODUCT, CATEGORY, BANNER, POPUP, REVIEW, INQUIRY)',
-    `reference_id`   VARCHAR(50) NOT NULL COMMENT '참조ID (Entity PK)',
-    `org_name`       VARCHAR(255) NOT NULL COMMENT '원본파일명',
-    `save_name`      VARCHAR(255) NOT NULL COMMENT '저장파일명(UUID포함)',
-    `path`           VARCHAR(500) NOT NULL COMMENT '전체 URL 또는 상대경로',
-    `ext`            VARCHAR(10) NOT NULL COMMENT '확장자',
-    `size`           BIGINT DEFAULT 0 NOT NULL COMMENT '파일크기(Byte)',
+CREATE TABLE file_store (
+    file_id        VARCHAR(36) NOT NULL COMMENT '파일ID (UUID)',
+    reference_type VARCHAR(50) NOT NULL COMMENT '참조구분 (PRODUCT, CATEGORY, BANNER, POPUP, REVIEW, INQUIRY)',
+    reference_id   VARCHAR(50) NOT NULL COMMENT '참조ID (Entity PK)',
+    org_name       VARCHAR(255) NOT NULL COMMENT '원본파일명',
+    save_name      VARCHAR(255) NOT NULL COMMENT '저장파일명(UUID포함)',
+    path           VARCHAR(500) NOT NULL COMMENT '전체 URL 또는 상대경로',
+    ext            VARCHAR(10) NOT NULL COMMENT '확장자',
+    size           BIGINT DEFAULT 0 NOT NULL COMMENT '파일크기(Byte)',
     
-    `is_main`        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '대표이미지 여부(Y/N)',
-    `display_order`  INT DEFAULT 0 NOT NULL COMMENT '노출순서',
-    `created_at`       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    `created_by`       VARCHAR(20) NOT NULL COMMENT '등록자',
-    `updated_at`       DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
-    `updated_by`       VARCHAR(20) DEFAULT NULL COMMENT '수정자',
-    `deleted_at`       DATETIME DEFAULT NULL COMMENT '삭제일시',
-    `deleted_by`       VARCHAR(20) DEFAULT NULL COMMENT '삭제자',
-    `delete_yn`        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부(Y/N)',
+    is_main        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '대표이미지 여부(Y/N)',
+    display_order  INT DEFAULT 0 NOT NULL COMMENT '노출순서',
+    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
+    created_by       VARCHAR(20) NOT NULL COMMENT '등록자',
+    updated_at       DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
+    updated_by       VARCHAR(20) DEFAULT NULL COMMENT '수정자',
+    deleted_at       DATETIME DEFAULT NULL COMMENT '삭제일시',
+    deleted_by       VARCHAR(20) DEFAULT NULL COMMENT '삭제자',
+    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부(Y/N)',
     
-    PRIMARY KEY (`file_id`),
-    INDEX `idx_file_ref` (`reference_type`, `reference_id`),
-    INDEX `idx_file_reg` (`created_at`)
+    PRIMARY KEY (file_id),
+    INDEX idx_file_ref (reference_type, reference_id),
+    INDEX idx_file_reg (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='전사 통합 파일 관리';
 
 
@@ -821,20 +824,6 @@ CREATE TABLE product_biz_mapping (
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
 ) COMMENT '기업전용상품매핑';
 
-
--- Source: product_wishlist.sql
-CREATE TABLE product_wishlist (
-    wishlist_id      INT AUTO_INCREMENT COMMENT '찜ID',
-    member_code      VARCHAR(30) NOT NULL COMMENT '회원코드(FK)',
-    product_id       INT NOT NULL COMMENT '상품ID(FK)',
-    created_at         DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    PRIMARY KEY (wishlist_id),
-    UNIQUE KEY uq_wishlist_user_prod (member_code, product_id),
-    CONSTRAINT fk_wishlist_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
-    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 찜 목록';
-
-
 -- Source: wishlist.sql
 -- -----------------------------------------------------
 -- Wishlist (Product Wishlist)
@@ -876,6 +865,69 @@ CREATE TABLE site_policy_history (
     delete_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (seq)
 ) COMMENT '사이트 정책 이력';
+
+-- Source: inout.sql
+CREATE TABLE inout_master (
+  io_seq 			INT(11) NOT NULL AUTO_INCREMENT COMMENT 'pk',
+  io_code 			VARCHAR(45) NOT NULL COMMENT '입출고코드',
+  io_type 			VARCHAR(10) NOT NULL COMMENT '입출고구분 IN: 입고, OUT: 출고',
+  io_category 		VARCHAR(20) NOT NULL COMMENT '입출고 상세카테고리 (일반입고, 생산입고, 반품입고, 일반출고, 생산출고, 주문출고, 폐기출고)',
+  io_date 			DATETIME DEFAULT NULL COMMENT '입고일',
+  order_no 			VARCHAR(45) DEFAULT NULL COMMENT '주문번호',
+  manager_code		VARCHAR(30) DEFAULT NULL COMMENT '관리자코드(MGR+6자리)',
+
+  created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+  created_by 		INT NULL COMMENT '생성자',
+  updated_at 		DATETIME NULL COMMENT '수정일',
+  updated_by 		INT NULL COMMENT '수정자',
+  deleted_at 		DATETIME NULL COMMENT '삭제일',
+  deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
+  delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
+  PRIMARY KEY (io_seq),
+  UNIQUE KEY uq_inout_io_code (io_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입출고 Master';
+
+
+CREATE TABLE inout_detail (
+  io_code 			VARCHAR(45) NOT NULL COMMENT '입출고코드 (IO+8자리)',
+  no 				INT(11) NOT NULL COMMENT '번호',
+  io_type 			VARCHAR(10) NOT NULL COMMENT '입출고구분 IN: 입고, OUT: 출고',
+  in_io_code 		VARCHAR(45) DEFAULT NULL COMMENT '입고 코드',
+  in_no	 	 		INT(11) DEFAULT NULL COMMENT '입고 코드의번호', 
+  product_id 		INT(11) DEFAULT NULL COMMENT '상품ID',
+  option_id 		INT(11) DEFAULT NULL COMMENT '옵션ID',
+  product_name 		VARCHAR(200) DEFAULT NULL COMMENT '상품명',
+  option_name 		VARCHAR(200) DEFAULT NULL COMMENT '옵션명',
+  brand_name 		VARCHAR(100) DEFAULT NULL COMMENT '브랜드명',
+  qty 				INT(11) DEFAULT '0' COMMENT '입출고수량',
+  real_qty 			INT(11) DEFAULT '0' COMMENT '출고에따라 변동되는 입고수량 최초엔 입고수량과 동일하지만 출고할때마다 수량이 감소되는 구조 (IN의 모두 더하면 실제 수량)',
+  from_type 		CHAR(1) DEFAULT NULL COMMENT 'FROM (C:거래처, S:창고, L:라인)',
+  location_type 	CHAR(1) DEFAULT NULL COMMENT 'TO (C:거래처, S:창고, L:라인)',
+  to_type 			CHAR(1) DEFAULT NULL COMMENT 'TO (C:거래처, S:창고, L:라인)',
+  location1 		INT(11) DEFAULT NULL COMMENT '위치1',
+  location2 		INT(11) DEFAULT NULL COMMENT '위치2',
+  location3 		INT(11) DEFAULT NULL COMMENT '위치3',
+  from_location1 	INT(11) DEFAULT NULL COMMENT 'FROM 위치1',
+  from_location2 	INT(11) DEFAULT NULL COMMENT 'FROM 위치2',
+  from_location3 	INT(11) DEFAULT NULL COMMENT 'FROM 위치3',
+  to_location1 		INT(11) DEFAULT NULL COMMENT 'TO 위치1',
+  to_location2 		INT(11) DEFAULT NULL COMMENT 'TO 위치2',
+  to_location3 		INT(11) DEFAULT NULL COMMENT 'TO 위치3',
+  memo 				VARCHAR(200) DEFAULT NULL COMMENT '메모',
+
+  created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+  created_by 		INT NULL COMMENT '생성자',
+  updated_at 		DATETIME NULL COMMENT '수정일',
+  updated_by 		INT NULL COMMENT '수정자',
+  deleted_at 		DATETIME NULL COMMENT '삭제일',
+  deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
+  delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
+  PRIMARY KEY (io_code, no),
+  CONSTRAINT fk_inout_detail_io_code FOREIGN KEY (io_code) REFERENCES inout_master (io_code) ON DELETE CASCADE,
+  CONSTRAINT fk_inout_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
+  KEY idx_inout_product_id (product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입출고 Detail';
+
 
 
 
