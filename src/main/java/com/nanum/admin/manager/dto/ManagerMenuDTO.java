@@ -32,7 +32,10 @@ public class ManagerMenuDTO {
                     .displayYn(entity.getDisplayYn())
                     .displayOrder(entity.getDisplayOrder())
                     .menuParameter(entity.getMenuParameter())
-                    .children(entity.getChildren().stream().map(Info::from).collect(Collectors.toList()))
+                    .children(entity.getChildren().stream()
+                            .filter(c -> "N".equals(c.getDeleteYn()))
+                            .map(Info::from)
+                            .collect(Collectors.toList()))
                     .build();
         }
     }

@@ -30,6 +30,7 @@ public class ManagerMenu extends BaseEntity {
     private ManagerMenu parent;
 
     @OneToMany(mappedBy = "parent")
+    @OrderBy("displayOrder ASC")
     @Builder.Default
     private List<ManagerMenu> children = new ArrayList<>();
 

@@ -18,15 +18,15 @@ public class ManagerMenuService {
 
     @Transactional(readOnly = true)
     public List<ManagerMenuDTO.Info> getAllMenus() {
-        // 삭제되지 않은(deleteYn='N') 메뉴만 조회하며, 
-        // 최상위 메뉴부터 displayOrder 순으로 정렬하여 계층 구조 생성
-        List<ManagerMenu> allMenus = managerMenuRepository.findAll().stream()
-                .filter(menu -> "N".equals(menu.getDeleteYn()))
-                .sorted(java.util.Comparator.comparing(ManagerMenu::getDisplayOrder, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
-                .collect(Collectors.toList());
-
-        return allMenus.stream()
-                .filter(menu -> menu.getParent() == null)
+        /**
+         * 삭제되지 않은(deleteYn='N') 최상위 메뉴(parent is null)만 조회하며,
+         * displayOrder 순으로 정렬하여 반환합니다.
+         * 하위 메뉴는 엔티티의 @OrderBy 설정에 의해 자동으로 정렬됩니다.
+         */
+        return managerMenuRepository.findAll().stream()
+                .filter(menu -> menu.getParent() == null && "N".equals(menu.getDeleteYn()))
+                .sorted(java.util.Comparator.comparing(ManagerMenu::getDisplayOrder, 
+                        java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())))
                 .map(ManagerMenuDTO.Info::from)
                 .collect(Collectors.toList());
     }
@@ -34,7 +34,8 @@ public class ManagerMenuService {
     @Transactional(readOnly = true)
     public ManagerMenuDTO.Info getMenu(Long seq) {
         ManagerMenu menu = managerMenuRepository.findById(seq)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메뉴입니다."));
+                .filter(m -> "N".equals(m.getDeleteYn()))
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 삭제된 메뉴입니다."));
         return ManagerMenuDTO.Info.from(menu);
     }
 

@@ -56,15 +56,6 @@ CREATE TABLE shop_info (
 ) COMMENT '쇼핑몰 기본정보';
 
 
--- Source: basic.sql
-CREATE TABLE basic (
-    basic_id   INT AUTO_INCREMENT COMMENT '기본설정코드',
-    type       VARCHAR(20) NOT NULL COMMENT '타입',
-    content    VARCHAR(4000) NULL COMMENT '컨텐츠',
-    updated_at DATETIME NULL COMMENT '수정일',
-    updated_by INT NULL COMMENT '수정자',
-    PRIMARY KEY (basic_id)
-) COMMENT '기본설정';
 
 
 -- Source: member.sql
@@ -607,6 +598,7 @@ CREATE TABLE order_detail (
     order_id         INT NOT NULL COMMENT '주문ID',
     order_seq        INT NOT NULL COMMENT '주문순번',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
+    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명(스냅샷)',
@@ -615,7 +607,6 @@ CREATE TABLE order_detail (
     option_price     DECIMAL(19,4) DEFAULT 0 COMMENT '옵션가격',
     quantity         INT NOT NULL COMMENT '주문수량',
     total_price      DECIMAL(19,4) NOT NULL COMMENT '총금액(구 sub_total)',
-    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태',
     delivery_num     VARCHAR(100) NULL COMMENT '송장번호',
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',
     delivery_date_start DATETIME NULL COMMENT '배송시작일시',
@@ -867,19 +858,25 @@ CREATE TABLE wishlist (
 
 -- Source: site_policy_history.sql
 CREATE TABLE site_policy_history (
-    seq            INT AUTO_INCREMENT COMMENT '시퀀스',
-    site_cd        VARCHAR(20) NOT NULL COMMENT '사이트코드',
-    terms_of_use   MEDIUMTEXT NULL COMMENT '이용약관',
-    privacy_policy MEDIUMTEXT NULL COMMENT '개인정보처리방침',
-    legal_notice   MEDIUMTEXT NULL COMMENT '법적고지',
-    footer_info    TEXT NULL COMMENT '푸터 정보',
-    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by     INT NULL COMMENT '생성자',
-    updated_at     DATETIME NULL COMMENT '수정일',
-    updated_by     INT NULL COMMENT '수정자',
-    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    seq               INT AUTO_INCREMENT COMMENT '시퀀스',
+    site_cd           VARCHAR(20) NOT NULL COMMENT '사이트코드',
+    
+    terms_of_use      MEDIUMTEXT NULL COMMENT '이용약관',
+    privacy_policy    MEDIUMTEXT NULL COMMENT '개인정보처리방침',
+    legal_notice      MEDIUMTEXT NULL COMMENT '법적고지',
+    marketing_consent MEDIUMTEXT NULL COMMENT '마케팅활용동의',
+    footer_info       TEXT NULL COMMENT '푸터 정보',
+
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by        INT NULL COMMENT '생성자',
+    updated_at        DATETIME NULL COMMENT '수정일',
+    updated_by        INT NULL COMMENT '수정자',
+    deleted_at        DATETIME NULL COMMENT '삭제일',
+    deleted_by        VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (seq)
 ) COMMENT '사이트 정책 이력';
+
 
 
 -- Source: init_data.sql

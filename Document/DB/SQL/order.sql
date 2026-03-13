@@ -61,6 +61,7 @@ CREATE TABLE order_detail (
     order_id         INT NOT NULL COMMENT '주문ID',
     order_seq        INT NOT NULL COMMENT '주문순번',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
+    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명(스냅샷)',
@@ -70,8 +71,6 @@ CREATE TABLE order_detail (
     option_price     DECIMAL(19,4) DEFAULT 0 COMMENT '옵션가격',
     quantity         INT NOT NULL COMMENT '주문수량',
     total_price      DECIMAL(19,4) NOT NULL COMMENT '총금액(구 sub_total)',
-    
-    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태',
     
     delivery_num     VARCHAR(100) NULL COMMENT '송장번호',
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',

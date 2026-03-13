@@ -143,6 +143,11 @@
   - [x] 백엔드 API (권한 CRUD, 메뉴 트리 조회, 권한별 메뉴 매핑 로직)
   - [x] 프론트엔드 (권한 관리, 트리 구조 메뉴 권한 설정 모달, 계층형 메뉴 관리 UI)
   - [x] `ROLE_MASTER` 전용 상시 노출 메뉴 적용
+- [x] **사이트 설정 및 약관 관리 통합 (완료)**
+  - [x] 중복 `basic` 테이블 및 `basic.sql` 제거
+  - [x] 프론트엔드 `SiteSettingsPage` 및 `siteService` 통합 이전 (`system` 메뉴 하위)
+  - [x] `TermsManagePage` 및 `termService` 삭제
+  - [x] 사이트 정책 관리 UI 개선 (저장 버튼 하단 이동)
 
 
 ## 프론트엔드 리팩토링 (Nanum_Master)
