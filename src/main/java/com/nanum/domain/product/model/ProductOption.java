@@ -74,4 +74,12 @@ public class ProductOption {
         this.extraPrice = extraPrice;
         this.stockQuantity = stockQuantity;
     }
+
+    /**
+     * 재고 수량을 업데이트합니다.
+     * @param stockQuantity 새로운 재고 수량
+     */
+    public void updateStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
 }

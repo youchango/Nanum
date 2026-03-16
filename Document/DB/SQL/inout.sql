@@ -31,7 +31,7 @@ CREATE TABLE inout_detail (
   option_name 		VARCHAR(200) DEFAULT NULL COMMENT '옵션명',
   brand_name 		VARCHAR(100) DEFAULT NULL COMMENT '브랜드명',
   qty 				INT(11) DEFAULT '0' COMMENT '입출고수량',
-  real_qty 			INT(11) DEFAULT '0' COMMENT '출고에따라 변동되는 입고수량 최초엔 입고수량과 동일하지만 출고할때마다 수량이 감소되는 구조 (IN의 모두 더하면 실제 수량)',
+  real_qty 			INT(11) DEFAULT '0' COMMENT '재고잔량',
   from_type 		CHAR(1) DEFAULT NULL COMMENT 'FROM (C:거래처, S:창고, L:라인)',
   location_type 	CHAR(1) DEFAULT NULL COMMENT 'TO (C:거래처, S:창고, L:라인)',
   to_type 			CHAR(1) DEFAULT NULL COMMENT 'TO (C:거래처, S:창고, L:라인)',

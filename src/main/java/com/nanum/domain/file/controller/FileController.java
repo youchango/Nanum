@@ -1,4 +1,4 @@
-package com.nanum.global.file.controller;
+package com.nanum.domain.file.controller;
 
 import com.nanum.domain.file.dto.FileResponseDTO;
 import com.nanum.domain.file.model.FileStore;
@@ -66,5 +66,32 @@ public class FileController implements ResponseSupport {
 
         fileService.setMainImage(fileId, referenceType, referenceId);
         return success();
+    }
+
+    /**
+     * 에디터 전용 업로드 API
+     * CKEditor / Tiptap 등의 에디터 규격에 맞는 JSON 응답을 반환합니다.
+     */
+    @PostMapping("/editor-upload")
+    @Operation(summary = "에디터 파일 업로드", description = "에디터 전용 파일 업로드 API입니다. DB에 EDITOR 타입으로 저장됩니다.")
+    public ResponseEntity<java.util.Map<String, Object>> editorUpload(
+            @RequestParam("upload") MultipartFile file) {
+        
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        try {
+            // 에디터 업로드는 ReferenceType.EDITOR, referenceId는 "EDITOR" (또는 세션 정보 등)로 저장
+            FileStore fileStore = fileService.uploadFile(file, ReferenceType.EDITOR, "EDITOR", false);
+            String fullUrl = fileService.getFullUrl(fileStore.getPath());
+
+            response.put("uploaded", true);
+            response.put("url", fullUrl);
+            response.put("fileId", fileStore.getFileId()); // 추후 관리를 위해 ID도 포함
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("uploaded", false);
+            response.put("error", java.util.Map.of("message", "파일 업로드에 실패했습니다. " + e.getMessage()));
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 }

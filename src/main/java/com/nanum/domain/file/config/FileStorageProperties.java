@@ -1,4 +1,4 @@
-package com.nanum.global.file;
+package com.nanum.domain.file.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "file.storage")
 public class FileStorageProperties {
     private String type = "local"; // local or remote
+    private String serverDomain = "http://localhost:8080";
     private Local local = new Local();
     private Remote remote = new Remote();
 

@@ -13,7 +13,8 @@ public enum ReferenceType {
     INQUIRY("문의"),
     REVIEW("리뷰"),
     SCM("SCM/사업자"),
-    BIZ("사업자등록증");
+    BIZ("사업자등록증"),
+    EDITOR("에디터");
 
     private final String description;
 }

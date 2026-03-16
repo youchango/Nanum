@@ -25,6 +25,7 @@ public class AdminProductListDTO {
     private String optionYn;
     private ProductStatus status;
     private String applyYn;
+    private String thumbnailUrl;
 
     // To check stock level logic
     @JsonProperty("options")

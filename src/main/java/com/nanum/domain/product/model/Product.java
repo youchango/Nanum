@@ -120,4 +120,12 @@ public class Product extends BaseEntity {
         this.description = description;
         this.applyYn = applyYn != null ? applyYn : "N";
     }
+
+    /**
+     * 재고 수량을 업데이트합니다.
+     * @param stockQuantity 새로운 재고 수량
+     */
+    public void updateStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
 }

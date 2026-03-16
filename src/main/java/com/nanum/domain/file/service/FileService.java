@@ -3,9 +3,9 @@ package com.nanum.domain.file.service;
 import com.nanum.domain.file.model.FileStore;
 import com.nanum.domain.file.model.ReferenceType;
 import com.nanum.domain.file.repository.FileStoreRepository;
+import com.nanum.domain.file.config.FileStorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,51 +26,34 @@ import java.util.UUID;
 public class FileService {
 
     private final FileStoreRepository fileStoreRepository;
+    private final FileStorageProperties fileStorageProperties;
 
-    @Value("${file.storage.local.path:./uploads}")
-    private String uploadDir;
-
-    @Value("${file.storage.type:LOCAL}")
-    private String storageType;
-
-    @Value("${file.storage.server-domain:http://localhost:8080}")
-    private String serverDomain;
-
+    /**
+     * 파일을 저장소에 업로드하고 DB에 메타데이터를 저장합니다.
+     */
     @Transactional
     public FileStore uploadFile(MultipartFile file, ReferenceType type, String refId, boolean isMain) {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
 
         try {
-            // 1. 디렉토리 생성
-            String datePath = java.time.LocalDate.now().toString(); // YYYY-MM-DD
-            Path uploadPath = Paths.get(uploadDir, type.name(), datePath);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            // 1. 저장 경로 생성 (ReferenceType/YYYY-MM-DD)
+            String datePath = java.time.LocalDate.now().toString();
+            String subPath = type.name() + "/" + datePath;
 
-            // 2. 파일 저장
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-            String ext = "";
-            if (originalFilename.lastIndexOf(".") > -1) {
-                ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-            }
-            String saveName = UUID.randomUUID().toString() + "." + ext;
-            Path filePath = uploadPath.resolve(saveName);
-            file.transferTo(filePath.toFile());
+            // 2. 물리적 저장 실행
+            String saveName = generateSaveName(file.getOriginalFilename());
+            String relativePath = saveToStorage(file, subPath, saveName);
 
-            // 3. DB 저장 (상대 경로로 저장: /ReferenceType/YYYY-MM-DD/filename)
-            // Windows 구분자(\)를 표준(/)으로 변경
-            String dbPath = "/" + type.name() + "/" + datePath + "/" + saveName;
-
+            // 3. DB 메타데이터 저장
             FileStore fileStore = FileStore.builder()
                     .referenceType(type)
                     .referenceId(refId)
-                    .orgName(originalFilename)
+                    .orgName(StringUtils.cleanPath(file.getOriginalFilename()))
                     .saveName(saveName)
-                    .path(dbPath) // DB에는 상대 경로만 저장
-                    .ext(ext)
+                    .path(relativePath)
+                    .ext(getFileExtension(file.getOriginalFilename()))
                     .size(file.getSize())
                     .isMain(isMain ? "Y" : "N")
                     .displayOrder(0)
@@ -78,47 +62,81 @@ public class FileService {
             return fileStoreRepository.save(fileStore);
 
         } catch (IOException e) {
-            log.error("파일 업로드 실패", e);
+            log.error("파일 업로드 실패: {}", e.getMessage());
             throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
     }
 
+    /**
+     * 저장소 설정에 따라 파일을 물리적으로 저장합니다.
+     */
+    private String saveToStorage(MultipartFile file, String subPath, String saveName) throws IOException {
+        String storageType = fileStorageProperties.getType();
+
+        if ("local".equalsIgnoreCase(storageType)) {
+            // 로컬 저장
+            String baseDir = fileStorageProperties.getLocal().getPath();
+            Path uploadPath = Paths.get(baseDir, subPath).toAbsolutePath().normalize();
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(saveName);
+            file.transferTo(filePath.toFile());
+
+            log.info("Local storage save success: {}", filePath);
+            return "/" + subPath + "/" + saveName;
+        } else if ("remote".equalsIgnoreCase(storageType) || "server".equalsIgnoreCase(storageType)) {
+            // 원격/서버 저장 (추후 구현 예정)
+            log.warn("Remote storage upload requested but not fully implemented. Host: {}",
+                    fileStorageProperties.getRemote().getHost());
+            throw new UnsupportedOperationException("원격 서버 저장소 기능은 준비 중입니다.");
+        } else {
+            throw new IllegalArgumentException("알 수 없는 저장소 타입입니다: " + storageType);
+        }
+    }
+
+    private String generateSaveName(String originalFilename) {
+        String ext = getFileExtension(originalFilename);
+        return UUID.randomUUID().toString() + (ext.isEmpty() ? "" : "." + ext);
+    }
+
+    private String getFileExtension(String filename) {
+        if (!StringUtils.hasText(filename))
+            return "";
+        int dotIndex = filename.lastIndexOf(".");
+        return dotIndex > -1 ? filename.substring(dotIndex + 1) : "";
+    }
+
     public List<FileStore> getFiles(ReferenceType type, String refId) {
-        List<FileStore> files = fileStoreRepository.findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(type,
-                refId);
-        // 조회 시 Full URL로 변환하여 반환 (DTO 변환 시 처리하거나 여기서 처리)
-        // FileStore 엔티티의 path는 DB값이므로, DTO 변환 시 Full URL을 조합하도록 유도하거나,
-        // 필요하다면 여기서 Transient 필드 등을 채울 수 있음.
-        // 현재는 FileStore 객체 그대로 반환하므로, 사용하는 쪽에서 getUrl() 등을 호출할 수 있게 하거나
-        // DTO 변환 로직에서 getFullUrl()을 사용해야 함.
-        return files;
+        return fileStoreRepository.findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(type, refId);
+    }
+
+    public List<FileStore> getFiles(ReferenceType type, List<String> refIds) {
+        if (refIds == null || refIds.isEmpty()) {
+            return List.of();
+        }
+        return fileStoreRepository.findByReferenceTypeAndReferenceIdIn(type, refIds);
     }
 
     /**
      * 파일의 전체 접근 URL을 생성합니다.
-     * 
-     * @param dbPath DB에 저장된 상대 경로
-     * @return 전체 접근 가능한 URL
      */
     public String getFullUrl(String dbPath) {
-        if (StringUtils.hasText(dbPath) && !dbPath.startsWith("http")) {
-            if ("SERVER".equalsIgnoreCase(storageType)) {
-                return serverDomain + dbPath;
-            } else {
-                // LOCAL: WebMvcConfig의 정적 자원 매핑 경로(/resources/upload)와 일치시킴
-                return serverDomain + "/resources/upload" + dbPath;
-            }
+        if (!StringUtils.hasText(dbPath) || dbPath.startsWith("http")) {
+            return dbPath;
         }
-        return dbPath;
+
+        String serverDomain = fileStorageProperties.getServerDomain();
+        if ("local".equalsIgnoreCase(fileStorageProperties.getType())) {
+            // 로컬인 경우 정적 리소스 매핑 경로(/resources/upload)를 추가
+            return serverDomain + "/resources/upload" + (dbPath.startsWith("/") ? dbPath : "/" + dbPath);
+        } else {
+            return serverDomain + (dbPath.startsWith("/") ? dbPath : "/" + dbPath);
+        }
     }
 
-    /**
-     * 특정 참조 대상의 대표(MAIN) 이미지만 조회합니다.
-     * 
-     * @param type 참조 타입 (예: PRODUCT)
-     * @param refId 참조 ID (예: 상품 식별자)
-     * @return 대표 이미지 정보 (없을 경우 null)
-     */
     public FileStore getMainFile(ReferenceType type, String refId) {
         return fileStoreRepository.findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(type, refId)
                 .stream()
@@ -127,13 +145,9 @@ public class FileService {
                 .orElse(null);
     }
 
-    /**
-     * Soft delete files by reference
-     */
     @Transactional
     public void deleteByReference(ReferenceType type, String refId, String memberCode) {
-        List<FileStore> files = fileStoreRepository.findByReferenceTypeAndReferenceIdOrderByDisplayOrderAsc(type,
-                refId);
+        List<FileStore> files = getFiles(type, refId);
         for (FileStore file : files) {
             file.delete(memberCode);
         }
@@ -144,14 +158,14 @@ public class FileService {
         FileStore fileStore = fileStoreRepository.findById(fileId)
                 .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
 
-        // 물리 파일 삭제
-        try {
-            // DB Path: /PRODUCT/2026-02-06/uuid.jpg
-            // Local Path: ./uploads + /PRODUCT/2026-02-06/uuid.jpg
-            Path filePath = Paths.get(uploadDir, fileStore.getPath());
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            log.warn("물리 파일 삭제 실패: {}", fileStore.getPath());
+        // 물리 파일 삭제 (로컬인 경우만 예시 구현)
+        if ("local".equalsIgnoreCase(fileStorageProperties.getType())) {
+            try {
+                Path filePath = Paths.get(fileStorageProperties.getLocal().getPath(), fileStore.getPath());
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                log.warn("물리 파일 삭제 실패: {}", fileStore.getPath());
+            }
         }
 
         fileStoreRepository.delete(fileStore);
@@ -165,6 +179,30 @@ public class FileService {
         List<FileStore> files = fileStoreRepository.findAllById(fileIds);
         for (FileStore file : files) {
             file.updateReference(type, refId);
+        }
+    }
+
+    /**
+     * 파일 참조 정보를 동기화합니다. (기존 파일 중 리스트에 없는 파일 삭제 포함)
+     */
+    @Transactional
+    public void syncFiles(List<String> newFileIds, ReferenceType type, String refId) {
+        // 1. 기존에 해당 참조로 등록된 파일 조회
+        List<FileStore> existingFiles = getFiles(type, refId);
+        
+        // 2. 삭제 대상 식별 (기존 파일 중 새 리스트에 없는 것)
+        List<FileStore> filesToDelete = existingFiles.stream()
+                .filter(ef -> newFileIds == null || !newFileIds.contains(ef.getFileId()))
+                .collect(Collectors.toList());
+        
+        // 3. 파일 삭제 수행
+        for (FileStore file : filesToDelete) {
+            deleteFile(file.getFileId());
+        }
+        
+        // 4. 신규 파일들 참조 업데이트
+        if (newFileIds != null && !newFileIds.isEmpty()) {
+            updateFileReference(newFileIds, type, refId);
         }
     }
 

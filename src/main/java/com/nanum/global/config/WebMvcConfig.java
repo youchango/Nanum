@@ -1,6 +1,6 @@
 package com.nanum.global.config;
 
-import com.nanum.global.file.FileStorageProperties;
+import com.nanum.domain.file.config.FileStorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;

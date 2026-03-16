@@ -51,6 +51,24 @@ public class AdminProductService {
 
                 List<AdminProductListDTO> productList = productRepository.findAdminProducts(searchDTO);
 
+                // 대표 이미지(MAIN) 일괄 조회 및 설정
+                if (!productList.isEmpty()) {
+                        List<String> productIds = productList.stream()
+                                        .map(p -> String.valueOf(p.getId()))
+                                        .collect(Collectors.toList());
+
+                        Map<String, String> mainImageMap = fileService.getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, productIds)
+                                        .stream()
+                                        .filter(f -> "Y".equals(f.getIsMain()))
+                                        .collect(Collectors.toMap(
+                                                        com.nanum.domain.file.model.FileStore::getReferenceId,
+                                                        f -> fileService.getFullUrl(f.getPath()),
+                                                        (existing, replacement) -> existing // 중복 시 기존값 유지
+                                        ));
+
+                        productList.forEach(p -> p.setThumbnailUrl(mainImageMap.get(String.valueOf(p.getId()))));
+                }
+
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("productList", productList);
                 responseData.put("totalCount", totalCount);
@@ -74,8 +92,8 @@ public class AdminProductService {
                 List<ProductDTO.Image> images = files.stream()
                                 .map(f -> ProductDTO.Image.builder()
                                                 .fileId(f.getFileId())
-                                                .imageUrl(f.getPath())
-                                                .type(f.getReferenceType())
+                                                .imageUrl(fileService.getFullUrl(f.getPath()))
+                                                .type("Y".equals(f.getIsMain()) ? "MAIN" : "DETAIL")
                                                 .displayOrder(f.getDisplayOrder())
                                                 .build())
                                 .collect(Collectors.toList());
@@ -153,7 +171,6 @@ public class AdminProductService {
                                                         .build())
                                         .collect(Collectors.toList());
                         product.getOptions().addAll(options);
-                        productOptionRepository.saveAll(options);
                 }
 
                 productRepository.save(product);
@@ -267,20 +284,21 @@ public class AdminProductService {
         }
 
         private void processFiles(List<ProductDTO.Image> images, Long productId) {
-                if (images == null || images.isEmpty())
-                        return;
-
-                List<String> fileIds = images.stream()
+                List<String> fileIds = images != null ? images.stream()
                                 .map(ProductDTO.Image::getFileId)
                                 .filter(id -> id != null && !id.isEmpty())
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toList()) : new ArrayList<>();
 
                 com.nanum.domain.file.model.ReferenceType type = com.nanum.domain.file.model.ReferenceType.PRODUCT;
-                fileService.updateFileReference(fileIds, type, String.valueOf(productId));
+                
+                // syncFiles 호출로 기존 파일 중 제외된 파일들은 실제 삭제 처리
+                fileService.syncFiles(fileIds, type, String.valueOf(productId));
 
-                for (ProductDTO.Image img : images) {
-                        if (img.getFileId() != null && "MAIN".equals(img.getType())) {
-                                fileService.setMainImage(img.getFileId(), type, String.valueOf(productId));
+                if (images != null) {
+                        for (ProductDTO.Image img : images) {
+                                if (img.getFileId() != null && "MAIN".equals(img.getType())) {
+                                        fileService.setMainImage(img.getFileId(), type, String.valueOf(productId));
+                                }
                         }
                 }
         }

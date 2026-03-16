@@ -60,6 +60,7 @@
     - [x] 상품 수정 및 상태 변경 (판매중/품절/중지)
     - [x] 상품 삭제 (무결성 보장)
     - [x] 상품 및 옵션 연결 무결성 강화 및 추가금액 컬럼 로직 동기화 (`a_extra_price` 등)
+    - [x] **상품 등록 시 `TransientPropertyValueException` 백엔드 오류 수정 (JPA Cascade 순서 최적화)**
     - [x] 상품 목록 페이징(0-based Offset) 연동 버그 수정 및 상태 변경 UI 재배치
     - [x] 상품 API 페이징 파라미터 컨벤션 마이그레이션 (SearchDTO 기반 1-based Pagination 완벽 호환)
     - [x] **상품 검색 및 필터링 통합 (SearchDTO 기반 카테고리/키워드 검색 구현 완료)**
@@ -87,7 +88,17 @@
   - [x] `CartController` 구현 (409 Conflict 처리)
 - [ ] **주문 (Order)**
 - [ ] 결제 시스템 연동 (PG/가상계좌)
-- [ ] 입출고 및 재고 동기화
+- [x] **입출고 및 재고 동기화 시스템 (완료)**
+  - [x] 입고 관리 (입고 등록, 실재고 연동, 정산 로직)
+  - [x] 출고 관리 (출고 등록, 선입선출 지원, 가용 재고 검증)
+  - [x] 상품 목록 및 상세 조회 API
+  - [x] 상품 목록 및 수정 페이지 내 이미지 노출 기능 개선
+  - [x] 상품 등록/수정 (기본 정보, 카테고리, 옵션, 이미지 연동)
+  - [x] **파일 업로드 통합 및 상품 이미지 동기화 로직 개선 (자동 삭제 포함)**
+  - [x] 입출고 현황 및 상세 조회 API/UI
+  - [x] 입출고 관리 모듈 구조 리팩토링 (Controller/Service/Repository/DTO를 Admin 영역으로 분리)
+  - [x] **InoutController API 응답 표준화(ApiResponse) 및 Swagger-UI 문서화 적용**
+  - [x] 실재고(ProductStock)와 전시재고(Product/Option) 간 자동 동기화
 
 ### 6. 관리자 시스템 (Admin Back-Office)
 - [x] 관리자 인증 (로그인/토큰 갱신)

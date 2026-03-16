@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/resources/**", "/WEB-INF/**").permitAll()
                         .requestMatchers("/", "/login", "/admin/login", "/biz/login", "/signup").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll() // Allow Auth API
+                        .requestMatchers("/api/v1/files/editor-upload").authenticated() // 에디터 업로드는 모든 회원 허용
                         .requestMatchers("/api/v1/admin/auth/**").permitAll() // Allow Admin Auth API
                         .requestMatchers("/api/v1/members/check-id").permitAll() // Allow ID Check API
                         .requestMatchers("/api/v1/categories/**", "/api/v1/products/**").permitAll() // Allow User
