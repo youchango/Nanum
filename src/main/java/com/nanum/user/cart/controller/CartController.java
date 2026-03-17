@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ public class CartController {
     @Operation(summary = "장바구니 상품 추가", description = "현재 로그인한 사용자의 장바구니에 특정 상품(CartDTO.AddRequest)을 추가합니다. 이미 존재하는 상품일 경우 예외가 발생합니다.")
     @PostMapping
     public ResponseEntity<ApiResponse<Long>> addToCart(
-            @RequestBody CartDTO.AddRequest request,
+            @Valid @RequestBody CartDTO.AddRequest request,
             Principal principal) {
         Long cartId = cartService.addToCart(principal.getName(), request);
         return ResponseEntity.ok(ApiResponse.success("장바구니에 상품이 담겼습니다.", cartId));
@@ -34,17 +35,15 @@ public class CartController {
     @Operation(summary = "장바구니 목록 조회", description = "현재 로그인한 사용자의 장바구니 리스트를 옵션 및 권한별 계산된 가격 형식으로 반환합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<java.util.List<CartDTO.Response>>> getCartList(Principal principal) {
-        // 회원 권한은 Service에서 내부 조회 또는 Authentication 객체 사용 시 principal을 통해 추출
-        // 임의 편의상 서비스단 조회 후 로직 처리로 연계
         return ResponseEntity.ok(ApiResponse.success("장바구니 목록 조회 성공",
-                cartService.getCartList(principal.getName(), null))); // Service에서 auth 연동 후 Role 조회하도록 추후 보강
+                cartService.getCartList(principal.getName())));
     }
 
     @Operation(summary = "장바구니 수량 변경", description = "특정 장바구니 항목의 수량을 업데이트합니다.")
     @PutMapping("/{cartId}")
     public ResponseEntity<ApiResponse<Void>> updateCartQuantity(
             @PathVariable("cartId") Long cartId,
-            @RequestBody CartDTO.Request request,
+            @Valid @RequestBody CartDTO.Request request,
             Principal principal) {
         cartService.updateCartQuantity(cartId, request.getQuantity(), principal.getName());
         return ResponseEntity.ok(ApiResponse.success("수량이 변경되었습니다.", null));

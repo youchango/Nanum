@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    Optional<Cart> findByMemberMemberCodeAndProduct_IdAndOptionId(String memberCode, Long productId, Long optionId);
+    Optional<Cart> findByMemberMemberCodeAndProduct_IdAndOptionIdAndDeleteYn(String memberCode, Long productId, Long optionId, String deleteYn);
 
     /**
      * 로그인한 사용자의 장바구니 목록과 상품, 옵션, 사이트 가격, 썸네일 등을 단일 쿼리로 함께 조회합니다.
@@ -28,5 +28,5 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             "ORDER BY c.cartId DESC")
     List<Cart> findCartListWithDetailsByMemberCode(@Param("memberCode") String memberCode);
 
-    List<Cart> findByCartIdInAndMemberMemberCode(List<Long> cartIds, String memberCode);
+    List<Cart> findByCartIdInAndMemberMemberCodeAndDeleteYn(List<Long> cartIds, String memberCode, String deleteYn);
 }
