@@ -29,5 +29,6 @@ public class InboundRequest {
         private String optionName;
         private String brandName;
         private Integer qty;
+        private String memo;
     }
 }

@@ -14,4 +14,6 @@ public class InoutSearchDTO extends SearchDTO {
     private String searchKeyword;
     private String ioType; // 입출고구분(IN/OUT)
     private String ioCategory; // 입출고 카테고리 (일반입고, 생산입고, 반품입고, 일반출고, 생산출고, 주문출고, 폐기출고)
+    private Long productId;
+    private Long optionId;
 }

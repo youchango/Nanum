@@ -44,4 +44,17 @@ public class ProductCategory {
     @Builder.Default
     private List<ProductCategory> children = new ArrayList<>();
 
+    /**
+     * 상위 카테고리부터 현재 카테고리까지의 전체 경로를 반환합니다.
+     * 예: "전자가전 > 컴퓨터 > 노트북"
+     * 
+     * @return 카테고리 전체 경로 문자열
+     */
+    public String getFullPath() {
+        if (this.parent == null) {
+            return this.categoryName;
+        }
+        return this.parent.getFullPath() + " > " + this.categoryName;
+    }
+
 }

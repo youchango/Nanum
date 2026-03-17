@@ -1,6 +1,7 @@
 package com.nanum.domain.product.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,12 +27,15 @@ public class ProductSiteBulkCreateDTO {
         private String siteCd;
 
         @Schema(description = "기업회원가(A)")
+        @JsonProperty("aPrice")
         private BigDecimal aPrice;
 
         @Schema(description = "일반회원가(B)")
+        @JsonProperty("bPrice")
         private BigDecimal bPrice;
 
         @Schema(description = "보훈회원가(C)")
+        @JsonProperty("cPrice")
         private BigDecimal cPrice;
     }
 }

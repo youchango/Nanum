@@ -10,7 +10,9 @@ import com.nanum.domain.product.model.QProductOption;
 import com.nanum.domain.product.model.QProductStock;
 import com.nanum.admin.inout.repository.InoutDetailRepository;
 import com.nanum.admin.inout.repository.InoutRepository;
+import com.nanum.admin.manager.entity.QManager;
 import com.nanum.admin.manager.entity.QManagerScm;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.nanum.domain.product.model.Product;
 import com.nanum.domain.product.model.ProductOption;
 import com.nanum.domain.product.model.ProductStock;
@@ -27,6 +29,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.service.CustomManagerDetails;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,13 +59,14 @@ public class AdminInoutService {
     @Transactional
     public String registerInbound(InboundRequest request) {
         String ioCode = generateIoCode();
+        Manager manager = getCurrentManager();
 
         InoutMaster master = InoutMaster.builder()
                 .ioCode(ioCode)
                 .ioType("IN")
                 .ioCategory(request.getIoCategory())
                 .ioDate(LocalDateTime.now())
-                .managerCode(request.getManagerCode())
+                .managerCode(manager.getManagerCode())
                 .build();
         inoutRepository.save(master);
 
@@ -77,6 +83,7 @@ public class AdminInoutService {
                     .brandName(item.getBrandName())
                     .qty(item.getQty())
                     .realQty(item.getQty())
+                    .memo(item.getMemo())
                     .build();
             inoutDetailRepository.save(detail);
 
@@ -93,13 +100,14 @@ public class AdminInoutService {
     @Transactional
     public String registerOutbound(OutboundRequest request) {
         String ioCode = generateIoCode();
+        Manager manager = getCurrentManager();
 
         InoutMaster master = InoutMaster.builder()
                 .ioCode(ioCode)
                 .ioType("OUT")
                 .ioCategory(request.getIoCategory())
                 .ioDate(LocalDateTime.now())
-                .managerCode(request.getManagerCode())
+                .managerCode(manager.getManagerCode())
                 .build();
         inoutRepository.save(master);
 
@@ -144,6 +152,7 @@ public class AdminInoutService {
         QInoutDetail detail = QInoutDetail.inoutDetail;
         QInoutMaster master = QInoutMaster.inoutMaster;
         QManagerScm scm = QManagerScm.managerScm;
+        QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(detail.ioType.eq(searchDTO.getIoType()));
@@ -163,6 +172,17 @@ public class AdminInoutService {
             }
         }
 
+        if (searchDTO.getProductId() != null) {
+            builder.and(detail.productId.eq(searchDTO.getProductId()));
+        }
+
+        if (searchDTO.getOptionId() != null) {
+            builder.and(detail.optionId.eq(searchDTO.getOptionId()));
+        } else if (searchDTO.getProductId() != null) {
+            // 옵션 ID가 없고 상품 ID만 있는 경우, 해당 상품의 단품 내역(optionId is null)만 조회할지 여부 결정
+            // 여기서는 사용자의 요구사항에 따라 옵션 상품이 아닌 경우 productId만 같은 것을 조회하므로 추가 조건 없음
+        }
+
         List<InoutDetailResponse> list = queryFactory
                 .select(Projections.fields(InoutDetailResponse.class,
                         detail.ioCode,
@@ -170,6 +190,10 @@ public class AdminInoutService {
                         detail.ioType,
                         master.ioCategory,
                         scm.supplierName,
+                        new CaseBuilder()
+                                .when(scm.supplierName.isNull().or(scm.supplierName.eq("")))
+                                .then(manager.managerName)
+                                .otherwise(scm.supplierName).as("supplierName"),
                         detail.productName,
                         detail.optionName,
                         detail.brandName,
@@ -182,6 +206,7 @@ public class AdminInoutService {
                 .from(detail)
                 .join(master).on(detail.ioCode.eq(master.ioCode))
                 .leftJoin(scm).on(master.managerCode.eq(scm.managerCode))
+                .leftJoin(manager).on(master.managerCode.eq(manager.managerCode))
                 .where(builder)
                 .orderBy(detail.createdAt.desc())
                 .offset(searchDTO.getOffset())
@@ -211,6 +236,7 @@ public class AdminInoutService {
         QInoutMaster master = QInoutMaster.inoutMaster;
         QInoutDetail detail = QInoutDetail.inoutDetail;
         QManagerScm scm = QManagerScm.managerScm;
+        QManager manager = QManager.manager;
 
         BooleanBuilder builder = new BooleanBuilder();
         if (searchDTO.getIoType() != null && !searchDTO.getIoType().isEmpty()) {
@@ -236,16 +262,20 @@ public class AdminInoutService {
         // 여기서는 Master 기준으로 리스트를 가져오고 첫 번째 상세 품목을 대표로 표시하도록 구현
         List<InoutStatusResponse> list = queryFactory
                 .select(Projections.fields(InoutStatusResponse.class,
-                        master.ioCode,
-                        master.ioType,
-                        master.ioCategory,
-                        detail.brandName,
-                        detail.productName,
-                        scm.supplierName,
-                        master.createdAt))
+                        master.ioCode.as("ioCode"),
+                        master.ioType.as("ioType"),
+                        master.ioCategory.as("ioCategory"),
+                        detail.brandName.as("brandName"),
+                        detail.productName.as("productName"),
+                        new CaseBuilder()
+                                .when(scm.supplierName.isNull().or(scm.supplierName.eq("")))
+                                .then(manager.managerName)
+                                .otherwise(scm.supplierName).as("supplierName"),
+                        master.createdAt.as("createdAt")))
                 .from(master)
                 .leftJoin(detail).on(master.ioCode.eq(detail.ioCode).and(detail.no.eq(1)))
                 .leftJoin(scm).on(master.managerCode.eq(scm.managerCode))
+                .leftJoin(manager).on(master.managerCode.eq(manager.managerCode))
                 .where(builder)
                 .orderBy(master.createdAt.desc())
                 .offset(searchDTO.getOffset())
@@ -269,20 +299,28 @@ public class AdminInoutService {
         QInoutDetail detail = QInoutDetail.inoutDetail;
         QManagerScm scm = QManagerScm.managerScm;
         QInoutMaster master = QInoutMaster.inoutMaster;
+        QManager manager = QManager.manager;
 
         return queryFactory
                 .select(Projections.fields(InoutDetailResponse.class,
-                        detail.ioCode,
-                        detail.no,
-                        detail.ioType,
-                        detail.productName,
-                        detail.brandName,
-                        detail.qty,
-                        scm.supplierName,
-                        detail.createdAt))
+                        detail.ioCode.as("ioCode"),
+                        detail.no.as("no"),
+                        detail.ioType.as("ioType"),
+                        master.ioCategory.as("ioCategory"),
+                        detail.productName.as("productName"),
+                        detail.optionName.as("optionName"),
+                        detail.brandName.as("brandName"),
+                        detail.qty.as("qty"),
+                        new CaseBuilder()
+                                .when(scm.supplierName.isNull().or(scm.supplierName.eq("")))
+                                .then(manager.managerName)
+                                .otherwise(scm.supplierName).as("supplierName"),
+                        detail.memo.as("memo"),
+                        detail.createdAt.as("createdAt")))
                 .from(detail)
                 .join(master).on(detail.ioCode.eq(master.ioCode))
                 .leftJoin(scm).on(master.managerCode.eq(scm.managerCode))
+                .leftJoin(manager).on(master.managerCode.eq(manager.managerCode))
                 .where(detail.ioCode.eq(ioCode))
                 .orderBy(detail.no.asc())
                 .fetch();
@@ -426,7 +464,7 @@ public class AdminInoutService {
                     nextId = Integer.parseInt(lastCode.substring(2)) + 1;
                 }
             } catch (Exception e) {
-                log.warn("Failed to parse last ioCode: {}", lastCode);
+                log.warn("마지막 입출고 코드 분석 실패: {}", lastCode);
             }
         }
         return String.format("IO%08d", nextId);
@@ -443,17 +481,27 @@ public class AdminInoutService {
         }
 
         final ProductOption finalOption = option;
-        // product_stock 업데이트
-        ProductStock stock = productStockRepository.findByProductAndOption(product, finalOption)
-                .orElseGet(() -> {
-                    ProductStock newStock = ProductStock.builder()
-                            .product(product)
-                            .option(finalOption)
-                            .stockQuantity(0)
-                            .createdAt(LocalDateTime.now())
-                            .build();
-                    return productStockRepository.save(newStock);
-                });
+        // product_stock 업데이트 (중복 데이터가 있을 수 있으므로 리스트로 조회 후 첫 번째 것 사용)
+        List<ProductStock> stockList = productStockRepository.findByProduct(product).stream()
+                .filter(s -> (finalOption == null && s.getOption() == null) || 
+                             (finalOption != null && s.getOption() != null && s.getOption().getId().equals(finalOption.getId())))
+                .collect(java.util.stream.Collectors.toList());
+
+        ProductStock stock;
+        if (stockList.isEmpty()) {
+            stock = ProductStock.builder()
+                    .product(product)
+                    .option(finalOption)
+                    .stockQuantity(0)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            productStockRepository.save(stock);
+        } else {
+            stock = stockList.get(0);
+            if (stockList.size() > 1) {
+                log.warn("상품 {} 옵션 {}에 대해 여러 개의 재고 데이터가 발견되었습니다. 첫 번째 데이터를 사용합니다.", productId, optionId);
+            }
+        }
 
         if ("IN".equals(type)) {
             stock.increaseStock(qty);
@@ -477,5 +525,13 @@ public class AdminInoutService {
             product.updateStockQuantity(stock.getStockQuantity());
             productRepository.save(product);
         }
+    }
+
+    private Manager getCurrentManager() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomManagerDetails) {
+            return ((CustomManagerDetails) principal).getManager();
+        }
+        throw new IllegalStateException("인증된 관리자 정보가 없습니다.");
     }
 }

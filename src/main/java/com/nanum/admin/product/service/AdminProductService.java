@@ -16,7 +16,7 @@ import com.nanum.domain.product.repository.ProductSiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
@@ -57,7 +57,8 @@ public class AdminProductService {
                                         .map(p -> String.valueOf(p.getId()))
                                         .collect(Collectors.toList());
 
-                        Map<String, String> mainImageMap = fileService.getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, productIds)
+                        Map<String, String> mainImageMap = fileService
+                                        .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, productIds)
                                         .stream()
                                         .filter(f -> "Y".equals(f.getIsMain()))
                                         .collect(Collectors.toMap(
@@ -289,7 +290,7 @@ public class AdminProductService {
                                 .collect(Collectors.toList()) : new ArrayList<>();
 
                 com.nanum.domain.file.model.ReferenceType type = com.nanum.domain.file.model.ReferenceType.PRODUCT;
-                
+
                 // syncFiles 호출로 기존 파일 중 제외된 파일들은 실제 삭제 처리
                 fileService.syncFiles(fileIds, type, String.valueOf(productId));
 
@@ -379,9 +380,10 @@ public class AdminProductService {
                         ProductSite newSite = ProductSite.builder()
                                         .product(product)
                                         .siteCd(siteCd)
-                                        .aPrice(siteReq.getAPrice())
-                                        .bPrice(siteReq.getBPrice())
-                                        .cPrice(siteReq.getCPrice())
+                                        .aPrice(siteReq.getAPrice() != null ? siteReq.getAPrice() : BigDecimal.ZERO)
+                                        .bPrice(siteReq.getBPrice() != null ? siteReq.getBPrice() : BigDecimal.ZERO)
+                                        .cPrice(siteReq.getCPrice() != null ? siteReq.getCPrice() : BigDecimal.ZERO)
+                                        .pdtClick(0)
                                         .viewYn("Y") // 일괄 등록 시 기본 노출 처리
                                         .build();
 

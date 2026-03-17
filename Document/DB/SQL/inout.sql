@@ -8,9 +8,9 @@ CREATE TABLE inout_master (
   manager_code		VARCHAR(30) DEFAULT NULL COMMENT '관리자코드(MGR+6자리)',
 
   created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-  created_by 		INT NULL COMMENT '생성자',
+  created_by 		VARCHAR(50) NULL COMMENT '생성자',
   updated_at 		DATETIME NULL COMMENT '수정일',
-  updated_by 		INT NULL COMMENT '수정자',
+  updated_by 		VARCHAR(50) NULL COMMENT '수정자',
   deleted_at 		DATETIME NULL COMMENT '삭제일',
   deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
   delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
@@ -47,9 +47,9 @@ CREATE TABLE inout_detail (
   memo 				VARCHAR(200) DEFAULT NULL COMMENT '메모',
 
   created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-  created_by 		INT NULL COMMENT '생성자',
+  created_by 		VARCHAR(50) NULL COMMENT '생성자',
   updated_at 		DATETIME NULL COMMENT '수정일',
-  updated_by 		INT NULL COMMENT '수정자',
+  updated_by 		VARCHAR(50) NULL COMMENT '수정자',
   deleted_at 		DATETIME NULL COMMENT '삭제일',
   deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
   delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
