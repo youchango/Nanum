@@ -209,7 +209,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private BooleanExpression searchKeyword(String searchType, String keyword) {
         if (!StringUtils.hasText(keyword))
             return null;
-        if ("NAME".equals(searchType)) {
+        if ("NAME".equals(searchType) || searchType == null) {
             return product.name.contains(keyword);
         }
         return null;

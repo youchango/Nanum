@@ -71,8 +71,10 @@ public class Member {
     @Column(name = "memo", length = 2000)
     private String memo; // 관리자 메모
 
-    @Column(name = "withdraw_yn", insertable = false)
-    private String withdrawYn; // 탈퇴 여부 (Y/N) - DB default 'N' case
+    @Column(name = "withdraw_yn", nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String withdrawYn = "N"; // 탈퇴 여부 (Y/N)
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt; // 가입일

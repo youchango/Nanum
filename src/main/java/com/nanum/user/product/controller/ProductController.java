@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.nanum.global.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -130,19 +132,11 @@ public class ProductController implements ResponseSupport {
         return ok();
     }
 
-    // Helper
     private String getCurrentMemberCode() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // CustomUserDetails 사용 패키지에 맞추어 임시 변환
-        try {
-            java.lang.reflect.Method getMemberCode = principal.getClass().getMethod("getMemberCode");
-            return (String) getMemberCode.invoke(principal);
-        } catch (Exception e) {
-            // If getMemberCode fails, maybe it's UserDetails.getUsername() or similar
-            if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-                return ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-            }
-            return null; // 인증되지 않은 사용자
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails)) {
+            return null;
         }
+        return ((CustomUserDetails) auth.getPrincipal()).getMember().getMemberCode();
     }
 }

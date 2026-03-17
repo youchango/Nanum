@@ -11,8 +11,12 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,8 +48,23 @@ public class AuthController implements ResponseSupport {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenDto>> login(@RequestBody LoginRequest loginRequest,
             HttpServletResponse response) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPassword()));
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPassword()));
+        } catch (DisabledException e) {
+            return ResponseEntity.status(403)
+                    .body(ApiResponse.error("승인 대기 중인 계정입니다. 관리자 승인 후 로그인할 수 있습니다."));
+        } catch (LockedException e) {
+            return ResponseEntity.status(403)
+                    .body(ApiResponse.error("잠긴 계정입니다. 관리자에게 문의하세요."));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error("아이디 또는 비밀번호가 올바르지 않습니다."));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error("로그인에 실패했습니다."));
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
