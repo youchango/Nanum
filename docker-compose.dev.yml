@@ -2,7 +2,7 @@ services:
   app:
     build: .
     ports:
-      - "8090:8080"
+      - "8090:9013"
     depends_on:
       - db
     environment:
@@ -13,14 +13,12 @@ services:
   db:
     image: mariadb:10.6
     environment:
-      MYSQL_ROOT_password: ttcc1234
-      MYSQL_DATABASE: db_nanum
+      MARIADB_ROOT_PASSWORD: ttcc1234
+      MARIADB_DATABASE: db_nanum
     ports:
       - "33306:3306"
 
 
     volumes:
       - ./Local/DB:/var/lib/mysql
-      - ./Document/DB/SQL:/app/sql
-      - ./docker-init.sh:/docker-entrypoint-initdb.d/init.sh
 
