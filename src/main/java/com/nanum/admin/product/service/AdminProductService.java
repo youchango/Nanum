@@ -242,12 +242,11 @@ public class AdminProductService {
                                                         .filter(opt -> opt.getId().equals(reqOpt.getOptionId()))
                                                         .findFirst()
                                                         .ifPresent(opt -> {
-                                                                opt.update(
+                                                                opt.updateBasicInfo(
                                                                                 reqOpt.getTitle1(), reqOpt.getName1(),
                                                                                 reqOpt.getTitle2(), reqOpt.getName2(),
                                                                                 reqOpt.getTitle3(), reqOpt.getName3(),
-                                                                                reqOpt.getExtraPrice(),
-                                                                                reqOpt.getStockQuantity());
+                                                                                reqOpt.getExtraPrice());
                                                         });
                                 } else {
                                         ProductOption newOpt = ProductOption.builder()

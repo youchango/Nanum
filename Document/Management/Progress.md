@@ -73,7 +73,7 @@
     - [x] `JOIN FETCH` 및 `IN` 절 쿼리 방식 튜닝을 통해 N+1 성능 현안 해결
     - [x] `sale_price` 필드를 완전 퇴출하고 Cart와 동일한 구조의 권한별 다중 가격 계산 로직(`unitPrice`, `retailPrice`) 이식 완료
 - [ ] 일반/기업 전용 상품 등록 및 노출 제어 (Site Code 적용 완료)
-- [ ] 상품 옵션 및 재고 관리 시스템
+- [x] 상품 옵션 및 재고 관리 시스템 (단품 재고 조회 기능 추가)
 - [ ] **상품 리뷰 및 평가 (Product Review & Like)**
     - [ ] DB 스키마 (`product_review`, `product_review_like`) 구축 완료
     - [ ] 사용자(User) - 상품 리뷰 및 별점 등록/수정/논리삭제(Soft Delete) 기능 구현
