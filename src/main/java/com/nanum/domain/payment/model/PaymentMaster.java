@@ -101,6 +101,9 @@ public class PaymentMaster extends BaseEntity {
     @ColumnDefault("0")
     private BigDecimal cancelDeliveryPrice;
 
+    @Column(name = "payment_key", length = 200)
+    private String paymentKey;
+
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 

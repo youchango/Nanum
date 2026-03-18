@@ -20,6 +20,7 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "order_detail_id")
     private Long id;
 
+    @Setter
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
@@ -103,5 +104,10 @@ public class OrderDetail extends BaseEntity {
 
     @Column(name = "pickup_date_end")
     private LocalDateTime pickupDateEnd;
+
+    @Setter
+    @Builder.Default
+    @Column(name = "review_yn", nullable = false, length = 1)
+    private String reviewYn = "N";
 
 }
