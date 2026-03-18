@@ -271,6 +271,7 @@ CREATE TABLE file_store (
 -- Source: banner.sql
 CREATE TABLE banner (
     banner_id      INT AUTO_INCREMENT COMMENT '배너코드',
+    title          VARCHAR(100) NOT NULL COMMENT '배너제목',
     site_cd        VARCHAR(20) NULL COMMENT '사이트코드',
     banner_type    VARCHAR(20) NOT NULL COMMENT '배너구분 (MAIN_TOP, SUB_MID)',
     link_type      VARCHAR(20) NULL COMMENT '링크 타입',

@@ -22,15 +22,15 @@ public class AdminBannerController {
 
     @GetMapping
     @Operation(summary = "배너 목록 조회", description = "데이터베이스의 banner 테이블에서 현재 등록된 모든 배너 목록을 조회하여 반환합니다.")
-    public ApiResponse<List<BannerDTO.Response>> getBanners() {
-        return ApiResponse.success(adminBannerService.getBanners());
+    public ApiResponse<List<BannerDTO.Response>> getBanners(@RequestParam(required = false) String siteCd) {
+        return ApiResponse.success(adminBannerService.getBanners(siteCd));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "배너 등록", description = "배너 정보(BannerDTO.Request)와 이미지 파일들을 전달받아 데이터베이스에 신규 배너를 등록합니다.")
     public ApiResponse<Long> createBanner(
-            @RequestPart(value = "request") BannerDTO.Request request,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+            @ModelAttribute BannerDTO.Request request,
+            @RequestParam(value = "imageFile", required = false) List<MultipartFile> files) {
         return ApiResponse.success(adminBannerService.createBanner(request, files));
     }
 
@@ -38,8 +38,8 @@ public class AdminBannerController {
     @Operation(summary = "배너 수정", description = "특정 배너 ID를 식별자로 하여, 전달받은 수정 요청 데이터와 파일로 기존 배너 정보를 업데이트합니다.")
     public ApiResponse<Void> updateBanner(
             @PathVariable Long id,
-            @RequestPart(value = "request") BannerDTO.Request request,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+            @ModelAttribute BannerDTO.Request request,
+            @RequestParam(value = "imageFile", required = false) List<MultipartFile> files) {
         adminBannerService.updateBanner(id, request, files);
         return ApiResponse.success(null);
     }

@@ -45,7 +45,7 @@
     - [x] 클레임 관리 (Claim)
     - [x] 공지사항 관리 (Content)
     - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
-    - [x] 배너 및 팝업 관리 (Banner, Popup)
+    - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너 SiteTab 및 권한별 사이트 자동 할당 로직 적용 완료
     - [x] 관리자 로그인 및 권한 관리 (Back-end)
 - **Biz (기업회원)**
     - [x] 기업 정보 등록 및 가입 프로세스 고도화 (member_biz 연동 및 스키마 정규화 완료)

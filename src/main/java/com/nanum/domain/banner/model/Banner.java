@@ -22,6 +22,9 @@ public class Banner extends BaseEntity {
     @Column(name = "banner_id")
     private Long id;
 
+    @Column(name = "title", length = 100)
+    private String title;
+
     @Column(name = "site_cd", length = 20)
     private String siteCd;
 
@@ -53,8 +56,9 @@ public class Banner extends BaseEntity {
     @Builder.Default
     private String useYn = "Y";
 
-    public void update(String siteCd, BannerType type, String linkUrl, int sortOrder, String useYn,
+    public void update(String title, String siteCd, BannerType type, String linkUrl, int sortOrder, String useYn,
             LocalDateTime start, LocalDateTime end) {
+        this.title = title;
         this.siteCd = siteCd;
         this.type = type;
         this.linkUrl = linkUrl;

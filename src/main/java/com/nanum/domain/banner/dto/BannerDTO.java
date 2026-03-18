@@ -17,6 +17,7 @@ public class BannerDTO {
     @AllArgsConstructor
     @Builder
     public static class Request {
+        private String title;
         private BannerType type;
         private String siteCd;
         private String linkUrl;
@@ -34,6 +35,7 @@ public class BannerDTO {
     @Builder
     public static class Response {
         private Long id;
+        private String title;
         private String siteCd;
         private BannerType type;
         private String linkUrl;
@@ -47,6 +49,7 @@ public class BannerDTO {
         public static Response from(Banner banner) {
             return Response.builder()
                     .id(banner.getId())
+                    .title(banner.getTitle())
                     .siteCd(banner.getSiteCd())
                     .type(banner.getType())
                     .linkUrl(banner.getLinkUrl())
