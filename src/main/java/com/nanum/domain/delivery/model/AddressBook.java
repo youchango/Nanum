@@ -53,4 +53,19 @@ public class AddressBook {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public void update(String addressName, String receiverName, String receiverPhone,
+                       String zipcode, String address, String addressDetail, String isDefault) {
+        this.addressName = addressName;
+        this.receiverName = receiverName;
+        this.receiverPhone = receiverPhone;
+        this.zipcode = zipcode;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.isDefault = isDefault;
+    }
+
+    public void setDefaultAddress(String isDefault) {
+        this.isDefault = isDefault;
+    }
 }

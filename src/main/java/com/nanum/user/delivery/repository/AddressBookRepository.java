@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface AddressBookRepository extends JpaRepository<AddressBook, Long> {
     List<AddressBook> findAllByMemberCode(String memberCode);
+    List<AddressBook> findByMemberCodeOrderByIsDefaultDescCreatedAtDesc(String memberCode);
+    List<AddressBook> findByMemberCodeAndIsDefault(String memberCode, String isDefault);
 }
