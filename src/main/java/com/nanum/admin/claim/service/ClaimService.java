@@ -1,14 +1,14 @@
 package com.nanum.admin.claim.service;
 
-import com.nanum.admin.claim.entity.Claim;
-import com.nanum.admin.claim.repository.ClaimRepository;
+import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.repository.ClaimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
+@Service("adminClaimService")
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ClaimService {
@@ -28,8 +28,7 @@ public class ClaimService {
     public Claim updateClaimStatus(Long claimId, String status, String managerCode) {
         Claim claim = getClaim(claimId);
         claim.setClaimStatus(status);
-        claim.setClaimCheckCd(managerCode);
-        claim.setClaimDateCheck(java.time.LocalDateTime.now());
+        claim.setReviewedAt(java.time.LocalDateTime.now());
         return claim;
     }
 }
