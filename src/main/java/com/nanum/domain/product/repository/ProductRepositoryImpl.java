@@ -3,6 +3,7 @@ package com.nanum.domain.product.repository;
 import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,7 +20,7 @@ import com.nanum.domain.product.model.Product;
 import com.nanum.global.common.dto.SearchDTO;
 import com.nanum.domain.product.dto.ProductSitePriceDTO;
 import com.nanum.domain.product.model.QProductOption;
-
+import com.nanum.domain.product.model.ProductCategory;
 import com.nanum.domain.product.model.QProductSite;
 
 import static com.nanum.domain.product.model.QProduct.product;
@@ -44,7 +45,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.deleteYn.eq("N"),
                         product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
-                        searchKeyword(null, searchDTO.getKeyword()),
+                        mallSearchKeyword(searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
                 .orderBy(mallSortOrder(searchDTO.getSort()))
                 .offset(searchDTO.getOffset())
@@ -77,7 +78,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.deleteYn.eq("N"),
                         product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
-                        searchKeyword(null, searchDTO.getKeyword()),
+                        mallSearchKeyword(searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
                 .fetchOne();
         return count != null ? count.intValue() : 0;
@@ -97,7 +98,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.deleteYn.eq("N"),
                         product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
-                        searchKeyword(null, searchDTO.getKeyword()),
+                        mallSearchKeyword(searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
                 .orderBy(product.viewCount.desc(), product.createdAt.desc())
                 .offset(searchDTO.getOffset())
@@ -179,11 +180,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // 5. 최종 DTO 매핑
         List<AdminProductListDTO> content = products.stream().map(p -> {
             String catName = p.getCategories().isEmpty() ? "" : p.getCategories().get(0).getCategoryName();
+            String catFullName = p.getCategories().stream()
+                    .map(ProductCategory::getFullPath)
+                    .collect(Collectors.joining(", "));
             Long catId = p.getCategories().isEmpty() ? null : p.getCategories().get(0).getCategoryId();
             return AdminProductListDTO.builder()
                     .id(p.getId())
                     .categoryId(catId)
                     .categoryName(catName)
+                    .categoryFullName(catFullName)
                     .name(p.getName())
                     .supplyPrice(p.getSupplyPrice())
                     .mapPrice(p.getMapPrice())
@@ -239,16 +244,51 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return null;
     }
 
+    /**
+     * 사용자 몰 검색 (공백 제거 후 비교)
+     */
+    private BooleanExpression mallSearchKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword))
+            return null;
+        String trimmedKeyword = keyword.trim().replaceAll("\\s+", "");
+        return Expressions.stringTemplate(
+                "REPLACE({0}, ' ', '')", product.name)
+                .containsIgnoreCase(trimmedKeyword);
+    }
+
+    /**
+     * 관리자 검색 (searchType별 분기)
+     */
     private BooleanExpression searchKeyword(String searchType, String keyword) {
         if (!StringUtils.hasText(keyword))
             return null;
-        if ("NAME".equals(searchType) || searchType == null) {
-            String trimmedKeyword = keyword.trim().replaceAll("\\s+", "");
-            // DB의 상품명에서도 공백 제거 후 비교 (띄어쓰기 무관 매칭)
-            return com.querydsl.core.types.dsl.Expressions.stringTemplate(
-                    "REPLACE({0}, ' ', '')", product.name)
-                    .containsIgnoreCase(trimmedKeyword);
+
+        if ("ALL".equals(searchType) || !StringUtils.hasText(searchType)) {
+            BooleanExpression exp = product.name.contains(keyword)
+                    .or(product.brandName.contains(keyword));
+
+            // 키워드가 숫자인 경우 ID 검색 추가
+            if (keyword.matches("^[0-9]+$")) {
+                exp = exp.or(product.id.eq(Long.parseLong(keyword)));
+            }
+            return exp;
         }
+
+        if ("NAME".equals(searchType)) {
+            return product.name.contains(keyword);
+        }
+
+        if ("BRAND".equals(searchType)) {
+            return product.brandName.contains(keyword);
+        }
+
+        if ("CODE".equals(searchType)) {
+            if (keyword.matches("^[0-9]+$")) {
+                return product.id.eq(Long.parseLong(keyword));
+            }
+            return Expressions.asBoolean(false).isTrue(); // 숫자가 아니면 결과 없음
+        }
+
         return null;
     }
 

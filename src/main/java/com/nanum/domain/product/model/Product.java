@@ -86,7 +86,7 @@ public class Product extends BaseEntity {
     @Builder.Default
     private BigDecimal minOrderAmount = BigDecimal.ZERO;
 
-    @Column(name = "review_yn", length = 1, nullable = false)
+    @Column(name = "review_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     @Builder.Default
     private String reviewYn = "Y";
@@ -105,17 +105,17 @@ public class Product extends BaseEntity {
     @Column(name = "delivery_type", length = 20)
     private String deliveryType; // FREE, PAY, COND
 
-    @Column(name = "bundle_shipping_yn", length = 1, nullable = false)
+    @Column(name = "bundle_shipping_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     @Builder.Default
     private String bundleShippingYn = "Y";
 
-    @Column(name = "delivery_policy_type", length = 20, nullable = false)
+    @Column(name = "delivery_policy_type", nullable = false, length = 20)
     @ColumnDefault("'MAX'")
     @Builder.Default
     private String deliveryPolicyType = "MAX"; // MAX or MIN
 
-    @Column(name = "delivery_min_order_fee", precision = 19, scale = 4, nullable = false)
+    @Column(name = "delivery_min_order_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     @Builder.Default
     private BigDecimal deliveryMinOrderFee = BigDecimal.ZERO;
@@ -126,27 +126,27 @@ public class Product extends BaseEntity {
     @Column(name = "inbound_shipment_code", length = 30)
     private String inboundShipmentCode;
 
-    @Column(name = "delivery_fee", precision = 19, scale = 4, nullable = false)
+    @Column(name = "delivery_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     @Builder.Default
     private BigDecimal deliveryFee = BigDecimal.ZERO;
 
-    @Column(name = "return_fee", precision = 19, scale = 4, nullable = false)
+    @Column(name = "return_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     @Builder.Default
     private BigDecimal returnFee = BigDecimal.ZERO;
 
-    @Column(name = "exchange_fee", precision = 19, scale = 4, nullable = false)
+    @Column(name = "exchange_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     @Builder.Default
     private BigDecimal exchangeFee = BigDecimal.ZERO;
 
-    @Column(name = "delivery_island_yn", length = 1, nullable = false)
+    @Column(name = "delivery_island_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     @Builder.Default
     private String deliveryIslandYn = "Y";
 
-    @Column(name = "delivery_island_fee", precision = 19, scale = 4, nullable = false)
+    @Column(name = "delivery_island_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
     @Builder.Default
     private BigDecimal deliveryIslandFee = BigDecimal.ZERO;
@@ -159,7 +159,10 @@ public class Product extends BaseEntity {
     public void update(String name, String brandName, int supplyPrice, Integer mapPrice, Integer retailPrice,
             Integer suggestedPrice, Integer safetyStock,
             String description,
-            ProductStatus status, String applyYn) {
+            ProductStatus status, String applyYn,
+            String reviewYn, String deliveryWay, String deliveryArea, String deliveryType, String bundleShippingYn,
+            String deliveryPolicyType, BigDecimal deliveryMinOrderFee, String outboundShipmentCode, String inboundShipmentCode,
+            BigDecimal deliveryFee, BigDecimal returnFee, BigDecimal exchangeFee, String deliveryIslandYn, BigDecimal deliveryIslandFee) {
         this.name = name;
         this.brandName = brandName;
         this.supplyPrice = supplyPrice;
@@ -170,6 +173,20 @@ public class Product extends BaseEntity {
         this.description = description;
         this.status = status;
         this.applyYn = applyYn != null ? applyYn : "N";
+        this.reviewYn = reviewYn;
+        this.deliveryWay = deliveryWay;
+        this.deliveryArea = deliveryArea;
+        this.deliveryType = deliveryType;
+        this.bundleShippingYn = bundleShippingYn;
+        this.deliveryPolicyType = deliveryPolicyType;
+        this.deliveryMinOrderFee = deliveryMinOrderFee;
+        this.outboundShipmentCode = outboundShipmentCode;
+        this.inboundShipmentCode = inboundShipmentCode;
+        this.deliveryFee = deliveryFee;
+        this.returnFee = returnFee;
+        this.exchangeFee = exchangeFee;
+        this.deliveryIslandYn = deliveryIslandYn;
+        this.deliveryIslandFee = deliveryIslandFee;
     }
 
     public void updateInfo(List<ProductCategory> categories, String name, String brandName, int supplyPrice,
@@ -177,7 +194,10 @@ public class Product extends BaseEntity {
             Integer retailPrice,
             Integer suggestedPrice,
             Integer safetyStock,
-            String optionYn, ProductStatus status, String description, String applyYn) {
+            String optionYn, ProductStatus status, String description, String applyYn,
+            String reviewYn, String deliveryWay, String deliveryArea, String deliveryType, String bundleShippingYn,
+            String deliveryPolicyType, BigDecimal deliveryMinOrderFee, String outboundShipmentCode, String inboundShipmentCode,
+            BigDecimal deliveryFee, BigDecimal returnFee, BigDecimal exchangeFee, String deliveryIslandYn, BigDecimal deliveryIslandFee) {
         this.categories = categories;
         this.name = name;
         this.brandName = brandName;
@@ -190,6 +210,20 @@ public class Product extends BaseEntity {
         this.status = status;
         this.description = description;
         this.applyYn = applyYn != null ? applyYn : "N";
+        this.reviewYn = reviewYn;
+        this.deliveryWay = deliveryWay;
+        this.deliveryArea = deliveryArea;
+        this.deliveryType = deliveryType;
+        this.bundleShippingYn = bundleShippingYn;
+        this.deliveryPolicyType = deliveryPolicyType;
+        this.deliveryMinOrderFee = deliveryMinOrderFee;
+        this.outboundShipmentCode = outboundShipmentCode;
+        this.inboundShipmentCode = inboundShipmentCode;
+        this.deliveryFee = deliveryFee;
+        this.returnFee = returnFee;
+        this.exchangeFee = exchangeFee;
+        this.deliveryIslandYn = deliveryIslandYn;
+        this.deliveryIslandFee = deliveryIslandFee;
     }
 
     /**

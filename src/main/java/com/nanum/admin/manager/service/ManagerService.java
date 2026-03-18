@@ -163,12 +163,6 @@ public class ManagerService {
                     .scmBankName(request.getScmInfo().getScmBankName())
                     .scmBankAccountNum(request.getScmInfo().getScmBankAccountNum())
                     .scmBankAccountName(request.getScmInfo().getScmBankAccountName())
-                    .shippingZipcode(request.getScmInfo().getShippingZipcode())
-                    .shippingAddr1(request.getScmInfo().getShippingAddr1())
-                    .shippingAddr2(request.getScmInfo().getShippingAddr2())
-                    .returnZipcode(request.getScmInfo().getReturnZipcode())
-                    .returnAddr1(request.getScmInfo().getReturnAddr1())
-                    .returnAddr2(request.getScmInfo().getReturnAddr2())
                     .build();
 
             managerScmRepository.save(scm);
@@ -288,13 +282,7 @@ public class ManagerService {
                     request.getScmInfo().getScmDamEmail(),
                     request.getScmInfo().getScmBankName(),
                     request.getScmInfo().getScmBankAccountNum(),
-                    request.getScmInfo().getScmBankAccountName(),
-                    request.getScmInfo().getShippingZipcode(),
-                    request.getScmInfo().getShippingAddr1(),
-                    request.getScmInfo().getShippingAddr2(),
-                    request.getScmInfo().getReturnZipcode(),
-                    request.getScmInfo().getReturnAddr1(),
-                    request.getScmInfo().getReturnAddr2());
+                    request.getScmInfo().getScmBankAccountName());
 
             managerScmRepository.save(scm);
         }
@@ -388,12 +376,6 @@ public class ManagerService {
                     .scmBankName(request.getScmBankName())
                     .scmBankAccountNum(request.getScmBankAccountNum())
                     .scmBankAccountName(request.getScmBankAccountName())
-                    .shippingZipcode(request.getShippingZipcode())
-                    .shippingAddr1(request.getShippingAddr1())
-                    .shippingAddr2(request.getShippingAddr2())
-                    .returnZipcode(request.getReturnZipcode())
-                    .returnAddr1(request.getReturnAddr1())
-                    .returnAddr2(request.getReturnAddr2())
                     .build();
 
             managerScmRepository.save(scm);

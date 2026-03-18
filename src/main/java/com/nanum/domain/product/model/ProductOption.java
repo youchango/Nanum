@@ -76,6 +76,28 @@ public class ProductOption {
     }
 
     /**
+     * 옵션 기본 정보를 갱신합니다. (재고 제외)
+     *
+     * @param title1        옵션분류1
+     * @param name1         옵션값1
+     * @param title2        옵션분류2
+     * @param name2         옵션값2
+     * @param title3        옵션분류3
+     * @param name3         옵션값3
+     * @param extraPrice    추가 금액
+     */
+    public void updateBasicInfo(String title1, String name1, String title2, String name2, String title3, String name3,
+            int extraPrice) {
+        this.title1 = title1;
+        this.name1 = name1;
+        this.title2 = title2;
+        this.name2 = name2;
+        this.title3 = title3;
+        this.name3 = name3;
+        this.extraPrice = extraPrice;
+    }
+
+    /**
      * 재고 수량을 업데이트합니다.
      * @param stockQuantity 새로운 재고 수량
      */

@@ -8,6 +8,9 @@ import org.hibernate.annotations.SQLDelete;
 
 import java.math.BigDecimal;
 
+/**
+ * 출고지/입고지 및 배송 정책 엔티티
+ */
 @Entity
 @Table(name = "shipment")
 @Getter
@@ -79,8 +82,44 @@ public class Shipment extends BaseEntity {
     @Builder.Default
     private BigDecimal deliveryIslandFee = BigDecimal.ZERO;
 
-    @Column(name = "is_default", length = 1, nullable = false)
+    @Column(name = "is_default", nullable = false, length = 1)
     @ColumnDefault("'N'")
     @Builder.Default
     private String isDefault = "N";
+
+    /**
+     * 출고지 정보를 업데이트합니다.
+     */
+    public void update(String shipmentType, String shipmentName, String zipcode, String address, String addressDetail,
+                       String supplierName, String phone, String mobile, BigDecimal shippingFee, BigDecimal returnFee,
+                       BigDecimal exchangeFee, String deliveryIslandYn, BigDecimal deliveryIslandFee, String isDefault) {
+        this.shipmentType = shipmentType;
+        this.shipmentName = shipmentName;
+        this.zipcode = zipcode;
+        this.address = address;
+        this.addressDetail = addressDetail;
+        this.supplierName = supplierName;
+        this.phone = phone;
+        this.mobile = mobile;
+        this.shippingFee = shippingFee;
+        this.returnFee = returnFee;
+        this.exchangeFee = exchangeFee;
+        this.deliveryIslandYn = deliveryIslandYn;
+        this.deliveryIslandFee = deliveryIslandFee;
+        this.isDefault = isDefault;
+    }
+
+    /**
+     * 출고지 코드를 업데이트합니다.
+     */
+    public void updateShipmentCode(String shipmentCode) {
+        this.shipmentCode = shipmentCode;
+    }
+
+    /**
+     * 기본 배송지 설정을 해제합니다.
+     */
+    public void clearDefault() {
+        this.isDefault = "N";
+    }
 }

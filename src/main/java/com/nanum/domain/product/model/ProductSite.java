@@ -33,19 +33,23 @@ public class ProductSite extends BaseEntity {
 
     @Column(name = "a_price", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
-    private BigDecimal aPrice;
+    @Builder.Default
+    private BigDecimal aPrice = BigDecimal.ZERO;
 
     @Column(name = "b_price", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
-    private BigDecimal bPrice;
+    @Builder.Default
+    private BigDecimal bPrice = BigDecimal.ZERO;
 
     @Column(name = "c_price", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")
-    private BigDecimal cPrice;
+    @Builder.Default
+    private BigDecimal cPrice = BigDecimal.ZERO;
 
     @Column(name = "pdt_click", nullable = false)
     @ColumnDefault("0")
-    private Integer pdtClick;
+    @Builder.Default
+    private Integer pdtClick = 0;
 
     /**
      * 사이트별 가격 및 노출 여부를 업데이트합니다.

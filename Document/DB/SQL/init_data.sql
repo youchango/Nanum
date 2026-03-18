@@ -1,57 +1,109 @@
-﻿-- ==========================================
--- Nanum Shopping Mall Platform Initial Data
--- ==========================================
+﻿-- 🏗️ 관리자 메뉴 초기 데이터 (AdminLayout.tsx 기반)
 
--- 1. Members
--- Admin
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, role, member_type)
-VALUES ('M_ADMIN_001', 'admin', 'Master Admin', '$2a$10$gucmZaGXYDF6Nk8DdJRzbe9zAA14dmKlOEHPmZuGsSLCpcYzMYjYS', '010-1234-5678', 'admin@nanum.com', 'ROLE_MASTER', 'ADMIN');
+-- 기존 데이터 정리 (필요시)
+-- DELETE FROM manager_menu;
+-- ALTER TABLE manager_menu AUTO_INCREMENT = 1;
 
--- Biz User
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
-VALUES ('M_BIZ_001', 'bizuser', 'Biz Partner', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-1111-2222', 'biz@nanum.com', '12345', 'Seoul', 'Gangnam 123', 'ROLE_BIZ', 'BIZ');
+-- 1. 대시보드
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '대시보드', '/admin/dashboard', 'Y', 1, '', 'SYSTEM');
 
--- General User
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
-VALUES ('M_USER_001', 'user01', 'Normal User', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-3333-4444', 'user@nanum.com', '54321', 'Busan', 'Haeundae 456', 'ROLE_USER', 'USER');
+-- 2. 상점 관리 (대메뉴)
+SET @shop_parent_seq = (SELECT LAST_INSERT_ID());
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '상점 관리', NULL, 'Y', 2, '', 'SYSTEM');
+SET @shop_parent_seq = (SELECT LAST_INSERT_ID());
 
--- 2. Member Biz Info
-INSERT INTO member_biz (member_code, company_name, ceo_name, business_number, approval_status)
-VALUES ('M_BIZ_001', 'Nanum Corp', 'Kim Biz', '123-45-67890', 'APPROVED');
+    -- 상점 관리 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@shop_parent_seq, '상점 목록', '/admin/shops', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@shop_parent_seq, '상점 등록', '/admin/shops/new', 'Y', 2, '', 'SYSTEM');
 
--- 3. Address Book
-INSERT INTO address_book (member_code, address_name, receiver_name, receiver_phone, zipcode, address, address_detail, is_default)
-VALUES ('M_USER_001', 'Home', 'Normal User', '010-3333-4444', '54321', 'Busan', 'Haeundae 456', 'Y');
+-- 3. 회원 관리 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '회원 관리', NULL, 'Y', 3, '', 'SYSTEM');
+SET @member_parent_seq = (SELECT LAST_INSERT_ID());
 
--- 4. Product Categories
-INSERT INTO product_category (category_name, depth, display_order) VALUES ('Electronics', 1, 1);
-INSERT INTO product_category (category_name, depth, display_order) VALUES ('Fashion', 1, 2);
-INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Computers', 2, 1);
-INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Smartphones', 2, 2);
+    -- 회원 관리 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@member_parent_seq, '회원 목록', '/admin/members/list', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@member_parent_seq, '관리자 관리', '/admin/members/managers', 'Y', 2, '', 'SYSTEM');
 
--- 5. Products
--- Public Product
-INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
-VALUES (3, 'Gaming Laptop', 1500000, 1350000, 'SALE', 'High performance gaming laptop', '/uploads/laptop.jpg');
+-- 4. 상품 관리 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '상품 관리', NULL, 'Y', 4, '', 'SYSTEM');
+SET @product_parent_seq = (SELECT LAST_INSERT_ID());
 
--- Biz Only Product (Only mapped users can see discount? Or mapping logic)
-INSERT INTO product (category_id, product_name, price, sale_price, status, description, thumbnail_url)
-VALUES (4, 'Biz Smartphone', 1000000, 900000, 'SALE', 'Corporate optimized phone', '/uploads/phone.jpg');
+    -- 상품 관리 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@product_parent_seq, '상품 목록', '/admin/products', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@product_parent_seq, '상품 가격 관리', '/admin/product-sites', 'Y', 2, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@product_parent_seq, '상품 등록', '/admin/products/new', 'Y', 3, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@product_parent_seq, '카테고리 관리', '/admin/products/categories', 'Y', 4, '', 'SYSTEM');
 
--- 6. Product Options
-INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
-VALUES (1, 'RAM 16GB', 0, 100);
-INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
-VALUES (1, 'RAM 32GB', 200000, 50);
+-- 5. 주문/배송 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '주문/배송', NULL, 'Y', 5, '', 'SYSTEM');
+SET @order_parent_seq = (SELECT LAST_INSERT_ID());
 
--- 7. Product Biz Mapping
-INSERT INTO product_biz_mapping (product_id, member_code, discount_rate)
-VALUES (2, 'M_BIZ_001', 10); -- 10% discount for this biz member
+    -- 주문/배송 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@order_parent_seq, '주문 관리', '/admin/orders', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@order_parent_seq, '배송 관리', '/admin/delivery', 'Y', 2, '', 'SYSTEM');
 
--- 8. Content (Notice)
-INSERT INTO content (content_type, subject, body)
-VALUES ('NOTICE', 'Nanum Mall Open!', 'Welcome to Nanum Shopping Mall.');
+-- 6. 마케팅 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '마케팅', NULL, 'Y', 6, '', 'SYSTEM');
+SET @marketing_parent_seq = (SELECT LAST_INSERT_ID());
 
--- 9. Inquiry
-INSERT INTO inquiry (member_code, inquiry_type, title, content, status)
-VALUES ('M_USER_001', 'General', 'Delivery Question', 'When does shipping start?', 'WAITING');
+    -- 마케팅 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@marketing_parent_seq, '배너 관리', '/admin/display/banners', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@marketing_parent_seq, '팝업 관리', '/admin/display/popups', 'Y', 2, '', 'SYSTEM');
+
+-- 7. 고객센터 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '고객센터', NULL, 'Y', 7, '', 'SYSTEM');
+SET @cs_parent_seq = (SELECT LAST_INSERT_ID());
+
+    -- 고객센터 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@cs_parent_seq, '1:1 문의', '/admin/inquiries', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@cs_parent_seq, '공지사항', '/admin/contents/notices', 'Y', 2, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@cs_parent_seq, 'FAQ', '/admin/contents/faqs', 'Y', 3, '', 'SYSTEM');
+
+-- 8. 시스템 설정 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '시스템 설정', NULL, 'Y', 8, '', 'SYSTEM');
+SET @config_parent_seq = (SELECT LAST_INSERT_ID());
+
+    -- 시스템 설정 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@config_parent_seq, '코드 관리', '/admin/codes', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@config_parent_seq, '공통 약관 관리', '/admin/system/terms', 'Y', 2, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@config_parent_seq, '사이트 정책 설정', '/admin/site/settings', 'Y', 3, '', 'SYSTEM');
+
+-- 9. 권한 설정 (대메뉴)
+INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+VALUES (NULL, '권한 설정', NULL, 'Y', 9, '', 'SYSTEM');
+SET @auth_parent_seq = (SELECT LAST_INSERT_ID());
+
+    -- 권한 설정 하위
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@auth_parent_seq, '권한 관리', '/admin/manager/auth-groups', 'Y', 1, '', 'SYSTEM');
+    INSERT INTO manager_menu (parent_menu_seq, menu_name, menu_url, display_yn, display_order, menu_parameter, created_by)
+    VALUES (@auth_parent_seq, '메뉴 관리', '/admin/manager/menus', 'Y', 2, '', 'SYSTEM');
+
+
+

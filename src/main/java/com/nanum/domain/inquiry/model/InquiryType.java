@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum InquiryType {
-    PRODUCT("상품문의", 1),
-    DELIVERY("배송문의", 2),
-    ORDER("주문/결제", 3),
-    ETC("기타", 99);
+    PRODUCT("상품"),
+    DELIVERY("배송"),
+    ORDER("주문"),
+    ETC("기타");
 
     private final String description;
-    private final int code; // DB ID mapping if needed, or simple enum ordinal/string
 }

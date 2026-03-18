@@ -30,6 +30,12 @@ public class Inquiry extends BaseEntity {
     @Column(name = "inquiry_type", nullable = false, length = 20)
     private InquiryType type;
 
+    @Column(name = "product_id")
+    private Long productId;
+
+    @Column(name = "order_no", length = 50)
+    private String orderNo;
+
     @Column(nullable = false)
     private String title;
 
@@ -54,12 +60,6 @@ public class Inquiry extends BaseEntity {
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
-
-    @Column(name = "product_id")
-    private Long productId;
-
-    @Column(name = "order_no", length = 50)
-    private String orderNo;
 
     @Column(name = "is_secret", length = 1, nullable = false)
     @org.hibernate.annotations.ColumnDefault("'N'")

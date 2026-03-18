@@ -16,10 +16,10 @@ public class InquiryDTO {
     @Builder
     public static class CreateRequest {
         private InquiryType type;
-        private String title;
-        private String content;
         private Long productId;
         private String orderNo;
+        private String title;
+        private String content;
         private String isSecret;
     }
 
@@ -41,6 +41,8 @@ public class InquiryDTO {
     public static class Search {
         private InquiryType type;
         private InquiryStatus status;
+        private Long productId;
+        private String orderNo;
         private String keyword; // Title or Content or Writer
         private String writerCode;
         private LocalDateTime startDate;
@@ -56,15 +58,15 @@ public class InquiryDTO {
         private Long id;
         private InquiryType type;
         private String typeDesc;
+        private Long productId;
+        private String orderNo;
         private String title;
         private String content;
         private String answer;
         private InquiryStatus status;
         private String statusDesc;
         private String writerCode;
-        private String writerName; // Optional if Member has name
-        private Long productId;
-        private String orderNo;
+        private String writerName;
         @com.fasterxml.jackson.annotation.JsonProperty("isSecret")
         private boolean isSecret;
         private LocalDateTime createdAt;
@@ -76,6 +78,8 @@ public class InquiryDTO {
                     .id(inquiry.getId())
                     .type(inquiry.getType())
                     .typeDesc(inquiry.getType().getDescription())
+                    .productId(inquiry.getProductId())
+                    .orderNo(inquiry.getOrderNo())
                     .title(inquiry.getTitle())
                     .content(inquiry.getContent())
                     .answer(inquiry.getAnswer())
@@ -83,8 +87,6 @@ public class InquiryDTO {
                     .statusDesc(inquiry.getStatus().getDescription())
                     .writerCode(inquiry.getWriter().getMemberCode())
                     .writerName(inquiry.getWriter().getMemberName())
-                    .productId(inquiry.getProductId())
-                    .orderNo(inquiry.getOrderNo())
                     .isSecret("Y".equals(inquiry.getIsSecret()))
                     .createdAt(inquiry.getCreatedAt())
                     .answeredAt(inquiry.getAnsweredAt())

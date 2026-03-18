@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Nanum_Master"
+		},
+		{
+			"path": "../Nanum_User"
+		}
+	],
+	"settings": {}
+}

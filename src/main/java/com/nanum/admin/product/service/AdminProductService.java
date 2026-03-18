@@ -16,7 +16,7 @@ import com.nanum.domain.product.repository.ProductSiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
@@ -38,6 +38,7 @@ public class AdminProductService {
         private final ProductOptionRepository productOptionRepository;
         private final InventoryService inventoryService;
         private final com.nanum.domain.file.service.FileService fileService;
+        private final com.nanum.domain.shipment.repository.ShipmentRepository shipmentRepository;
 
         public Map<String, Object> getProducts(AdminProductSearchDTO searchDTO) {
                 Manager manager = getCurrentManager();
@@ -57,7 +58,8 @@ public class AdminProductService {
                                         .map(p -> String.valueOf(p.getId()))
                                         .collect(Collectors.toList());
 
-                        Map<String, String> mainImageMap = fileService.getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, productIds)
+                        Map<String, String> mainImageMap = fileService
+                                        .getFiles(com.nanum.domain.file.model.ReferenceType.PRODUCT, productIds)
                                         .stream()
                                         .filter(f -> "Y".equals(f.getIsMain()))
                                         .collect(Collectors.toMap(
@@ -126,6 +128,27 @@ public class AdminProductService {
                                 .applyYn(product.getApplyYn())
                                 .optionYn(product.getOptionYn())
                                 .description(product.getDescription())
+                                // 신규 정책 필드 매핑
+                                .reviewYn(product.getReviewYn())
+                                .deliveryWay(product.getDeliveryWay())
+                                .deliveryArea(product.getDeliveryArea())
+                                .deliveryType(product.getDeliveryType())
+                                .bundleShippingYn(product.getBundleShippingYn())
+                                .deliveryPolicyType(product.getDeliveryPolicyType())
+                                .deliveryMinOrderFee(product.getDeliveryMinOrderFee())
+                                .outboundShipmentCode(product.getOutboundShipmentCode())
+                                .inboundShipmentCode(product.getInboundShipmentCode())
+                                .deliveryFee(product.getDeliveryFee())
+                                .returnFee(product.getReturnFee())
+                                .exchangeFee(product.getExchangeFee())
+                                .deliveryIslandYn(product.getDeliveryIslandYn())
+                                .deliveryIslandFee(product.getDeliveryIslandFee())
+                                .outboundShipment(product.getOutboundShipmentCode() != null ? 
+                                    shipmentRepository.findByShipmentCode(product.getOutboundShipmentCode())
+                                        .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from).orElse(null) : null)
+                                .inboundShipment(product.getInboundShipmentCode() != null ? 
+                                    shipmentRepository.findByShipmentCode(product.getInboundShipmentCode())
+                                        .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from).orElse(null) : null)
                                 .options(options)
                                 .images(images)
                                 .build();
@@ -155,6 +178,21 @@ public class AdminProductService {
                                 .description(request.getDescription())
                                 .supplyPrice(request.getSupplyPrice())
                                 .viewCount(0)
+                                // 신규 정책 필드 설정
+                                .reviewYn(request.getReviewYn() != null ? request.getReviewYn() : "Y")
+                                .deliveryWay(request.getDeliveryWay())
+                                .deliveryArea(request.getDeliveryArea())
+                                .deliveryType(request.getDeliveryType())
+                                .bundleShippingYn(request.getBundleShippingYn() != null ? request.getBundleShippingYn() : "Y")
+                                .deliveryPolicyType(request.getDeliveryPolicyType() != null ? request.getDeliveryPolicyType() : "MAX")
+                                .deliveryMinOrderFee(request.getDeliveryMinOrderFee() != null ? request.getDeliveryMinOrderFee() : BigDecimal.ZERO)
+                                .outboundShipmentCode(request.getOutboundShipmentCode())
+                                .inboundShipmentCode(request.getInboundShipmentCode())
+                                .deliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO)
+                                .returnFee(request.getReturnFee() != null ? request.getReturnFee() : BigDecimal.ZERO)
+                                .exchangeFee(request.getExchangeFee() != null ? request.getExchangeFee() : BigDecimal.ZERO)
+                                .deliveryIslandYn(request.getDeliveryIslandYn() != null ? request.getDeliveryIslandYn() : "Y")
+                                .deliveryIslandFee(request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee() : BigDecimal.ZERO)
                                 .build();
 
                 // Check if options usage is Y and add them
@@ -210,7 +248,22 @@ public class AdminProductService {
                                 request.getOptionYn() != null ? request.getOptionYn() : "N",
                                 request.getStatus(),
                                 request.getDescription(),
-                                "N"); // 수정 시 무조건 N
+                                "N",
+                                // 신규 정책 필드 업데이트
+                                request.getReviewYn() != null ? request.getReviewYn() : "Y",
+                                request.getDeliveryWay(),
+                                request.getDeliveryArea(),
+                                request.getDeliveryType(),
+                                request.getBundleShippingYn() != null ? request.getBundleShippingYn() : "Y",
+                                request.getDeliveryPolicyType() != null ? request.getDeliveryPolicyType() : "MAX",
+                                request.getDeliveryMinOrderFee() != null ? request.getDeliveryMinOrderFee() : BigDecimal.ZERO,
+                                request.getOutboundShipmentCode(),
+                                request.getInboundShipmentCode(),
+                                request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO,
+                                request.getReturnFee() != null ? request.getReturnFee() : BigDecimal.ZERO,
+                                request.getExchangeFee() != null ? request.getExchangeFee() : BigDecimal.ZERO,
+                                request.getDeliveryIslandYn() != null ? request.getDeliveryIslandYn() : "Y",
+                                request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee() : BigDecimal.ZERO); // 수정 시 무조건 N
 
                 // salePrice 변경 시 사이트별 가격 일괄 동기화 로직 제거
 
@@ -242,12 +295,11 @@ public class AdminProductService {
                                                         .filter(opt -> opt.getId().equals(reqOpt.getOptionId()))
                                                         .findFirst()
                                                         .ifPresent(opt -> {
-                                                                opt.update(
+                                                                opt.updateBasicInfo(
                                                                                 reqOpt.getTitle1(), reqOpt.getName1(),
                                                                                 reqOpt.getTitle2(), reqOpt.getName2(),
                                                                                 reqOpt.getTitle3(), reqOpt.getName3(),
-                                                                                reqOpt.getExtraPrice(),
-                                                                                reqOpt.getStockQuantity());
+                                                                                reqOpt.getExtraPrice());
                                                         });
                                 } else {
                                         ProductOption newOpt = ProductOption.builder()
@@ -290,7 +342,7 @@ public class AdminProductService {
                                 .collect(Collectors.toList()) : new ArrayList<>();
 
                 com.nanum.domain.file.model.ReferenceType type = com.nanum.domain.file.model.ReferenceType.PRODUCT;
-                
+
                 // syncFiles 호출로 기존 파일 중 제외된 파일들은 실제 삭제 처리
                 fileService.syncFiles(fileIds, type, String.valueOf(productId));
 
@@ -313,7 +365,21 @@ public class AdminProductService {
                                 product.getSuggestedPrice(),
                                 product.getSafetyStock(),
                                 product.getDescription(),
-                                status, product.getApplyYn());
+                                status, product.getApplyYn(),
+                                product.getReviewYn(),
+                                product.getDeliveryWay(),
+                                product.getDeliveryArea(),
+                                product.getDeliveryType(),
+                                product.getBundleShippingYn(),
+                                product.getDeliveryPolicyType(),
+                                product.getDeliveryMinOrderFee(),
+                                product.getOutboundShipmentCode(),
+                                product.getInboundShipmentCode(),
+                                product.getDeliveryFee(),
+                                product.getReturnFee(),
+                                product.getExchangeFee(),
+                                product.getDeliveryIslandYn(),
+                                product.getDeliveryIslandFee());
         }
 
         @Transactional
@@ -380,9 +446,10 @@ public class AdminProductService {
                         ProductSite newSite = ProductSite.builder()
                                         .product(product)
                                         .siteCd(siteCd)
-                                        .aPrice(siteReq.getAPrice())
-                                        .bPrice(siteReq.getBPrice())
-                                        .cPrice(siteReq.getCPrice())
+                                        .aPrice(siteReq.getAPrice() != null ? siteReq.getAPrice() : BigDecimal.ZERO)
+                                        .bPrice(siteReq.getBPrice() != null ? siteReq.getBPrice() : BigDecimal.ZERO)
+                                        .cPrice(siteReq.getCPrice() != null ? siteReq.getCPrice() : BigDecimal.ZERO)
+                                        .pdtClick(0)
                                         .viewYn("Y") // 일괄 등록 시 기본 노출 처리
                                         .build();
 

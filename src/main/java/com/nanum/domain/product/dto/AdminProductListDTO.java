@@ -15,6 +15,7 @@ public class AdminProductListDTO {
     private Long id;
     private Long categoryId;
     private String categoryName;
+    private String categoryFullName;
     private String name;
     private int supplyPrice;
     private Integer mapPrice;

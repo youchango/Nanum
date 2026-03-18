@@ -2,9 +2,10 @@ package com.nanum.domain.product.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 import com.nanum.domain.product.model.ProductStatus;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductDTO {
 
@@ -26,6 +27,23 @@ public class ProductDTO {
         private ProductStatus status;
         private String applyYn;
         private String description;
+
+        // 신규 정책 필드
+        private String reviewYn;
+        private String deliveryWay;
+        private String deliveryArea;
+        private String deliveryType;
+        private String bundleShippingYn;
+        private String deliveryPolicyType;
+        private BigDecimal deliveryMinOrderFee;
+        private String outboundShipmentCode;
+        private String inboundShipmentCode;
+        private BigDecimal deliveryFee;
+        private BigDecimal returnFee;
+        private BigDecimal exchangeFee;
+        private String deliveryIslandYn;
+        private BigDecimal deliveryIslandFee;
+
         private List<Option> options;
         private List<Image> images;
     }
@@ -83,6 +101,26 @@ public class ProductDTO {
         private String applyYn;
         private String optionYn;
         private String description;
+
+        // 신규 정책 필드
+        private String reviewYn;
+        private String deliveryWay;
+        private String deliveryArea;
+        private String deliveryType;
+        private String bundleShippingYn;
+        private String deliveryPolicyType;
+        private BigDecimal deliveryMinOrderFee;
+        private String outboundShipmentCode;
+        private String inboundShipmentCode;
+        private BigDecimal deliveryFee;
+        private BigDecimal returnFee;
+        private BigDecimal exchangeFee;
+        private String deliveryIslandYn;
+        private BigDecimal deliveryIslandFee;
+
+        private com.nanum.domain.shipment.dto.ShipmentDTO.Response outboundShipment;
+        private com.nanum.domain.shipment.dto.ShipmentDTO.Response inboundShipment;
+
         private List<Option> options;
         private List<Image> images;
     }
@@ -109,6 +147,26 @@ public class ProductDTO {
         private String applyYn;
         private String optionYn;
         private String description;
+
+        // 신규 정책 필드
+        private String reviewYn;
+        private String deliveryWay;
+        private String deliveryArea;
+        private String deliveryType;
+        private String bundleShippingYn;
+        private String deliveryPolicyType;
+        private BigDecimal deliveryMinOrderFee;
+        private String outboundShipmentCode;
+        private String inboundShipmentCode;
+        private BigDecimal deliveryFee;
+        private BigDecimal returnFee;
+        private BigDecimal exchangeFee;
+        private String deliveryIslandYn;
+        private BigDecimal deliveryIslandFee;
+
+        private com.nanum.domain.shipment.dto.ShipmentDTO.Response outboundShipment;
+        private com.nanum.domain.shipment.dto.ShipmentDTO.Response inboundShipment;
+
         private List<MallOptionResponse> options;
         private List<Image> images;
     }
