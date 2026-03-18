@@ -59,8 +59,6 @@ public class InquiryService {
                 .orderNo(request.getOrderNo())
                 .title(request.getTitle())
                 .content(request.getContent())
-                .productId(request.getProductId())
-                .orderNo(request.getOrderNo())
                 .isSecret(request.getIsSecret() != null && "Y".equals(request.getIsSecret()) ? "Y" : "N")
                 .writer(writer)
                 .status(InquiryStatus.WAIT)
