@@ -26,22 +26,8 @@ public class Inquiry extends BaseEntity {
     @Column(name = "site_cd", length = 20)
     private String siteCd;
 
-    @Enumerated(EnumType.ORDINAL) // init_db.sql defines INT. Mapping might need Code converter or just ordinal if
-                                  // aligned.
-    // Plan suggested Enum. Let's strictly map to DB definition 'inquiry_type INT'.
-    // If I use EnumType.ORDINAL, verify order.
-    // Or I can use @Convert if needed. For now assume ORDINAL matches or use a
-    // Converter.
-    // Given the simplicity, I'll use a Code Converter later if needed?
-    // Let's use INT column with a Converter or just assume Ordinal for now
-    // (Product/Delivery/Order/Etc).
-    // Actually, init_db comment says '臾몄쓽援щ텇 (肄붾뱶ID)'. This implies reference to a
-    // Code table.
-    // But for this refactor I will Map it to Enum for code clarity.
-    // To be safe with INT column, I should use @Convert or EnumType.ORDINAL.
-    // I will use @Enumerated(EnumType.ORDINAL) assuming strict order provided in
-    // Enum.
-    @Column(name = "inquiry_type", nullable = false) // 1:상품문의, 2:배송문의, 3:주문문의, 99:기타문의
+    @Enumerated(EnumType.STRING)
+    @Column(name = "inquiry_type", nullable = false, length = 20)
     private InquiryType type;
 
     @Column(nullable = false)
@@ -68,6 +54,17 @@ public class Inquiry extends BaseEntity {
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
+
+    @Column(name = "product_id")
+    private Long productId;
+
+    @Column(name = "order_no", length = 50)
+    private String orderNo;
+
+    @Column(name = "is_secret", length = 1, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String isSecret = "N";
 
     public void reply(String answer, Member answerer) {
         this.answer = answer;

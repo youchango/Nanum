@@ -46,8 +46,41 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.deleteYn.eq("N"),
                         searchKeyword(null, searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
-                .orderBy(product.createdAt.desc())
+                .orderBy(mallSortOrder(searchDTO.getSort()))
+                .offset(searchDTO.getOffset())
+                .limit(searchDTO.getRecordSize())
                 .fetch();
+    }
+
+    private com.querydsl.core.types.OrderSpecifier<?> mallSortOrder(String sort) {
+        if (sort == null) return product.createdAt.desc();
+        return switch (sort) {
+            case "best" -> product.viewCount.desc();
+            case "new" -> product.createdAt.desc();
+            case "price_asc" -> product.retailPrice.asc();
+            case "price_desc" -> product.retailPrice.desc();
+            case "name" -> product.name.asc();
+            default -> product.createdAt.desc();
+        };
+    }
+
+    public int countMallProducts(String siteCd, SearchDTO searchDTO) {
+        QProductSite productSite = QProductSite.productSite;
+
+        Long count = queryFactory
+                .select(product.count())
+                .from(product)
+                .join(productSite).on(product.id.eq(productSite.product.id))
+                .where(
+                        productSite.siteCd.eq(siteCd),
+                        productSite.viewYn.eq("Y"),
+                        productSite.deleteYn.eq("N"),
+                        product.applyYn.eq("Y"),
+                        product.deleteYn.eq("N"),
+                        searchKeyword(null, searchDTO.getKeyword()),
+                        inCategoryIds(null, searchDTO.getCategoryId()))
+                .fetchOne();
+        return count != null ? count.intValue() : 0;
     }
 
     @Override
@@ -210,7 +243,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (!StringUtils.hasText(keyword))
             return null;
         if ("NAME".equals(searchType) || searchType == null) {
-            return product.name.contains(keyword);
+            String trimmedKeyword = keyword.trim().replaceAll("\\s+", "");
+            // DB의 상품명에서도 공백 제거 후 비교 (띄어쓰기 무관 매칭)
+            return com.querydsl.core.types.dsl.Expressions.stringTemplate(
+                    "REPLACE({0}, ' ', '')", product.name)
+                    .containsIgnoreCase(trimmedKeyword);
         }
         return null;
     }

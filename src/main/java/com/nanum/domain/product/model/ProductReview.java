@@ -28,6 +28,9 @@ public class ProductReview extends BaseEntity {
     @JoinColumn(name = "member_code", referencedColumnName = "member_code", nullable = false)
     private Member member;
 
+    @Column(name = "order_id")
+    private Long orderId;
+
     @Column(nullable = false)
     private String title;
 

@@ -18,7 +18,9 @@ public class InquiryDTO {
         private InquiryType type;
         private String title;
         private String content;
-        // writerCode is extracted from JWT
+        private Long productId;
+        private String orderNo;
+        private String isSecret;
     }
 
     @Getter
@@ -61,6 +63,10 @@ public class InquiryDTO {
         private String statusDesc;
         private String writerCode;
         private String writerName; // Optional if Member has name
+        private Long productId;
+        private String orderNo;
+        @com.fasterxml.jackson.annotation.JsonProperty("isSecret")
+        private boolean isSecret;
         private LocalDateTime createdAt;
         private LocalDateTime answeredAt;
         private String answererCode;
@@ -75,8 +81,11 @@ public class InquiryDTO {
                     .answer(inquiry.getAnswer())
                     .status(inquiry.getStatus())
                     .statusDesc(inquiry.getStatus().getDescription())
-                    .writerCode(inquiry.getWriter().getMemberCode()) // Assuming Member has getMemberCode
-                    // .writerName(inquiry.getWriter().getName())
+                    .writerCode(inquiry.getWriter().getMemberCode())
+                    .writerName(inquiry.getWriter().getMemberName())
+                    .productId(inquiry.getProductId())
+                    .orderNo(inquiry.getOrderNo())
+                    .isSecret("Y".equals(inquiry.getIsSecret()))
                     .createdAt(inquiry.getCreatedAt())
                     .answeredAt(inquiry.getAnsweredAt())
                     .answererCode(inquiry.getAnswerer() != null ? inquiry.getAnswerer().getMemberCode() : null)

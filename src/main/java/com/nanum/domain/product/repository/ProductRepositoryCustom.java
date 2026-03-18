@@ -13,5 +13,7 @@ public interface ProductRepositoryCustom {
 
     List<Product> findMallProducts(String siteCd, SearchDTO searchDTO);
 
+    int countMallProducts(String siteCd, SearchDTO searchDTO);
+
     List<Product> findMainProducts(String siteCd, SearchDTO searchDTO);
 }

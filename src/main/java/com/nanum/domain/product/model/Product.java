@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,9 +77,79 @@ public class Product extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "standard_price")
+    @ColumnDefault("0")
+    private Integer standardPrice;
+
+    @Column(name = "min_order_amount", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal minOrderAmount = BigDecimal.ZERO;
+
+    @Column(name = "review_yn", length = 1, nullable = false)
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private String reviewYn = "Y";
+
     @Column(name = "view_count")
     @ColumnDefault("0")
     private int viewCount;
+
+    // === 배송 관련 ===
+    @Column(name = "delivery_way", length = 20)
+    private String deliveryWay;
+
+    @Column(name = "delivery_area", length = 500)
+    private String deliveryArea;
+
+    @Column(name = "delivery_type", length = 20)
+    private String deliveryType; // FREE, PAY, COND
+
+    @Column(name = "bundle_shipping_yn", length = 1, nullable = false)
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private String bundleShippingYn = "Y";
+
+    @Column(name = "delivery_policy_type", length = 20, nullable = false)
+    @ColumnDefault("'MAX'")
+    @Builder.Default
+    private String deliveryPolicyType = "MAX"; // MAX or MIN
+
+    @Column(name = "delivery_min_order_fee", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal deliveryMinOrderFee = BigDecimal.ZERO;
+
+    @Column(name = "outbound_shipment_code", length = 30)
+    private String outboundShipmentCode;
+
+    @Column(name = "inbound_shipment_code", length = 30)
+    private String inboundShipmentCode;
+
+    @Column(name = "delivery_fee", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal deliveryFee = BigDecimal.ZERO;
+
+    @Column(name = "return_fee", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal returnFee = BigDecimal.ZERO;
+
+    @Column(name = "exchange_fee", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal exchangeFee = BigDecimal.ZERO;
+
+    @Column(name = "delivery_island_yn", length = 1, nullable = false)
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private String deliveryIslandYn = "Y";
+
+    @Column(name = "delivery_island_fee", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal deliveryIslandFee = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
