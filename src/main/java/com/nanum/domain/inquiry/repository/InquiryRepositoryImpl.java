@@ -31,6 +31,8 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
                 .where(
                         typeEq(search),
                         statusEq(search),
+                        productIdEq(search),
+                        orderNoEq(search),
                         keywordLike(search),
                         writerCodeEq(search),
                         periodBetween(search))
@@ -45,6 +47,8 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
                 .where(
                         typeEq(search),
                         statusEq(search),
+                        productIdEq(search),
+                        orderNoEq(search),
                         keywordLike(search),
                         writerCodeEq(search),
                         periodBetween(search));
@@ -58,6 +62,14 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 
     private BooleanExpression statusEq(InquiryDTO.Search search) {
         return search.getStatus() != null ? inquiry.status.eq(search.getStatus()) : null;
+    }
+    
+    private BooleanExpression productIdEq(InquiryDTO.Search search) {
+        return search.getProductId() != null ? inquiry.productId.eq(search.getProductId()) : null;
+    }
+
+    private BooleanExpression orderNoEq(InquiryDTO.Search search) {
+        return StringUtils.hasText(search.getOrderNo()) ? inquiry.orderNo.eq(search.getOrderNo()) : null;
     }
 
     private BooleanExpression keywordLike(InquiryDTO.Search search) {

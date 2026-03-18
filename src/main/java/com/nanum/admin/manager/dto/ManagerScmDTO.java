@@ -32,12 +32,6 @@ public class ManagerScmDTO {
         private String scmBankName;
         private String scmBankAccountNum;
         private String scmBankAccountName;
-        private String shippingZipcode;
-        private String shippingAddr1;
-        private String shippingAddr2;
-        private String returnZipcode;
-        private String returnAddr1;
-        private String returnAddr2;
         private String businessLicenseUrl;
 
         public static Info from(ManagerScm entity) {
@@ -63,12 +57,6 @@ public class ManagerScmDTO {
                     .scmBankName(entity.getScmBankName())
                     .scmBankAccountNum(entity.getScmBankAccountNum())
                     .scmBankAccountName(entity.getScmBankAccountName())
-                    .shippingZipcode(entity.getShippingZipcode())
-                    .shippingAddr1(entity.getShippingAddr1())
-                    .shippingAddr2(entity.getShippingAddr2())
-                    .returnZipcode(entity.getReturnZipcode())
-                    .returnAddr1(entity.getReturnAddr1())
-                    .returnAddr2(entity.getReturnAddr2())
                     .build();
         }
     }

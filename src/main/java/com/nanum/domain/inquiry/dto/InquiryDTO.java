@@ -16,6 +16,8 @@ public class InquiryDTO {
     @Builder
     public static class CreateRequest {
         private InquiryType type;
+        private Long productId;
+        private String orderNo;
         private String title;
         private String content;
         // writerCode is extracted from JWT
@@ -39,6 +41,8 @@ public class InquiryDTO {
     public static class Search {
         private InquiryType type;
         private InquiryStatus status;
+        private Long productId;
+        private String orderNo;
         private String keyword; // Title or Content or Writer
         private String writerCode;
         private LocalDateTime startDate;
@@ -54,13 +58,15 @@ public class InquiryDTO {
         private Long id;
         private InquiryType type;
         private String typeDesc;
+        private Long productId;
+        private String orderNo;
         private String title;
         private String content;
         private String answer;
         private InquiryStatus status;
         private String statusDesc;
         private String writerCode;
-        private String writerName; // Optional if Member has name
+        private String writerName;
         private LocalDateTime createdAt;
         private LocalDateTime answeredAt;
         private String answererCode;
@@ -70,13 +76,14 @@ public class InquiryDTO {
                     .id(inquiry.getId())
                     .type(inquiry.getType())
                     .typeDesc(inquiry.getType().getDescription())
+                    .productId(inquiry.getProductId())
+                    .orderNo(inquiry.getOrderNo())
                     .title(inquiry.getTitle())
                     .content(inquiry.getContent())
                     .answer(inquiry.getAnswer())
                     .status(inquiry.getStatus())
                     .statusDesc(inquiry.getStatus().getDescription())
-                    .writerCode(inquiry.getWriter().getMemberCode()) // Assuming Member has getMemberCode
-                    // .writerName(inquiry.getWriter().getName())
+                    .writerCode(inquiry.getWriter().getMemberCode())
                     .createdAt(inquiry.getCreatedAt())
                     .answeredAt(inquiry.getAnsweredAt())
                     .answererCode(inquiry.getAnswerer() != null ? inquiry.getAnswerer().getMemberCode() : null)

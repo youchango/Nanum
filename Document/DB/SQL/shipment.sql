@@ -1,0 +1,28 @@
+CREATE TABLE shipment (
+    shipment_id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    manager_code VARCHAR(30) NOT NULL COMMENT '관리자 코드',
+    shipment_code VARCHAR(50) NOT NULL COMMENT '출고지 코드(SHIP + 숫자 6자리)',
+    shipment_type VARCHAR(20) NOT NULL DEFAULT 'OUT' COMMENT 'IN(입고) / OUT(출고)',
+    shipment_name VARCHAR(100) NOT NULL COMMENT '출고지명',
+    zipcode VARCHAR(10) NOT NULL COMMENT '우편번호',
+    address VARCHAR(200) NOT NULL COMMENT '주소',
+    address_detail VARCHAR(200) NOT NULL COMMENT '상세주소',
+    supplier_name VARCHAR(50) NOT NULL COMMENT '공급자명',
+    phone VARCHAR(45) NOT NULL COMMENT '전화번호',
+    mobile VARCHAR(45) DEFAULT NULL COMMENT '휴대전화번호',
+    shipping_fee DECIMAL(19,4) NULL DEFAULT 0.0000 COMMENT '기본 배송비',
+    return_fee DECIMAL(19,4) NULL DEFAULT 0.0000 COMMENT '반품 배송비(편도)',
+    exchange_fee DECIMAL(19,4) NULL DEFAULT 0.0000 COMMENT '교환 배송비(왕복)',
+    delivery_island_yn	CHAR(1) NULL DEFAULT 'Y' COMMENT '제주/도서산간 배송여부',
+    delivery_island_fee	DECIMAL(19,4) NULL DEFAULT 0.0000 COMMENT '제주/도서산간 추가배송비',
+    is_default CHAR(1) NOT NULL DEFAULT 'N' COMMENT '기본 배송지 여부 (Y/N)',
+    
+    created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    created_by 		VARCHAR(50) NULL COMMENT '생성자',
+    updated_at 		DATETIME NULL COMMENT '수정일',
+    updated_by 		VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at 		DATETIME NULL COMMENT '삭제일',
+    deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
+    PRIMARY KEY (shipment_id),UNIQUE KEY uq_shipment_code (shipment_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='출고지/입고지 및 배송 정책';

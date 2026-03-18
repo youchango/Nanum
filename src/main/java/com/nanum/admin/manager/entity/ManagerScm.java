@@ -90,30 +90,10 @@ public class ManagerScm extends BaseEntity {
     @Column(name = "scm_bank_account_name", length = 50, nullable = false)
     private String scmBankAccountName;
 
-    @Column(name = "shipping_zipcode", length = 10)
-    private String shippingZipcode;
-
-    @Column(name = "shipping_addr1", length = 200)
-    private String shippingAddr1;
-
-    @Column(name = "shipping_addr2", length = 200)
-    private String shippingAddr2;
-
-    @Column(name = "return_zipcode", length = 10)
-    private String returnZipcode;
-
-    @Column(name = "return_addr1", length = 200)
-    private String returnAddr1;
-
-    @Column(name = "return_addr2", length = 200)
-    private String returnAddr2;
-
     public void update(String supplierName, String scmCeo, String scmCorp, String scmType, String scmBsn, String scmPsn,
             String scmUptae, String scmUpjong, String scmZipcode, String scmAddr1, String scmAddr2,
             String scmPhone, String scmFax, String scmDamName, String scmDamPosition, String scmDamPhone,
-            String scmDamEmail, String scmBankName, String scmBankAccountNum, String scmBankAccountName,
-            String shippingZipcode, String shippingAddr1, String shippingAddr2,
-            String returnZipcode, String returnAddr1, String returnAddr2) {
+            String scmDamEmail, String scmBankName, String scmBankAccountNum, String scmBankAccountName) {
         this.supplierName = supplierName;
         this.scmCeo = scmCeo;
         this.scmCorp = scmCorp;
@@ -134,11 +114,5 @@ public class ManagerScm extends BaseEntity {
         this.scmBankName = scmBankName;
         this.scmBankAccountNum = scmBankAccountNum;
         this.scmBankAccountName = scmBankAccountName;
-        this.shippingZipcode = shippingZipcode;
-        this.shippingAddr1 = shippingAddr1;
-        this.shippingAddr2 = shippingAddr2;
-        this.returnZipcode = returnZipcode;
-        this.returnAddr1 = returnAddr1;
-        this.returnAddr2 = returnAddr2;
     }
 }

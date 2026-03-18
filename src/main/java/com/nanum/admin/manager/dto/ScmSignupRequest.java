@@ -47,15 +47,6 @@ public class ScmSignupRequest {
     private String scmBankAccountNum;
     private String scmBankAccountName;
 
-    // Shipping/Return Address
-    private String shippingZipcode;
-    private String shippingAddr1;
-    private String shippingAddr2;
-
-    private String returnZipcode;
-    private String returnAddr1;
-    private String returnAddr2;
-
     // File
     private MultipartFile businessLicense;
 }

@@ -1,9 +1,11 @@
 ﻿-- Source: inquiry.sql
--- 1:상품문의, 2:배송문의, 3:주문문의, 99:기타문의
+-- PRODUCT:상품, ORDER:주문, DELIVERY:배송, ETC:기타
 CREATE TABLE inquiry (
     inquiry_id   INT AUTO_INCREMENT COMMENT '문의코드',
     site_cd      VARCHAR(20) NULL COMMENT '사이트코드',
-    inquiry_type INT NOT NULL COMMENT '문의구분 (코드ID)',
+    inquiry_type VARCHAR(20) NOT NULL COMMENT '문의구분 (PRODUCT:상품, ORDER:주문, DELIVERY:배송, ETC:기타)',
+    product_id   INT NULL COMMENT '상품코드',
+    order_no     VARCHAR(50) NULL COMMENT '주문번호',
     title        VARCHAR(100) NOT NULL COMMENT '제목',
     content      TEXT NOT NULL COMMENT '내용',
     answer       TEXT NULL COMMENT '답변',

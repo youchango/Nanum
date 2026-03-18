@@ -44,7 +44,7 @@
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
     - [x] 공지사항 관리 (Content)
-    - [x] 1:1문의 관리 (Inquiry)
+    - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
     - [x] 배너 및 팝업 관리 (Banner, Popup)
     - [x] 관리자 로그인 및 권한 관리 (Back-end)
 - **Biz (기업회원)**
@@ -59,6 +59,10 @@
     - [x] 상품 등록 (옵션/이미지 처리 및 UI 검토 완료)
     - [x] 상품 수정 및 상태 변경 (판매중/품절/중지)
     - [x] 상품 삭제 (무결성 보장)
+    - [x] **상품 배송/리뷰 정책 및 출고지 관리 연동 (완료)**
+        - [x] `product` 테이블 신규 정책 컬럼 14종 연동 (배송비, 리뷰 여부 등)
+        - [x] 출고지/입고지(Shipment) 관리 시스템 필터링 및 CRUD 구축
+        - [x] 상품 폼 내 '출고지/배송/리뷰 설정' 탭 및 검색 모달 통합
     - [x] 상품 및 옵션 연결 무결성 강화 및 추가금액 컬럼 로직 동기화 (`a_extra_price` 등)
     - [x] **상품 등록 시 `TransientPropertyValueException` 백엔드 오류 수정 (JPA Cascade 순서 최적화)**
     - [x] 상품 목록 페이징(0-based Offset) 연동 버그 수정 및 상태 변경 UI 재배치
@@ -68,6 +72,19 @@
     - [x] **상품 가격 상세표 UI 개편**: 기존 확장(Expandable)뷰 방식 제거 후, `Modal` 팝업 및 사이트별 탭(`Tabs`)으로 컴포넌트 재구성 완료.
     - [x] **상품 가격 관리(ProductSiteList) 분리 및 고도화**: `ROLE_MASTER` 전용 메뉴 신설. 체크박스로 선택한 사이트에 대한 동적 단가(A/B/C) 입력 표 제공 및 개별 Insert API 연동 완료, 상세 팝업 탭 명칭 ShopName 전환.
     - [x] **백엔드/프론트엔드 빌드 오류 및 프록시 에러 해결**: 에러 코드 정합성 수리 완료 및 `application-local.yml` 8090 포트 지정으로 로그인(ECONNREFUSED) 해결.
+    - [x] **Ant Design Deprecation 경고 제거**: `ProductForm.tsx`, `ShipmentSearchModal.tsx` 내 `Tabs`, `Modal`, `Input` 최신 API 적용 완료.
+    - [x] **배송 시스템 고도화 및 상품 등록 폼 연동**:
+        - [x] 백엔드: `SHIP000001` 형식의 자동 코드 생성 및 관리자별 기본 배송지 조회 API 구현 완료.
+        - [x] 프론트엔드: 출고지 선택 시 배송비 정책(5종) 자동 채우기 및 조건부 UI 로직(묶음배송/최소금액) 적용 완료.
+        - [x] UI/UX: 입/출고지 코드 대신 주소 표시 및 모달 내 기본 배송지 뱃지 시각화 적용 완료.
+        - [x] **주소 검색 및 기본 배송지 로직 고도화**: Daum Postcode 연동 및 입/출고지별 기본 배송지 독립 관리 로직 적용 완료.
+        - [x] **배송지 관리 UI 및 정책 반영 로직 고도화**: 
+            - 입고지/출고지 타입별 필수 필드 노출 제어 (ShipmentSearchModal)
+            - 상품 폼 내 '정책 적용' 버튼을 통한 선택적 배송비 동기화 구현
+            - 배송비 정책 '조건부 무료' 시 최소 금액 필드 노출 오류 수정 및 배송 필드 필수화/기본값 설정 적용
+        - [x] **배송지 스키마 및 엔티티 유연화 (NULL 허용 및 길이 확장)**: 
+            - 입고지/출고지 타입별 선택 입력 필드의 `NOT NULL` 제약 제거 및 `shipment_code` 길이를 50자로 확장하여 등록 오류(`Data too long`) 해결.
+        - [x] **상품 폼 런타임 에러(TypeError) 및 컴포넌트 임포트 누락 수정**: `useWatch` 안정화 및 누락된 antd 컴포넌트 보완 완료.
 - [x] **관심상품(Wishlist) 기능 최적화 및 리팩토링**
     - [x] DB 엔티티 `BaseEntity` 상속을 통한 논리적 삭제(Soft Delete) 도입 완료
     - [x] `JOIN FETCH` 및 `IN` 절 쿼리 방식 튜닝을 통해 N+1 성능 현안 해결
@@ -109,6 +126,7 @@
   - [x] SCM(입점사) 회원가입 및 승인 프로세스 구현 (Backend/Frontend)
   - [x] **최고관리자/SCM/쇼핑몰관리자(ADMIN) 조회 API 응답 포장 및 패치 에러 수정 (렌더링 정상화)**
   - [x] **관리자 정보 갱신(수정) 및 논리 삭제(`UseYn='N'`) UI / API 구현 및 양방향 연동 완료**
+  - [x] **SCM 중복 출고지/반품지 필드 삭제 및 신규 출고지(Shipment) 시스템 전환 완료**
   - [x] **내 정보 관리 (마이페이지) 기능 구현 (완료)**
     - [x] 본인 정보 조회 및 수정 전용 API (`/api/v1/admin/me`)
     - [x] `ProfilePage.tsx` 신설 및 메뉴 연결

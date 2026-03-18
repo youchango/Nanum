@@ -118,6 +118,22 @@ CREATE TABLE product (
     stock_quantity   INT DEFAULT 0 NOT NULL COMMENT '재고수량',
     description      TEXT NULL COMMENT '상품설명',
     view_count       INT DEFAULT 0 NOT NULL COMMENT '조회수',
+
+    review_yn 			CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '리뷰작성가능여부',
+    delivery_way		VARCHAR(20) NULL COMMENT '배송방법(택배, 우편(소포/등기), 직접전달(화물배달), 퀵서비스, 배송필요없음, 상담예약)',
+    delivery_area 		VARCHAR(20) NULL COMMENT '배송지역(전국, 전국(제주/도서산간지역 제외), 서울, 인천, 광주, 대구, 부산, 울산, 경기, 강원, 충남, 충북, 경남, 경북, 전남, 전북, 제주, 서울/경기, 서울/경기/대전, 충북/충남, 경북/경남, 전북/전남, 부산/울산, 서울/경기/제주도서산간 제외지역)',
+    delivery_type 		VARCHAR(20) NULL COMMENT '배송비정책(FREE:무료, PAY:유료, COND:조건부무료)',
+    bundle_shipping_yn CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '묶음배송 가능 여부 (Y: 가능, N: 불가)',
+    delivery_policy_type VARCHAR(20) NOT NULL DEFAULT 'MAX' COMMENT 'MAX: 상품의 최대 배송비 / MIN: 상품의 최소 배송비',
+    delivery_min_order_fee	DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '최소주문금액',
+    outbound_shipment_code VARCHAR(30) NULL COMMENT '출고지 코드',
+	inbound_shipment_code  VARCHAR(30) NULL COMMENT '입고지 코드',
+    delivery_fee 		DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '기본 배송비',
+    return_fee 			DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '반품 배송비(편도)',
+    exchange_fee 		DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '교환 배송비(왕복)',
+    delivery_island_yn	CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '제주/도서산간 배송여부',
+    delivery_island_fee	DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '제주/도서산간 배송비',
+
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
@@ -473,12 +489,6 @@ CREATE TABLE manager_scm (
     scm_bank_name         VARCHAR(50) NOT NULL COMMENT '은행명',
     scm_bank_account_num  VARCHAR(200) NOT NULL COMMENT '계좌번호(암호화)',
     scm_bank_account_name VARCHAR(50) NOT NULL COMMENT '예금주',
-    shipping_zipcode      VARCHAR(10) COMMENT '출고지우편번호',
-    shipping_addr1        VARCHAR(200) COMMENT '출고지주소',
-    shipping_addr2        VARCHAR(200) COMMENT '출고지상세주소',
-    return_zipcode        VARCHAR(10) COMMENT '반품지우편번호',
-    return_addr1          VARCHAR(200) COMMENT '반품지주소',
-    return_addr2          VARCHAR(200) COMMENT '반품지상세주소',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시',
     created_by       VARCHAR(20) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
@@ -785,30 +795,33 @@ CREATE TABLE point (
 
 
 -- Source: inquiry.sql
--- 1:상품문의, 2:배송문의, 3:주문문의, 99:기타문의
+-- PRODUCT:상품, ORDER:주문, DELIVERY:배송, ETC:기타
 CREATE TABLE inquiry (
-    inquiry_id      INT AUTO_INCREMENT COMMENT '문의코드',
-    site_cd         VARCHAR(20) NULL COMMENT '사이트코드',
-    inquiry_type    INT NOT NULL COMMENT '문의구분 (코드ID)',
-    title           VARCHAR(100) NOT NULL COMMENT '제목',
-    content         TEXT NOT NULL COMMENT '내용',
-    answer          TEXT NULL COMMENT '답변',
-    status          VARCHAR(20) NOT NULL COMMENT '처리상태',
-    writer_code     VARCHAR(30) NOT NULL COMMENT '작성자(회원코드)',
-    answerer_code   VARCHAR(30) NULL COMMENT '답변자(회원코드)',
-    answered_at     DATETIME NULL COMMENT '답변일',
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by      VARCHAR(50) NULL COMMENT '생성자',
-    updated_at      DATETIME NULL COMMENT '수정일',
-    updated_by      VARCHAR(50) NULL COMMENT '수정자',
-    deleted_at      DATETIME NULL COMMENT '삭제일',
-    deleted_by      VARCHAR(50) NULL COMMENT '삭제자',
-    delete_yn       CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    inquiry_id   INT AUTO_INCREMENT COMMENT '문의코드',
+    site_cd      VARCHAR(20) NULL COMMENT '사이트코드',
+    inquiry_type VARCHAR(20) NOT NULL COMMENT '문의구분 (PRODUCT:상품, ORDER:주문, DELIVERY:배송, ETC:기타)',
+    product_id   INT NULL COMMENT '상품코드',
+    order_no     VARCHAR(50) NULL COMMENT '주문번호',
+    title        VARCHAR(100) NOT NULL COMMENT '제목',
+    content      TEXT NOT NULL COMMENT '내용',
+    answer       TEXT NULL COMMENT '답변',
+    status       VARCHAR(20) NOT NULL COMMENT '처리상태',
+    writer_code  VARCHAR(30) NOT NULL COMMENT '작성자(회원코드)',
+    answerer_code VARCHAR(30) NULL COMMENT '답변자(회원코드)',
+    answered_at  DATETIME NULL COMMENT '답변일',
+    created_at             DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by             VARCHAR(50) NULL COMMENT '생성자',
+    updated_at             DATETIME NULL COMMENT '수정일',
+    updated_by             VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at             DATETIME NULL COMMENT '삭제일',
+    deleted_by             VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (inquiry_id),
     INDEX idx_inquiry_status (status),
     CONSTRAINT fk_inquiry_writer FOREIGN KEY (writer_code) REFERENCES member (member_code) ON DELETE CASCADE,
     CONSTRAINT fk_inquiry_answerer FOREIGN KEY (answerer_code) REFERENCES member (member_code) ON DELETE SET NULL
 ) COMMENT '문의';
+
 
 
 -- Source: product_biz_mapping.sql
@@ -929,65 +942,32 @@ CREATE TABLE inout_detail (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입출고 Detail';
 
 
-
-
--- Source: init_data.sql
--- ==========================================
--- Nanum Shopping Mall Platform Initial Data
--- ==========================================
-
--- 1. Members
--- Admin
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, role, member_type)
-VALUES ('M_ADMIN_001', 'admin', 'Master Admin', '$2a$10$gucmZaGXYDF6Nk8DdJRzbe9zAA14dmKlOEHPmZuGsSLCpcYzMYjYS', '010-1234-5678', 'admin@nanum.com', 'ROLE_MASTER', 'ADMIN');
-
--- Biz User
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
-VALUES ('M_BIZ_001', 'bizuser', 'Biz Partner', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-1111-2222', 'biz@nanum.com', '12345', 'Seoul', 'Gangnam 123', 'ROLE_BIZ', 'BIZ');
-
--- General User
-INSERT INTO member (member_code, member_login, member_name, password, mobile_phone, email, zipcode, address, address_detail, role, member_type)
-VALUES ('M_USER_001', 'user01', 'Normal User', '$2a$10$tzsZC81JJx0Jhz7MZKHiSeLIQSirLsZU/JpqAymZEgPXrEyLyiXGK', '010-3333-4444', 'user@nanum.com', '54321', 'Busan', 'Haeundae 456', 'ROLE_USER', 'USER');
-
--- 2. Member Biz Info
-INSERT INTO member_biz (member_code, company_name, ceo_name, business_number, approval_status)
-VALUES ('M_BIZ_001', 'Nanum Corp', 'Kim Biz', '123-45-67890', 'APPROVED');
-
--- 3. Address Book
-INSERT INTO address_book (member_code, address_name, receiver_name, receiver_phone, zipcode, address, address_detail, is_default)
-VALUES ('M_USER_001', 'Home', 'Normal User', '010-3333-4444', '54321', 'Busan', 'Haeundae 456', 'Y');
-
--- 4. Product Categories
-INSERT INTO product_category (category_name, depth, display_order) VALUES ('Electronics', 1, 1);
-INSERT INTO product_category (category_name, depth, display_order) VALUES ('Fashion', 1, 2);
-INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Computers', 2, 1);
-INSERT INTO product_category (parent_id, category_name, depth, display_order) VALUES (1, 'Smartphones', 2, 2);
-
--- 5. Products
--- Public Product
-INSERT INTO product (category_id, product_name, retail_price, status, description, thumbnail_url)
-VALUES (3, 'Gaming Laptop', 1500000, 'SALE', 'High performance gaming laptop', '/uploads/laptop.jpg');
-
--- Biz Only Product (Only mapped users can see discount? Or mapping logic)
-INSERT INTO product (category_id, product_name, retail_price, status, description, thumbnail_url)
-VALUES (4, 'Biz Smartphone', 1000000, 'SALE', 'Corporate optimized phone', '/uploads/phone.jpg');
-
--- 6. Product Options
-INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
-VALUES (1, 'RAM 16GB', 0, 100);
-INSERT INTO product_option (product_id, option_name, extra_price, stock_quantity)
-VALUES (1, 'RAM 32GB', 200000, 50);
-
--- 7. Product Biz Mapping
-INSERT INTO product_biz_mapping (product_id, member_code, discount_rate)
-VALUES (2, 'M_BIZ_001', 10); -- 10% discount for this biz member
-
--- 8. Content (Notice)
-INSERT INTO content (content_type, subject, body)
-VALUES ('NOTICE', 'Nanum Mall Open!', 'Welcome to Nanum Shopping Mall.');
-
--- 9. Inquiry
-INSERT INTO inquiry (member_code, inquiry_type, title, content, status)
-VALUES ('M_USER_001', 'General', 'Delivery Question', 'When does shipping start?', 'WAITING');
-
+-- source: shipment.sql
+CREATE TABLE shipment (
+    shipment_id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    shipment_code VARCHAR(30) NOT NULL COMMENT '출고지 코드(SHIP + 숫자 6자리)',
+    shipment_type VARCHAR(20) NOT NULL DEFAULT 'OUT' COMMENT 'IN(입고) / OUT(출고)',
+    shipment_name VARCHAR(100) NOT NULL COMMENT '출고지명',
+    zipcode VARCHAR(10) NOT NULL COMMENT '우편번호',
+    address VARCHAR(200) NOT NULL COMMENT '주소',
+    address_detail VARCHAR(200) NOT NULL COMMENT '상세주소',
+    supplier_name VARCHAR(50) NOT NULL COMMENT '공급자명',
+    phone VARCHAR(45) NOT NULL COMMENT '전화번호',
+    mobile VARCHAR(45) DEFAULT NULL COMMENT '휴대전화번호',
+    shipping_fee DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '기본 배송비',
+    return_fee DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '반품 배송비(편도)',
+    exchange_fee DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '교환 배송비(왕복)',
+    delivery_island_yn	CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '제주/도서산간 배송여부',
+    delivery_island_fee	DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '제주/도서산간 추가배송비',
+    is_default CHAR(1) NOT NULL DEFAULT 'N' COMMENT '기본 배송지 여부 (Y/N)',
+    
+    created_at 		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    created_by 		VARCHAR(50) NULL COMMENT '생성자',
+    updated_at 		DATETIME NULL COMMENT '수정일',
+    updated_by 		VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at 		DATETIME NULL COMMENT '삭제일',
+    deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
+    PRIMARY KEY (shipment_id),UNIQUE KEY uq_shipment_code (shipment_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='출고지/입고지 및 배송 정책';
 

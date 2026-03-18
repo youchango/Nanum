@@ -52,6 +52,8 @@ public class InquiryService {
 
         Inquiry inquiry = Inquiry.builder()
                 .type(request.getType())
+                .productId(request.getProductId())
+                .orderNo(request.getOrderNo())
                 .title(request.getTitle())
                 .content(request.getContent())
                 .writer(writer)
