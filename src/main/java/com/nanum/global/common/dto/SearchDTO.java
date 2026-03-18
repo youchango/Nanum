@@ -59,6 +59,9 @@ public class SearchDTO {
     /** 사용 여부 (정상: Y, 비활성/삭제: N) */
     private String useYn;
 
+    /** 정렬 기준 (best: 조회수순, new: 최신순, 기본: 최신순) */
+    private String sort;
+
     /** 검색 조건 맵 (추가적인 검색 조건) */
     private java.util.Map<String, Object> params = new java.util.HashMap<>();
 

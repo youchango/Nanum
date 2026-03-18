@@ -29,4 +29,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     List<Cart> findCartListWithDetailsByMemberCode(@Param("memberCode") String memberCode);
 
     List<Cart> findByCartIdInAndMemberMemberCodeAndDeleteYn(List<Long> cartIds, String memberCode, String deleteYn);
+
+    List<Cart> findByMemberMemberCodeAndProduct_IdInAndDeleteYn(String memberCode, List<Long> productIds, String deleteYn);
 }
