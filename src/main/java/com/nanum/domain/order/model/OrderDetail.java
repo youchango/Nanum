@@ -55,8 +55,9 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "total_price", precision = 19, scale = 4, nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false, length = 20)
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     @Column(name = "delivery_num", length = 100)
     private String deliveryNum;

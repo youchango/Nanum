@@ -180,7 +180,7 @@ public class OrderService {
                     .optionPrice(BigDecimal.valueOf(optionExtraPrice))
                     .quantity(item.getQuantity())
                     .totalPrice(itemTotal)
-                    .orderStatus(OrderStatus.PAYMENT_WAIT.name())
+                    .orderStatus(OrderStatus.PAYMENT_WAIT)
                     .build();
 
             orderDetails.add(detail);
@@ -737,7 +737,7 @@ public class OrderService {
                     .optionPrice(BigDecimal.valueOf(optionExtraPrice))
                     .quantity(item.getQuantity())
                     .totalPrice(itemTotal)
-                    .orderStatus(OrderStatus.PAID.name())
+                    .orderStatus(OrderStatus.PAID)
                     .build();
             orderDetails.add(detail);
         }
@@ -980,14 +980,16 @@ public class OrderService {
     }
 
     private OrderDTO.OrderDetailResponse toOrderDetailResponse(OrderDetail d) {
+        BigDecimal unitPrice = d.getProductPrice().add(
+                d.getOptionPrice() != null ? d.getOptionPrice() : BigDecimal.ZERO);
         return OrderDTO.OrderDetailResponse.builder()
                 .orderDetailId(d.getId())
                 .productId(d.getProductId())
                 .productName(d.getProductName())
                 .optionName(d.getOptionName())
                 .quantity(d.getQuantity())
-                .pricePerUnit(d.getProductPrice().intValue() + (d.getOptionPrice() != null ? d.getOptionPrice().intValue() : 0))
-                .totalPrice(d.getTotalPrice().intValue())
+                .pricePerUnit(unitPrice)
+                .totalPrice(d.getTotalPrice())
                 .reviewYn("Y".equals(d.getReviewYn()))
                 .build();
     }

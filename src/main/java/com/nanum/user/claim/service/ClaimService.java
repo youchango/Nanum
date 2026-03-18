@@ -2,6 +2,7 @@ package com.nanum.user.claim.service;
 
 import com.nanum.domain.claim.dto.ClaimDTO;
 import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimStatus;
 import com.nanum.domain.claim.repository.ClaimRepository;
 import com.nanum.domain.member.model.Member;
 import com.nanum.domain.order.model.OrderDetail;
@@ -30,11 +31,6 @@ public class ClaimService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
 
-    private static final List<String> VALID_CLAIM_TYPES = List.of("EXCHANGE", "RETURN", "REFUND");
-    private static final List<String> VALID_CLAIM_REASONS = List.of(
-            "ORDER_ERROR", "CHANGE_OF_MIND", "DEFECTIVE", "DAMAGED", "MISDELIVERY", "OTHER"
-    );
-
     /**
      * 클레임(교환/반품/환불) 접수
      */
@@ -57,20 +53,10 @@ public class ClaimService {
             throw new BusinessException("배송 완료된 주문만 교환/반품/환불 접수가 가능합니다.", ErrorCode.INVALID_INPUT_VALUE);
         }
 
-        // 4. 클레임 유형 검증
-        if (!VALID_CLAIM_TYPES.contains(request.getClaimType())) {
-            throw new BusinessException("유효하지 않은 클레임 유형입니다: " + request.getClaimType(), ErrorCode.INVALID_INPUT_VALUE);
-        }
-
-        // 5. 클레임 사유 검증
-        if (!VALID_CLAIM_REASONS.contains(request.getClaimReason())) {
-            throw new BusinessException("유효하지 않은 클레임 사유입니다: " + request.getClaimReason(), ErrorCode.INVALID_INPUT_VALUE);
-        }
-
-        // 6. 주문상세별 중복 클레임 방지
+        // 4. 주문상세별 중복 클레임 방지
         if (request.getOrderDetailId() != null) {
             boolean duplicateExists = claimRepository.existsByOrderDetailIdAndClaimStatusNot(
-                    request.getOrderDetailId(), "REJECTED");
+                    request.getOrderDetailId(), ClaimStatus.REJECTED);
             if (duplicateExists) {
                 throw new BusinessException("해당 주문 상품에 대해 이미 접수된 클레임이 있습니다.", ErrorCode.INVALID_INPUT_VALUE);
             }
@@ -97,7 +83,7 @@ public class ClaimService {
                 .member(member)
                 .siteCd(order.getSiteCd())
                 .claimType(request.getClaimType())
-                .claimStatus("REQUESTED")
+                .claimStatus(ClaimStatus.REQUESTED)
                 .claimReason(request.getClaimReason())
                 .claimReasonDetail(request.getClaimReasonDetail())
                 .orderDetailId(request.getOrderDetailId())

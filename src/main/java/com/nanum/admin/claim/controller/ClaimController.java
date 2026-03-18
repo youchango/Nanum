@@ -1,6 +1,7 @@
 package com.nanum.admin.claim.controller;
 
 import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimStatus;
 import com.nanum.admin.claim.service.ClaimService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class ClaimController {
     @PutMapping("/{id}/status")
     public ResponseEntity<Claim> updateClaimStatus(
             @PathVariable Long id,
-            @RequestParam String status,
+            @RequestParam ClaimStatus status,
             @RequestParam String managerCode) {
         return ResponseEntity.ok(claimService.updateClaimStatus(id, status, managerCode));
     }

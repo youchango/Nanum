@@ -1,6 +1,9 @@
 package com.nanum.domain.claim.dto;
 
 import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimType;
+import com.nanum.domain.claim.model.ClaimStatus;
+import com.nanum.domain.claim.model.ClaimReason;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,11 +27,11 @@ public class ClaimDTO {
         /** null이면 전체 주문 대상 클레임 */
         private Long orderDetailId;
 
-        @NotBlank(message = "클레임 유형은 필수입니다. (EXCHANGE/RETURN/REFUND)")
-        private String claimType;
+        @NotNull(message = "클레임 유형은 필수입니다. (EXCHANGE/RETURN/REFUND)")
+        private ClaimType claimType;
 
-        @NotBlank(message = "클레임 사유는 필수입니다.")
-        private String claimReason;
+        @NotNull(message = "클레임 사유는 필수입니다.")
+        private ClaimReason claimReason;
 
         @NotBlank(message = "상세 사유는 필수입니다.")
         @Size(min = 10, message = "상세 사유는 최소 10자 이상 입력해주세요.")
@@ -53,9 +56,9 @@ public class ClaimDTO {
         private Long orderId;
         private String orderNo;
         private String orderName;
-        private String claimType;
-        private String claimStatus;
-        private String claimReason;
+        private ClaimType claimType;
+        private ClaimStatus claimStatus;
+        private ClaimReason claimReason;
         private String claimReasonDetail;
         private String productName;
         private int quantity;

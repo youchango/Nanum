@@ -1,6 +1,7 @@
 package com.nanum.domain.claim.repository;
 
 import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,7 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     List<Claim> findByOrderMasterOrderId(Long orderId);
 
-    boolean existsByOrderDetailIdAndClaimStatusNot(Long orderDetailId, String status);
+    boolean existsByOrderDetailIdAndClaimStatusNot(Long orderDetailId, ClaimStatus status);
 
     // Admin dashboard queries
     List<Claim> findTop5BySiteCdOrderByRequestedAtDesc(String siteCd);

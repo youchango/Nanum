@@ -1,6 +1,7 @@
 package com.nanum.admin.claim.service;
 
 import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimStatus;
 import com.nanum.domain.claim.repository.ClaimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class ClaimService {
     }
 
     @Transactional
-    public Claim updateClaimStatus(Long claimId, String status, String managerCode) {
+    public Claim updateClaimStatus(Long claimId, ClaimStatus status, String managerCode) {
         Claim claim = getClaim(claimId);
         claim.setClaimStatus(status);
         claim.setReviewedAt(java.time.LocalDateTime.now());

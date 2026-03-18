@@ -118,8 +118,9 @@ public class OrderDTO {
         private String productName;
         private String optionName;
         private int quantity;
-        private int pricePerUnit;
-        private int totalPrice;
+        private BigDecimal pricePerUnit;
+        private BigDecimal totalPrice;
+        @com.fasterxml.jackson.annotation.JsonProperty("reviewYn")
         private boolean reviewYn;
     }
 

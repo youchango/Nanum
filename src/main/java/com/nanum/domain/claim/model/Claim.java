@@ -38,18 +38,18 @@ public class Claim extends BaseEntity {
     @Column(name = "site_cd", length = 100)
     private String siteCd;
 
-    /** EXCHANGE / RETURN / REFUND */
+    @Enumerated(EnumType.STRING)
     @Column(name = "claim_type", nullable = false, length = 20)
-    private String claimType;
+    private ClaimType claimType;
 
-    /** REQUESTED / REVIEWING / APPROVED / REJECTED / COMPLETED */
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     @Column(name = "claim_status", nullable = false, length = 20)
-    private String claimStatus = "REQUESTED";
+    private ClaimStatus claimStatus = ClaimStatus.REQUESTED;
 
-    /** ORDER_ERROR / CHANGE_OF_MIND / DEFECTIVE / DAMAGED / MISDELIVERY / OTHER */
+    @Enumerated(EnumType.STRING)
     @Column(name = "claim_reason", nullable = false, length = 30)
-    private String claimReason;
+    private ClaimReason claimReason;
 
     @Column(name = "claim_reason_detail", columnDefinition = "TEXT")
     private String claimReasonDetail;
