@@ -22,7 +22,8 @@ public class AdminInquiryController {
 
     @GetMapping
     @Operation(summary = "문의 목록 조회", description = "검색 조건(InquiryDTO.Search)과 페이징 정보를 기반으로 1:1 문의 목록을 조회하고 결과를 반환합니다.")
-    public ApiResponse<Page<InquiryDTO.Response>> getInquiries(InquiryDTO.Search search, Pageable pageable) {
+    public ApiResponse<Page<InquiryDTO.Response>> getInquiries(InquiryDTO.Search search, 
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable) {
         return ApiResponse.success(adminInquiryService.getInquiries(search, pageable));
     }
 

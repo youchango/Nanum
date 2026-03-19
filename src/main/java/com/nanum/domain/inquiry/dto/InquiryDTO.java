@@ -45,6 +45,7 @@ public class InquiryDTO {
         private String orderNo;
         private String keyword; // Title or Content or Writer
         private String writerCode;
+        private String siteCd;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
     }
@@ -67,6 +68,7 @@ public class InquiryDTO {
         private String statusDesc;
         private String writerCode;
         private String writerName;
+        private String siteCd;
         @com.fasterxml.jackson.annotation.JsonProperty("isSecret")
         private boolean isSecret;
         private LocalDateTime createdAt;
@@ -87,6 +89,7 @@ public class InquiryDTO {
                     .statusDesc(inquiry.getStatus().getDescription())
                     .writerCode(inquiry.getWriter().getMemberCode())
                     .writerName(inquiry.getWriter().getMemberName())
+                    .siteCd(inquiry.getSiteCd())
                     .isSecret("Y".equals(inquiry.getIsSecret()))
                     .createdAt(inquiry.getCreatedAt())
                     .answeredAt(inquiry.getAnsweredAt())

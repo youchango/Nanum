@@ -44,7 +44,7 @@
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
     - [x] 컨텐츠 통합 관리 (공지사항/FAQ 통합, SearchDTO 1-based Pagination 연동 필드명(type) 일괄 수정 및 MASTER 권한 전체 조회 쿼리 고도화 완료)
-    - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
+    - [x] 1:1문의 관리 (Inquiry) - 사이트 필터링(SiteTab), 검색 및 페이징 고도화, API 규격 정규화 및 답변 등록 로직 개선 완료
     - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너/팝업 타입 최신화(메인 상/중/하, 서브 좌/우), 목록 컬럼 고도화(타입, 노출순서, 등록일 표시), 파일 업로드 및 수정 시 이미지 동기화(syncFiles) 로직 적용 완료
     - [x] 관리자 로그인 및 권한 관리 (Back-end)
 - **Biz (기업회원)**

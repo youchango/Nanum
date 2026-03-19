@@ -35,7 +35,8 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
                         orderNoEq(search),
                         keywordLike(search),
                         writerCodeEq(search),
-                        periodBetween(search))
+                        periodBetween(search),
+                        siteCdEq(search))
                 .orderBy(inquiry.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -51,9 +52,14 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
                         orderNoEq(search),
                         keywordLike(search),
                         writerCodeEq(search),
-                        periodBetween(search));
+                        periodBetween(search),
+                        siteCdEq(search));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression siteCdEq(InquiryDTO.Search search) {
+        return StringUtils.hasText(search.getSiteCd()) ? inquiry.siteCd.eq(search.getSiteCd()) : null;
     }
 
     private BooleanExpression typeEq(InquiryDTO.Search search) {
