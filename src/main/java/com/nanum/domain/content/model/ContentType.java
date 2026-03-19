@@ -6,9 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ContentType {
-    NOTICE("공지사항", 1),
-    FAQ("FAQ", 2);
+    NOTICE("공지사항"),
+    FAQ("FAQ");
 
     private final String description;
-    private final int code;
 }

@@ -9,9 +9,9 @@ CREATE TABLE site_policy_history (
     footer_info       TEXT NULL COMMENT '푸터 정보',
 
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by        INT NULL COMMENT '생성자',
+    created_by        VARCHAR(50) NULL COMMENT '생성자',
     updated_at        DATETIME NULL COMMENT '수정일',
-    updated_by        INT NULL COMMENT '수정자',
+    updated_by        VARCHAR(50) NULL COMMENT '수정자',
     deleted_at        DATETIME NULL COMMENT '삭제일',
     deleted_by        VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',

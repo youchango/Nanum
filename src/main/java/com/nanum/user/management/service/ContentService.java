@@ -18,9 +18,15 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public List<ContentDTO.Response> getContents(ContentType type, String siteCd) {
-        return contentRepository.findByTypeAndSiteCd(type, siteCd).stream()
-                .filter(c -> "N".equals(c.getDeleteYn()))
+    public List<ContentDTO.Response> getContents(ContentType type, String siteCd, String keyword) {
+        List<Content> contents;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            contents = contentRepository.findBySearch(type, siteCd, keyword);
+        } else {
+            contents = contentRepository.findByTypeAndSiteCd(type, siteCd);
+        }
+
+        return contents.stream()
                 .map(ContentDTO.Response::from)
                 .collect(Collectors.toList());
     }

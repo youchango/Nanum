@@ -7,16 +7,18 @@ CREATE TABLE coupon (
     discount_value   INT NOT NULL COMMENT '할인값(원/%)',
     max_discount     INT NULL COMMENT '최대할인금액(정률시)',
     min_order_price  INT DEFAULT 0 NOT NULL COMMENT '최소주문금액',
-    
     valid_start_date DATETIME NOT NULL COMMENT '유효시작일시',
     valid_end_date   DATETIME NOT NULL COMMENT '유효종료일시',
     target_type      VARCHAR(20) DEFAULT 'ALL' NOT NULL COMMENT '적용대상(ALL:전체, USER:개인, BIZ:기업)',
     issue_limit      INT NULL COMMENT '발급제한수량',
     issue_count      INT DEFAULT 0 NOT NULL COMMENT '발급수량',
-    
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by       INT NULL COMMENT '생성자',
-    
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by     VARCHAR(50) NULL COMMENT '생성자',
+    updated_at     DATETIME NULL COMMENT '수정일',
+    updated_by     VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at     DATETIME NULL COMMENT '삭제일',
+    deleted_by     VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (coupon_id)
 ) COMMENT '쿠폰 마스터';
 

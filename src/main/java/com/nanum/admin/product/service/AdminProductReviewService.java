@@ -44,7 +44,7 @@ public class AdminProductReviewService {
         ProductReview review = productReviewRepository.findByIdAndDeleteYn(reviewId, "N")
                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-        review.delete(manager.getManagerId());
+        review.delete(manager.getManagerCode());
     }
 
     private Manager getCurrentManager() {

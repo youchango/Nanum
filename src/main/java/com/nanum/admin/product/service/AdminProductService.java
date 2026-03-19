@@ -2,6 +2,7 @@ package com.nanum.admin.product.service;
 
 import com.nanum.global.error.exception.BusinessException;
 import com.nanum.global.error.ErrorCode;
+import com.nanum.admin.inout.service.AdminInoutService;
 
 import com.nanum.domain.product.dto.AdminProductListDTO;
 import com.nanum.domain.product.dto.AdminProductSearchDTO;
@@ -36,7 +37,7 @@ public class AdminProductService {
         private final ProductSiteRepository productSiteRepository; // Injected
         private final ProductCategoryRepository productCategoryRepository;
         private final ProductOptionRepository productOptionRepository;
-        private final InventoryService inventoryService;
+        private final AdminInoutService adminInoutService;
         private final com.nanum.domain.file.service.FileService fileService;
         private final com.nanum.domain.shipment.repository.ShipmentRepository shipmentRepository;
 
@@ -143,12 +144,14 @@ public class AdminProductService {
                                 .exchangeFee(product.getExchangeFee())
                                 .deliveryIslandYn(product.getDeliveryIslandYn())
                                 .deliveryIslandFee(product.getDeliveryIslandFee())
-                                .outboundShipment(product.getOutboundShipmentCode() != null ? 
-                                    shipmentRepository.findByShipmentCode(product.getOutboundShipmentCode())
-                                        .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from).orElse(null) : null)
-                                .inboundShipment(product.getInboundShipmentCode() != null ? 
-                                    shipmentRepository.findByShipmentCode(product.getInboundShipmentCode())
-                                        .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from).orElse(null) : null)
+                                .outboundShipment(product.getOutboundShipmentCode() != null ? shipmentRepository
+                                                .findByShipmentCode(product.getOutboundShipmentCode())
+                                                .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from)
+                                                .orElse(null) : null)
+                                .inboundShipment(product.getInboundShipmentCode() != null ? shipmentRepository
+                                                .findByShipmentCode(product.getInboundShipmentCode())
+                                                .map(com.nanum.domain.shipment.dto.ShipmentDTO.Response::from)
+                                                .orElse(null) : null)
                                 .options(options)
                                 .images(images)
                                 .build();
@@ -183,16 +186,26 @@ public class AdminProductService {
                                 .deliveryWay(request.getDeliveryWay())
                                 .deliveryArea(request.getDeliveryArea())
                                 .deliveryType(request.getDeliveryType())
-                                .bundleShippingYn(request.getBundleShippingYn() != null ? request.getBundleShippingYn() : "Y")
-                                .deliveryPolicyType(request.getDeliveryPolicyType() != null ? request.getDeliveryPolicyType() : "MAX")
-                                .deliveryMinOrderFee(request.getDeliveryMinOrderFee() != null ? request.getDeliveryMinOrderFee() : BigDecimal.ZERO)
+                                .bundleShippingYn(request.getBundleShippingYn() != null ? request.getBundleShippingYn()
+                                                : "Y")
+                                .deliveryPolicyType(request.getDeliveryPolicyType() != null
+                                                ? request.getDeliveryPolicyType()
+                                                : "MAX")
+                                .deliveryMinOrderFee(request.getDeliveryMinOrderFee() != null
+                                                ? request.getDeliveryMinOrderFee()
+                                                : BigDecimal.ZERO)
                                 .outboundShipmentCode(request.getOutboundShipmentCode())
                                 .inboundShipmentCode(request.getInboundShipmentCode())
-                                .deliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO)
+                                .deliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee()
+                                                : BigDecimal.ZERO)
                                 .returnFee(request.getReturnFee() != null ? request.getReturnFee() : BigDecimal.ZERO)
-                                .exchangeFee(request.getExchangeFee() != null ? request.getExchangeFee() : BigDecimal.ZERO)
-                                .deliveryIslandYn(request.getDeliveryIslandYn() != null ? request.getDeliveryIslandYn() : "Y")
-                                .deliveryIslandFee(request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee() : BigDecimal.ZERO)
+                                .exchangeFee(request.getExchangeFee() != null ? request.getExchangeFee()
+                                                : BigDecimal.ZERO)
+                                .deliveryIslandYn(request.getDeliveryIslandYn() != null ? request.getDeliveryIslandYn()
+                                                : "Y")
+                                .deliveryIslandFee(
+                                                request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee()
+                                                                : BigDecimal.ZERO)
                                 .build();
 
                 // Check if options usage is Y and add them
@@ -220,7 +233,7 @@ public class AdminProductService {
                 processFiles(request.getImages(), product.getId());
 
                 // 4. Initialize Stock
-                inventoryService.initializeStock(product, product.getOptions());
+                adminInoutService.initializeStock(product, product.getOptions());
 
                 return product.getId();
         }
@@ -256,14 +269,16 @@ public class AdminProductService {
                                 request.getDeliveryType(),
                                 request.getBundleShippingYn() != null ? request.getBundleShippingYn() : "Y",
                                 request.getDeliveryPolicyType() != null ? request.getDeliveryPolicyType() : "MAX",
-                                request.getDeliveryMinOrderFee() != null ? request.getDeliveryMinOrderFee() : BigDecimal.ZERO,
+                                request.getDeliveryMinOrderFee() != null ? request.getDeliveryMinOrderFee()
+                                                : BigDecimal.ZERO,
                                 request.getOutboundShipmentCode(),
                                 request.getInboundShipmentCode(),
                                 request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO,
                                 request.getReturnFee() != null ? request.getReturnFee() : BigDecimal.ZERO,
                                 request.getExchangeFee() != null ? request.getExchangeFee() : BigDecimal.ZERO,
                                 request.getDeliveryIslandYn() != null ? request.getDeliveryIslandYn() : "Y",
-                                request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee() : BigDecimal.ZERO); // 수정 시 무조건 N
+                                request.getDeliveryIslandFee() != null ? request.getDeliveryIslandFee()
+                                                : BigDecimal.ZERO); // 수정 시 무조건 N
 
                 // salePrice 변경 시 사이트별 가격 일괄 동기화 로직 제거
 
@@ -332,7 +347,7 @@ public class AdminProductService {
 
                 productRepository.saveAndFlush(product);
 
-                inventoryService.initializeStock(product, product.getOptions());
+                adminInoutService.initializeStock(product, product.getOptions());
         }
 
         private void processFiles(List<ProductDTO.Image> images, Long productId) {
@@ -394,7 +409,7 @@ public class AdminProductService {
                 }
 
                 for (ProductSite ps : sites) {
-                        ps.delete(manager.getManagerId());
+                        ps.delete(manager.getManagerCode());
                 }
         }
 
@@ -468,7 +483,7 @@ public class AdminProductService {
                 Product product = productRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-                product.delete(manager.getManagerId());
+                product.delete(manager.getManagerCode());
                 fileService.deleteByReference(com.nanum.domain.file.model.ReferenceType.PRODUCT, String.valueOf(id),
                                 manager.getManagerId());
         }

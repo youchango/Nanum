@@ -43,7 +43,7 @@
     - [x] 회원 등록 시 사업자 등록번호 필드 제거 및 유형별 권한(BIZ/USER/VETERAN) 최적화
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
-    - [x] 공지사항 관리 (Content)
+    - [x] 컨텐츠 통합 관리 (Content - 공지사항/FAQ 통합, SiteTab, Enum(String), **삭제 시 매니저 정보 연동 및 사용자 검색 기능 추가 완료**)
     - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
     - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너 SiteTab 및 권한별 사이트 자동 할당 로직 적용 완료
     - [x] 관리자 로그인 및 권한 관리 (Back-end)
@@ -116,6 +116,7 @@
   - [x] 입출고 관리 모듈 구조 리팩토링 (Controller/Service/Repository/DTO를 Admin 영역으로 분리)
   - [x] **InoutController API 응답 표준화(ApiResponse) 및 Swagger-UI 문서화 적용**
   - [x] 실재고(ProductStock)와 전시재고(Product/Option) 간 자동 동기화
+  - [x] **재고 관리 로직 통합 (InventoryService 제거 및 AdminInoutService로 일원화 완료)**
 
 ### 6. 관리자 시스템 (Admin Back-Office)
 - [x] 관리자 인증 (로그인/토큰 갱신)

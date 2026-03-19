@@ -44,11 +44,11 @@ CREATE TABLE product (
     delivery_island_fee	DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '제주/도서산간 배송비',
     
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     PRIMARY KEY (product_id)
@@ -95,11 +95,11 @@ CREATE TABLE product_site (
     pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
     
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
     PRIMARY KEY (ps_id),

@@ -9,11 +9,11 @@ CREATE TABLE code (
     use_yn     CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
     delete_yn  CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by INT NULL COMMENT '생성자',
+    created_by VARCHAR(50) NULL COMMENT '생성자',
     updated_at DATETIME NULL COMMENT '수정일',
-    updated_by INT NULL COMMENT '수정자',
+    updated_by VARCHAR(50) NULL COMMENT '수정자',
     deleted_at DATETIME NULL COMMENT '삭제일',
-    deleted_by INT NULL COMMENT '삭제자',
+    deleted_by VARCHAR(50) NULL COMMENT '삭제자',
     PRIMARY KEY (code_id),
     INDEX idx_code_type (code_type),
     CONSTRAINT fk_code_upper FOREIGN KEY (upper) REFERENCES code (code_id) ON DELETE SET NULL
@@ -135,11 +135,11 @@ CREATE TABLE product (
     delivery_island_fee	DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '제주/도서산간 배송비',
 
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     PRIMARY KEY (product_id)
@@ -182,11 +182,11 @@ CREATE TABLE product_site (
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
     pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (ps_id),
     UNIQUE KEY uq_ps_prod_site (product_id, site_cd),
@@ -219,11 +219,11 @@ CREATE TABLE product_review (
     rating           INT NOT NULL COMMENT '별점',
     like_count       INT DEFAULT 0 COMMENT '좋아요',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(20) NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
-    updated_by       VARCHAR(20) DEFAULT NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) DEFAULT NULL COMMENT '수정자',
     deleted_at       DATETIME DEFAULT NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) DEFAULT NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) DEFAULT NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부(Y/N)',
     FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
@@ -255,11 +255,11 @@ CREATE TABLE file_store (
     is_main        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '대표이미지 여부(Y/N)',
     display_order  INT DEFAULT 0 NOT NULL COMMENT '노출순서',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(20) NOT NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NOT NULL COMMENT '등록자',
     updated_at       DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
-    updated_by       VARCHAR(20) DEFAULT NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) DEFAULT NULL COMMENT '수정자',
     deleted_at       DATETIME DEFAULT NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) DEFAULT NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) DEFAULT NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부(Y/N)',
     
     PRIMARY KEY (file_id),
@@ -283,34 +283,35 @@ CREATE TABLE banner (
     use_yn         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
     delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by     INT NULL COMMENT '생성자',
+    created_by     VARCHAR(50) NULL COMMENT '생성자',
     updated_at     DATETIME NULL COMMENT '수정일',
-    updated_by     INT NULL COMMENT '수정자',
+    updated_by     VARCHAR(50) NULL COMMENT '수정자',
     deleted_at     DATETIME NULL COMMENT '삭제일',
-    deleted_by     INT NULL COMMENT '삭제자',
+    deleted_by     VARCHAR(50) NULL COMMENT '삭제자',
     PRIMARY KEY (banner_id),
     INDEX idx_banner_sort (banner_type, sort_order),
     INDEX idx_banner_date (start_datetime, end_datetime)
 ) COMMENT '배너 관리';
 
 
+
 -- Source: content.sql
 CREATE TABLE content (
     content_id   INT AUTO_INCREMENT COMMENT '컨텐츠 코드',
     site_cd      VARCHAR(20) NULL COMMENT '사이트코드',
-    content_type INT NOT NULL COMMENT '구분(Code ID)',
+    content_type VARCHAR(50) NOT NULL COMMENT 'NOTICE, FAQ',
     subject      VARCHAR(200) NOT NULL COMMENT '제목',
     content_body LONGTEXT NOT NULL COMMENT '내용',
     url_info     VARCHAR(255) NULL COMMENT 'URL 정보',
-    delete_yn    CHAR(1) DEFAULT 'N' COMMENT '삭제유무',
-    created_by   BIGINT NULL COMMENT '생성자',
+    created_by   VARCHAR(50) NULL COMMENT '생성자',
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    updated_by   BIGINT NULL COMMENT '수정자',
+    updated_by   VARCHAR(50) NULL COMMENT '수정자',
     updated_at   DATETIME NULL COMMENT '수정일',
+    deleted_by   VARCHAR(50) NULL COMMENT '삭제자',
     deleted_at   DATETIME NULL COMMENT '삭제일',
-    deleted_by   BIGINT NULL COMMENT '삭제자',
+    delete_yn    CHAR(1) DEFAULT 'N' COMMENT '삭제유무',
     PRIMARY KEY (content_id)
-) COMMENT '컨텐츠';
+) COMMENT '공지사항 게시판 테이블';
 
 
 -- Source: popup.sql
@@ -330,16 +331,17 @@ CREATE TABLE popup (
     start_datetime DATETIME NOT NULL COMMENT '게시 시작일시',
     end_datetime   DATETIME NOT NULL COMMENT '게시 종료일시',
     use_yn         CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용유무',
-    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by     INT NULL COMMENT '생성자',
+    created_by     VARCHAR(50) NULL COMMENT '생성자',
     updated_at     DATETIME NULL COMMENT '수정일',
-    updated_by     INT NULL COMMENT '수정자',
+    updated_by     VARCHAR(50) NULL COMMENT '수정자',
     deleted_at     DATETIME NULL COMMENT '삭제일',
-    deleted_by     INT NULL COMMENT '삭제자',
+    deleted_by     VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (popup_id),
     INDEX idx_popup_date (start_datetime, end_datetime)
 ) COMMENT '팝업 관리';
+
 
 
 -- Source: coupon.sql
@@ -357,9 +359,13 @@ CREATE TABLE coupon (
     target_type      VARCHAR(20) DEFAULT 'ALL' NOT NULL COMMENT '적용대상(ALL:전체, USER:개인, BIZ:기업)',
     issue_limit      INT NULL COMMENT '발급제한수량',
     issue_count      INT DEFAULT 0 NOT NULL COMMENT '발급수량',
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by       INT NULL COMMENT '생성자',
-    
+    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by     VARCHAR(50) NULL COMMENT '생성자',
+    updated_at     DATETIME NULL COMMENT '수정일',
+    updated_by     VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at     DATETIME NULL COMMENT '삭제일',
+    deleted_by     VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (coupon_id)
 ) COMMENT '쿠폰 마스터';
 
@@ -401,11 +407,11 @@ CREATE TABLE manager (
     login_date       DATETIME NULL COMMENT '최근로그인일시',
     mb_type          VARCHAR(20) DEFAULT '' NOT NULL COMMENT '관리자유형(MASTER, SCM, ADMIN)',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(20) NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (manager_seq),
     UNIQUE KEY uq_manager_id (manager_id),
@@ -424,11 +430,11 @@ CREATE TABLE manager_menu (
     display_order    INT NULL COMMENT '표시순서',
     menu_parameter   VARCHAR(100) DEFAULT '' NOT NULL COMMENT '파라미터',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(200) NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(200) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(200) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (menu_seq)
 ) COMMENT '관리자 메뉴';
@@ -441,11 +447,11 @@ CREATE TABLE manager_auth_group (
     auth_group_name  VARCHAR(100) NOT NULL COMMENT '권한그룹명',
     use_yn           CHAR(1) NOT NULL COMMENT '사용여부',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(200) NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(200) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(200) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (auth_group_seq)
 ) COMMENT '관리자 권한 그룹';
@@ -457,7 +463,7 @@ CREATE TABLE manager_menu_group (
     auth_group_seq   INT NOT NULL COMMENT '권한그룹SEQ',
     menu_seq         INT NOT NULL COMMENT '메뉴SEQ',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(200) NULL COMMENT '등록자',
+    created_by       VARCHAR(50) NULL COMMENT '등록자',
     PRIMARY KEY (auth_group_seq, menu_seq),
     CONSTRAINT fk_mmg_auth FOREIGN KEY (auth_group_seq) REFERENCES manager_auth_group (auth_group_seq) ON DELETE CASCADE,
     CONSTRAINT fk_mmg_menu FOREIGN KEY (menu_seq) REFERENCES manager_menu (menu_seq) ON DELETE CASCADE
@@ -491,48 +497,15 @@ CREATE TABLE manager_scm (
     scm_bank_account_num  VARCHAR(200) NOT NULL COMMENT '계좌번호(암호화)',
     scm_bank_account_name VARCHAR(50) NOT NULL COMMENT '예금주',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     CONSTRAINT PK_MANAGER_SCM PRIMARY KEY (manager_seq),
     CONSTRAINT FK_MANAGER_SCM_BASE FOREIGN KEY (manager_seq) REFERENCES manager (manager_seq)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SCM 관리자 상세정보';
-
-
--- Source: inventory_history.sql
--- [NEW] Inventory History (Product Stock In/Out) - Master/Detail Structure
-
--- 1. Inventory History Master
--- 재고 변동의 공통 정보(날짜, 담당자, 전체 비고)를 관리
-CREATE TABLE inventory_history_master (
-    history_id       INT AUTO_INCREMENT COMMENT '이력마스터ID',
-    history_date     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '입출고일시',
-    memo             VARCHAR(500) NULL COMMENT '전체비고',
-    created_by       INT NULL COMMENT '담당자(관리자ID)',
-    PRIMARY KEY (history_id),
-    INDEX idx_hist_date (history_date)
-) COMMENT '재고 입출고 이력 마스터';
-
--- 2. Inventory History Detail
--- 개별 상품 및 옵션의 수량 변동 내역
-CREATE TABLE inventory_history_detail (
-    detail_id        INT AUTO_INCREMENT COMMENT '상세ID',
-    history_id       INT NOT NULL COMMENT '이력마스터ID',
-    product_id       INT NOT NULL COMMENT '상품ID',
-    option_id        INT NULL COMMENT '옵션ID',
-    type             VARCHAR(20) NOT NULL COMMENT '구분(IN:입고, OUT:출고, RETURN:반품, ADJUST:조정)',
-    quantity         INT NOT NULL COMMENT '변동수량',
-    prev_quantity    INT NOT NULL COMMENT '변동전재고(창고재고 기준)',
-    curr_quantity    INT NOT NULL COMMENT '변동후재고(창고재고 기준)',
-    memo             VARCHAR(500) NULL COMMENT '개별비고',
-    PRIMARY KEY (detail_id),
-    CONSTRAINT fk_detail_master FOREIGN KEY (history_id) REFERENCES inventory_history_master (history_id) ON DELETE CASCADE,
-    CONSTRAINT fk_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
-    CONSTRAINT fk_detail_option FOREIGN KEY (option_id) REFERENCES product_option (option_id)
-) COMMENT '재고 입출고 이력 상세';
 
 
 -- Source: member_biz.sql
@@ -562,6 +535,8 @@ CREATE TABLE cart (
     created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일',
     updated_by       VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (cart_id),
     INDEX idx_cart_member (member_code),
@@ -594,11 +569,11 @@ CREATE TABLE order_master (
     tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
     -- BaseEntity Information
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시(주문일시)',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (order_id),
     UNIQUE KEY uq_order_no (order_no),
@@ -780,19 +755,25 @@ CREATE TABLE payment_master (
 
 -- Source: point.sql
 CREATE TABLE point (
-    point_id    INT AUTO_INCREMENT COMMENT '포인트코드',
-    site_cd     VARCHAR(20) NULL COMMENT '사이트코드',
-    point_use   INT NOT NULL COMMENT '사용/적립 포인트',
-    point_bigo  VARCHAR(255) NULL COMMENT '포인트 상세 이력',
-    point_gubun VARCHAR(20) NOT NULL COMMENT '구분(SAVE:적립, USE:사용)',
-    member_code VARCHAR(30) NOT NULL COMMENT '회원코드',
-    order_no    VARCHAR(50) NULL COMMENT '주문번호',
-    created_by  VARCHAR(50) NULL COMMENT '생성자',
-    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',
-    
-    PRIMARY KEY (point_id),
-    CONSTRAINT fk_point_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '포인트';
+  point_id int(11) NOT NULL AUTO_INCREMENT COMMENT '포인트코드',
+  site_cd varchar(20) DEFAULT NULL COMMENT '사이트코드',
+  point_use int(11) NOT NULL COMMENT '사용/적립 포인트',
+  point_bigo varchar(255) DEFAULT NULL COMMENT '포인트 상세 이력',
+  point_gubun varchar(20) NOT NULL COMMENT '구분(SAVE:적립, USE:사용)',
+  member_code varchar(30) NOT NULL COMMENT '회원코드',
+  order_no varchar(50) DEFAULT NULL COMMENT '주문번호',
+  created_at datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일',
+  created_by varchar(50) DEFAULT NULL COMMENT '생성자',
+  updated_at datetime DEFAULT NULL COMMENT '수정일',
+  updated_by varchar(50) DEFAULT NULL COMMENT '수정자',
+  deleted_at datetime DEFAULT NULL COMMENT '삭제일',
+  deleted_by varchar(50) DEFAULT NULL COMMENT '삭제자',
+  delete_yn char(1) NOT NULL DEFAULT 'N' COMMENT '삭제여부',
+  PRIMARY KEY (point_id),
+  KEY fk_point_member (member_code),
+  CONSTRAINT fk_point_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='포인트';
+
 
 
 -- Source: inquiry.sql
@@ -843,20 +824,23 @@ CREATE TABLE product_biz_mapping (
 -- Wishlist (Product Wishlist)
 -- -----------------------------------------------------
 CREATE TABLE wishlist (
-    wishlist_id      INT AUTO_INCREMENT COMMENT '찜ID',
-    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
-    member_code      VARCHAR(30) NOT NULL COMMENT '회원코드(FK)',
-    product_id       INT NOT NULL COMMENT '상품ID(FK)',
-    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
-    created_by       VARCHAR(50) NULL COMMENT '등록자',
-    updated_at       DATETIME NULL DEFAULT NULL COMMENT '수정일',
-    updated_by       VARCHAR(50) NULL COMMENT '수정자',
-    delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
-    PRIMARY KEY (wishlist_id),
-    UNIQUE KEY uq_wishlist_user_prod (member_code, product_id),
-    CONSTRAINT fk_wishlist_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
-    CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 찜 목록';
+  wishlist_id int(11) NOT NULL AUTO_INCREMENT COMMENT '찜ID',
+  site_cd varchar(20) DEFAULT NULL COMMENT '사이트코드',
+  member_code varchar(30) NOT NULL COMMENT '회원코드(FK)',
+  product_id int(11) NOT NULL COMMENT '상품ID(FK)',
+  created_at datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  created_by varchar(50) DEFAULT NULL COMMENT '등록자',
+  updated_at datetime DEFAULT NULL COMMENT '수정일',
+  updated_by varchar(50) DEFAULT NULL COMMENT '수정자',
+  deleted_at datetime DEFAULT NULL COMMENT '삭제일',
+  deleted_by varchar(50) DEFAULT NULL COMMENT '삭제자',
+  delete_yn char(1) NOT NULL DEFAULT 'N' COMMENT '삭제여부',
+  PRIMARY KEY (wishlist_id),
+  UNIQUE KEY uq_wishlist_user_prod (member_code,product_id),
+  KEY fk_wishlist_product (product_id),
+  CONSTRAINT fk_wishlist_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
+  CONSTRAINT fk_wishlist_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='상품 찜 목록';
 
 
 -- Source: site_policy_history.sql
