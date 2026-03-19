@@ -1,7 +1,7 @@
 package com.nanum.admin.dashboard.service;
 
-import com.nanum.admin.claim.entity.Claim;
-import com.nanum.admin.claim.repository.ClaimRepository;
+import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.repository.ClaimRepository;
 import com.nanum.admin.dashboard.dto.DashboardDTO;
 import com.nanum.domain.delivery.model.Delivery;
 import com.nanum.domain.inquiry.model.Inquiry;
@@ -54,14 +54,14 @@ public class DashboardServiceImpl implements DashboardService {
                                 .toList();
 
                 // 2. Claims
-                List<Claim> claims = isMaster ? claimRepository.findTop5ByOrderByClaimDateEntryDesc()
-                                : claimRepository.findTop5BySiteCdOrderByClaimDateEntryDesc(siteCd);
+                List<Claim> claims = isMaster ? claimRepository.findTop5ByOrderByRequestedAtDesc()
+                                : claimRepository.findTop5BySiteCdOrderByRequestedAtDesc(siteCd);
                 List<DashboardDTO.ClaimSummary> claimSummaries = claims.stream()
                                 .map(c -> DashboardDTO.ClaimSummary.builder()
                                                 .claimId(c.getClaimId())
-                                                .reason(c.getClaimReason())
-                                                .status(c.getClaimStatus())
-                                                .requestDate(c.getClaimDateEntry())
+                                                .reason(c.getClaimReason().name())
+                                                .status(c.getClaimStatus().name())
+                                                .requestDate(c.getRequestedAt())
                                                 .build())
                                 .toList();
 

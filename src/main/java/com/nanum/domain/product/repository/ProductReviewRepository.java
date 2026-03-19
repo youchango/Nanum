@@ -19,4 +19,7 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
 
     // 삭제되지 않은 단일 리뷰 조회
     Optional<ProductReview> findByIdAndDeleteYn(Long id, String deleteYn);
+
+    // 주문+상품 조합 중복 리뷰 체크
+    boolean existsByOrderIdAndProductIdAndDeleteYn(Long orderId, Long productId, String deleteYn);
 }

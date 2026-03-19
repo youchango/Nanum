@@ -61,6 +61,11 @@ public class Inquiry extends BaseEntity {
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
 
+    @Column(name = "is_secret", length = 1, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String isSecret = "N";
+
     public void reply(String answer, Member answerer) {
         this.answer = answer;
         this.answerer = answerer;

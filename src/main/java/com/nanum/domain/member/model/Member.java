@@ -71,11 +71,34 @@ public class Member {
     @Column(name = "memo", length = 2000)
     private String memo; // 관리자 메모
 
-    @Column(name = "withdraw_yn", insertable = false)
-    private String withdrawYn; // 탈퇴 여부 (Y/N) - DB default 'N' case
+    @Column(name = "sms_yn", length = 1, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String smsYn = "N"; // SMS 수신 동의 (Y/N)
+
+    @Column(name = "email_yn", length = 1, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String emailYn = "N"; // 이메일 수신 동의 (Y/N)
+
+    @Column(name = "login_fail_count", nullable = false)
+    @org.hibernate.annotations.ColumnDefault("0")
+    @Builder.Default
+    private Integer loginFailCount = 0; // 로그인 실패횟수
+
+    @Column(name = "withdraw_yn", nullable = false)
+    @org.hibernate.annotations.ColumnDefault("'N'")
+    @Builder.Default
+    private String withdrawYn = "N"; // 탈퇴 여부 (Y/N)
+
+    @Column(name = "withdraw_at")
+    private LocalDateTime withdrawAt; // 탈퇴일
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt; // 가입일
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt; // 수정일
 
     @PrePersist
     public void prePersist() {

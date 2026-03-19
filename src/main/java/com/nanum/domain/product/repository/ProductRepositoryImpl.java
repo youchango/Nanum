@@ -45,10 +45,43 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.deleteYn.eq("N"),
                         product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
-                        searchKeyword(null, searchDTO.getKeyword()),
+                        mallSearchKeyword(searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
-                .orderBy(product.createdAt.desc())
+                .orderBy(mallSortOrder(searchDTO.getSort()))
+                .offset(searchDTO.getOffset())
+                .limit(searchDTO.getRecordSize())
                 .fetch();
+    }
+
+    private com.querydsl.core.types.OrderSpecifier<?> mallSortOrder(String sort) {
+        if (sort == null) return product.createdAt.desc();
+        return switch (sort) {
+            case "best" -> product.viewCount.desc();
+            case "new" -> product.createdAt.desc();
+            case "price_asc" -> product.retailPrice.asc();
+            case "price_desc" -> product.retailPrice.desc();
+            case "name" -> product.name.asc();
+            default -> product.createdAt.desc();
+        };
+    }
+
+    public int countMallProducts(String siteCd, SearchDTO searchDTO) {
+        QProductSite productSite = QProductSite.productSite;
+
+        Long count = queryFactory
+                .select(product.count())
+                .from(product)
+                .join(productSite).on(product.id.eq(productSite.product.id))
+                .where(
+                        productSite.siteCd.eq(siteCd),
+                        productSite.viewYn.eq("Y"),
+                        productSite.deleteYn.eq("N"),
+                        product.applyYn.eq("Y"),
+                        product.deleteYn.eq("N"),
+                        mallSearchKeyword(searchDTO.getKeyword()),
+                        inCategoryIds(null, searchDTO.getCategoryId()))
+                .fetchOne();
+        return count != null ? count.intValue() : 0;
     }
 
     @Override
@@ -65,7 +98,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.deleteYn.eq("N"),
                         product.applyYn.eq("Y"),
                         product.deleteYn.eq("N"),
-                        searchKeyword(null, searchDTO.getKeyword()),
+                        mallSearchKeyword(searchDTO.getKeyword()),
                         inCategoryIds(null, searchDTO.getCategoryId()))
                 .orderBy(product.viewCount.desc(), product.createdAt.desc())
                 .offset(searchDTO.getOffset())
@@ -211,6 +244,21 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return null;
     }
 
+    /**
+     * 사용자 몰 검색 (공백 제거 후 비교)
+     */
+    private BooleanExpression mallSearchKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword))
+            return null;
+        String trimmedKeyword = keyword.trim().replaceAll("\\s+", "");
+        return Expressions.stringTemplate(
+                "REPLACE({0}, ' ', '')", product.name)
+                .containsIgnoreCase(trimmedKeyword);
+    }
+
+    /**
+     * 관리자 검색 (searchType별 분기)
+     */
     private BooleanExpression searchKeyword(String searchType, String keyword) {
         if (!StringUtils.hasText(keyword))
             return null;

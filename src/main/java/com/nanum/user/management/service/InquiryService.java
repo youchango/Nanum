@@ -5,13 +5,14 @@ import com.nanum.domain.inquiry.model.Inquiry;
 import com.nanum.domain.inquiry.model.InquiryStatus;
 import com.nanum.domain.inquiry.repository.InquiryRepository;
 import com.nanum.domain.member.model.Member;
+import com.nanum.global.error.ErrorCode;
+import com.nanum.global.error.exception.BusinessException;
 import com.nanum.user.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,34 +22,45 @@ public class InquiryService {
     private final InquiryRepository inquiryRepository;
     private final MemberRepository memberRepository;
 
-    public List<InquiryDTO.Response> getMyInquiries(String memberCode) {
-        Member writer = memberRepository.findByMemberCode(memberCode)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
-        return inquiryRepository.findByWriter(writer).stream()
-                .filter(i -> "N".equals(i.getDeleteYn()))
-                .map(InquiryDTO.Response::from)
-                .collect(Collectors.toList());
+    public Page<InquiryDTO.Response> getMyInquiries(String memberId, Pageable pageable) {
+        Member writer = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        return inquiryRepository.findByWriterAndDeleteYnOrderByCreatedAtDesc(writer, "N", pageable)
+                .map(InquiryDTO.Response::from);
     }
 
-    public InquiryDTO.Response getInquiry(Long id, String memberCode) {
+    public InquiryDTO.Response getInquiry(Long id, String memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
         Inquiry inquiry = inquiryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("문의를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("문의를 찾을 수 없습니다.", ErrorCode.ENTITY_NOT_FOUND));
 
         if ("Y".equals(inquiry.getDeleteYn())) {
-            throw new IllegalArgumentException("삭제된 문의입니다.");
+            throw new BusinessException("삭제된 문의입니다.", ErrorCode.ENTITY_NOT_FOUND);
         }
 
-        if (!inquiry.getWriter().getMemberCode().equals(memberCode)) {
-            throw new IllegalArgumentException("본인의 문의만 조회할 수 있습니다.");
+        if (!inquiry.getWriter().getMemberCode().equals(member.getMemberCode())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
         }
 
         return InquiryDTO.Response.from(inquiry);
     }
 
     @Transactional
-    public Long createInquiry(InquiryDTO.CreateRequest request, String memberCode) {
-        Member writer = memberRepository.findByMemberCode(memberCode)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+    public Long createInquiry(InquiryDTO.CreateRequest request, String memberId) {
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new BusinessException("제목을 입력해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (request.getContent() == null || request.getContent().trim().length() < 10) {
+            throw new BusinessException("내용을 10자 이상 입력해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (request.getType() == null) {
+            throw new BusinessException("문의 유형을 선택해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        Member writer = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         Inquiry inquiry = Inquiry.builder()
                 .type(request.getType())
@@ -56,11 +68,32 @@ public class InquiryService {
                 .orderNo(request.getOrderNo())
                 .title(request.getTitle())
                 .content(request.getContent())
+                .isSecret(request.getIsSecret() != null && "Y".equals(request.getIsSecret()) ? "Y" : "N")
                 .writer(writer)
                 .status(InquiryStatus.WAIT)
                 .build();
 
         inquiryRepository.save(inquiry);
         return inquiry.getId();
+    }
+
+    public Page<InquiryDTO.Response> getProductInquiries(Long productId, String memberId, Pageable pageable) {
+        Page<Inquiry> page = inquiryRepository.findByProductIdAndDeleteYnOrderByCreatedAtDesc(productId, "N", pageable);
+
+        String currentMemberCode = null;
+        if (memberId != null) {
+            currentMemberCode = memberRepository.findByMemberId(memberId)
+                .map(Member::getMemberCode).orElse(null);
+        }
+        final String memberCode = currentMemberCode;
+
+        return page.map(inquiry -> {
+            InquiryDTO.Response resp = InquiryDTO.Response.from(inquiry);
+            if ("Y".equals(inquiry.getIsSecret()) && (memberCode == null || !inquiry.getWriter().getMemberCode().equals(memberCode))) {
+                resp.setContent("비밀글입니다.");
+                resp.setAnswer(null);
+            }
+            return resp;
+        });
     }
 }

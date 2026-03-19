@@ -77,15 +77,25 @@ public class Product extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "view_count")
+    @Column(name = "standard_price")
     @ColumnDefault("0")
-    private int viewCount;
+    private Integer standardPrice;
+
+    @Column(name = "min_order_amount", precision = 19, scale = 4, nullable = false)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal minOrderAmount = BigDecimal.ZERO;
 
     @Column(name = "review_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
     @Builder.Default
     private String reviewYn = "Y";
 
+    @Column(name = "view_count")
+    @ColumnDefault("0")
+    private int viewCount;
+
+    // === 배송 관련 ===
     @Column(name = "delivery_way", length = 20)
     private String deliveryWay;
 
@@ -93,7 +103,7 @@ public class Product extends BaseEntity {
     private String deliveryArea;
 
     @Column(name = "delivery_type", length = 20)
-    private String deliveryType;
+    private String deliveryType; // FREE, PAY, COND
 
     @Column(name = "bundle_shipping_yn", nullable = false, length = 1)
     @ColumnDefault("'Y'")
@@ -103,7 +113,7 @@ public class Product extends BaseEntity {
     @Column(name = "delivery_policy_type", nullable = false, length = 20)
     @ColumnDefault("'MAX'")
     @Builder.Default
-    private String deliveryPolicyType = "MAX";
+    private String deliveryPolicyType = "MAX"; // MAX or MIN
 
     @Column(name = "delivery_min_order_fee", nullable = false, precision = 19, scale = 4)
     @ColumnDefault("0.0000")

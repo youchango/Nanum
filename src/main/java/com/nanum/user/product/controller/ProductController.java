@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.nanum.global.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +32,12 @@ public class ProductController implements ResponseSupport {
 
     @GetMapping
     @Operation(summary = "상품 목록 조회", description = "사이트 코드와 검색 조건을 기반으로 전체 상품 목록을 페이징하여 조회합니다.")
-    public ResponseEntity<ApiResponse<List<ProductDTO.MallProductResponse>>> getProducts(
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> getProducts(
             @RequestParam String siteCd,
             @ModelAttribute com.nanum.global.common.dto.SearchDTO searchDTO) {
         String memberCode = getCurrentMemberCode();
-        return success(productService.getMallProductList(searchDTO, siteCd, memberCode));
+        var result = productService.getMallProductListWithCount(searchDTO, siteCd, memberCode);
+        return success(result);
     }
 
     @GetMapping("/main")
@@ -50,8 +53,23 @@ public class ProductController implements ResponseSupport {
     @Operation(summary = "상품 상세 조회", description = "상품 ID와 사이트 코드를 기반으로 특정 상품의 상세 정보 및 옵션을 조회합니다.")
     public ResponseEntity<ApiResponse<ProductDTO.MallProductResponse>> getProduct(
             @PathVariable Long id,
-            @RequestParam String siteCd) {
+            @RequestParam String siteCd,
+            @CookieValue(name = "viewed_products", defaultValue = "") String viewedProducts,
+            jakarta.servlet.http.HttpServletResponse response) {
         String memberCode = getCurrentMemberCode();
+
+        // 쿠키 기반 중복 조회 방지
+        String productIdStr = String.valueOf(id);
+        if (!viewedProducts.contains("[" + productIdStr + "]")) {
+            productService.increaseViewCount(id);
+            String newValue = viewedProducts + "[" + productIdStr + "]";
+            jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("viewed_products", newValue);
+            cookie.setMaxAge(24 * 60 * 60); // 24시간
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
+        }
+
         return success(productService.getMallProduct(id, siteCd, memberCode));
     }
 
@@ -130,19 +148,11 @@ public class ProductController implements ResponseSupport {
         return ok();
     }
 
-    // Helper
     private String getCurrentMemberCode() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // CustomUserDetails 사용 패키지에 맞추어 임시 변환
-        try {
-            java.lang.reflect.Method getMemberCode = principal.getClass().getMethod("getMemberCode");
-            return (String) getMemberCode.invoke(principal);
-        } catch (Exception e) {
-            // If getMemberCode fails, maybe it's UserDetails.getUsername() or similar
-            if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-                return ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-            }
-            return null; // 인증되지 않은 사용자
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails)) {
+            return null;
         }
+        return ((CustomUserDetails) auth.getPrincipal()).getMember().getMemberCode();
     }
 }

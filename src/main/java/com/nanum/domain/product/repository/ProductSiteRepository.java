@@ -11,4 +11,6 @@ public interface ProductSiteRepository extends JpaRepository<ProductSite, Long> 
     List<ProductSite> findByProduct(Product product);
 
     boolean existsByProductAndSiteCd(Product product, String siteCd);
+
+    List<ProductSite> findByProductInAndSiteCd(List<Product> products, String siteCd);
 }

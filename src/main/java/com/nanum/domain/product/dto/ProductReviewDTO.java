@@ -12,6 +12,7 @@ public class ProductReviewDTO {
     @AllArgsConstructor
     @Builder
     public static class Request {
+        private Long orderId;
         private String title;
         private String content;
         private int rating;
@@ -31,6 +32,7 @@ public class ProductReviewDTO {
         private String content;
         private int rating;
         private int likeCount;
+        @com.fasterxml.jackson.annotation.JsonProperty("isLiked")
         private boolean isLiked; // 현재 로그인한 사용자의 좋아요 여부
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;

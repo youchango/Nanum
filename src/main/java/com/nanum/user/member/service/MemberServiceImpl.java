@@ -6,6 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nanum.domain.member.model.Member;
 import com.nanum.domain.member.dto.MemberDTO;
+import com.nanum.domain.member.dto.PasswordResetRequest;
+import com.nanum.domain.member.dto.PasswordResetResponse;
+import com.nanum.domain.member.dto.ProfileResponse;
+import com.nanum.domain.member.dto.ProfileUpdateRequest;
 import com.nanum.domain.member.model.MemberRole;
 import com.nanum.domain.member.model.MemberType;
 import com.nanum.user.member.repository.MemberRepository;
@@ -95,7 +99,7 @@ public class MemberServiceImpl implements MemberService {
         // 기업 회원일 경우 상세 정보 저장
         if (memberType == MemberType.B) {
             com.nanum.domain.member.model.MemberBiz memberBiz = com.nanum.domain.member.model.MemberBiz.builder()
-                    .member(member)
+                    .memberCode(member.getMemberCode())
                     .businessNumber(memberDTO.getBusinessNumber())
                     .companyName(memberDTO.getCompanyName())
                     .ceoName(memberDTO.getCeoName())
@@ -104,6 +108,103 @@ public class MemberServiceImpl implements MemberService {
                     .build();
             memberBizRepository.save(memberBiz);
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ProfileResponse getProfile(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberId));
+
+        if (member.getMemberType() == MemberType.B) {
+            com.nanum.domain.member.model.MemberBiz biz = memberBizRepository.findById(member.getMemberCode()).orElse(null);
+            return ProfileResponse.from(member, biz);
+        }
+        return ProfileResponse.from(member);
+    }
+
+    @Transactional
+    @Override
+    public void updateProfile(String memberId, ProfileUpdateRequest request) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다: " + memberId));
+
+        member.setMemberName(request.getMemberName());
+        member.setMobilePhone(request.getMobilePhone());
+        member.setEmail(request.getEmail());
+        member.setZipcode(request.getZipcode());
+        member.setAddress(request.getAddress());
+        member.setAddressDetail(request.getAddressDetail());
+        member.setSmsYn(request.getSmsYn());
+        member.setEmailYn(request.getEmailYn());
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            // 기존 비밀번호 검증 필수
+            if (request.getCurrentPassword() == null || request.getCurrentPassword().isBlank()) {
+                throw new IllegalArgumentException("비밀번호 변경 시 기존 비밀번호를 입력해주세요.");
+            }
+            if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
+                throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다.");
+            }
+            member.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    @Override
+    public void withdraw(String memberId, String password) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("비밀번호를 입력해주세요.");
+        }
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        member.setWithdrawYn("Y");
+        member.setWithdrawAt(java.time.LocalDateTime.now());
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    @Override
+    public PasswordResetResponse resetPassword(PasswordResetRequest request) {
+        Member member = memberRepository.findByMemberId(request.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        // 본인 확인 (이름 + 휴대전화번호)
+        if (!member.getMemberName().equals(request.getMemberName()) ||
+                !member.getMobilePhone().equals(request.getMobilePhone())) {
+            throw new IllegalArgumentException("입력하신 정보가 일치하지 않습니다.");
+        }
+
+        // 탈퇴 회원 체크
+        if ("Y".equals(member.getWithdrawYn())) {
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+        }
+
+        // 임시 비밀번호 생성 (8자리: 영문+숫자)
+        String tempPassword = generateTempPassword();
+
+        // 비밀번호 업데이트
+        member.setPassword(passwordEncoder.encode(tempPassword));
+        memberRepository.save(member);
+
+        return new PasswordResetResponse(member.getMemberId(), tempPassword);
+    }
+
+    private String generateTempPassword() {
+        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+        StringBuilder sb = new StringBuilder();
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 
     private String generateMemberCode(String prefix) {

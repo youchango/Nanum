@@ -34,10 +34,11 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
         // Duplicate Check
-        Optional<Cart> existingCart = cartRepository.findByMemberMemberCodeAndProduct_IdAndOptionId(
+        Optional<Cart> existingCart = cartRepository.findByMemberMemberCodeAndProduct_IdAndOptionIdAndDeleteYn(
                 member.getMemberCode(),
                 request.getProductId(),
-                request.getOptionId());
+                request.getOptionId(),
+                "N");
 
         if (existingCart.isPresent()) {
             if (request.isForceUpdate()) {
@@ -65,7 +66,11 @@ public class CartService {
     /**
      * 장바구니 리스트 조회 (Role에 따른 가격 차등 적용)
      */
-    public List<CartDTO.Response> getCartList(String memberCode, com.nanum.domain.member.model.MemberRole role) {
+    public List<CartDTO.Response> getCartList(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        String memberCode = member.getMemberCode();
+        com.nanum.domain.member.model.MemberRole role = member.getRole();
         List<Cart> cartList = cartRepository.findCartListWithDetailsByMemberCode(memberCode);
 
         return cartList.stream().map(cart -> {
@@ -151,7 +156,7 @@ public class CartService {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-        List<Cart> carts = cartRepository.findByCartIdInAndMemberMemberCode(cartIds, member.getMemberCode());
+        List<Cart> carts = cartRepository.findByCartIdInAndMemberMemberCodeAndDeleteYn(cartIds, member.getMemberCode(), "N");
         for (Cart cart : carts) {
             cart.delete(memberId);
         }

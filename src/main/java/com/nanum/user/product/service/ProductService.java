@@ -39,6 +39,21 @@ public class ProductService {
                                 .collect(Collectors.toList());
         }
 
+        public java.util.Map<String, Object> getMallProductListWithCount(com.nanum.global.common.dto.SearchDTO searchDTO,
+                        String siteCd,
+                        String memberCode) {
+                List<ProductDTO.MallProductResponse> list = getMallProductList(searchDTO, siteCd, memberCode);
+                int totalCount = productRepository.countMallProducts(siteCd, searchDTO);
+
+                java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+                result.put("content", list);
+                result.put("page", searchDTO.getPage());
+                result.put("recordSize", searchDTO.getRecordSize());
+                result.put("totalCount", totalCount);
+                result.put("totalPages", (int) Math.ceil((double) totalCount / searchDTO.getRecordSize()));
+                return result;
+        }
+
         public List<ProductDTO.MallProductResponse> getMainProductList(com.nanum.global.common.dto.SearchDTO searchDTO,
                         String siteCd,
                         String memberCode) {
@@ -167,6 +182,11 @@ public class ProductService {
                 } else {
                         return ps.getBPrice().intValue(); // 기본 일반회원가
                 }
+        }
+
+        @org.springframework.transaction.annotation.Transactional
+        public void increaseViewCount(Long productId) {
+                productRepository.increaseViewCount(productId);
         }
 
         public List<ProductDTO.Response> getProductList(Long categoryId) {

@@ -1,6 +1,7 @@
 package com.nanum.user.payment.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,4 +11,6 @@ public interface PaymentRepository extends JpaRepository<PaymentMaster, Long>, P
     List<PaymentMaster> findTop5ByOrderMaster_SiteCdOrderByPaymentDateDesc(String siteCd);
 
     List<PaymentMaster> findTop5ByOrderByPaymentDateDesc();
+
+    Optional<PaymentMaster> findByOrderMasterOrderId(Long orderId);
 }

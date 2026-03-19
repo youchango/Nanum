@@ -5,6 +5,8 @@ import com.nanum.domain.content.model.Content;
 import com.nanum.domain.content.model.ContentType;
 import com.nanum.domain.content.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,11 @@ public class ContentService {
         return contents.stream()
                 .map(ContentDTO.Response::from)
                 .collect(Collectors.toList());
+    }
+
+    public Page<ContentDTO.Response> getContents(ContentType type, String siteCd, Pageable pageable) {
+        return contentRepository.findByTypeAndSiteCdAndDeleteYnOrderByCreatedAtDesc(type, siteCd, "N", pageable)
+                .map(ContentDTO.Response::from);
     }
 
     public ContentDTO.Response getContent(Long id, String siteCd) {

@@ -16,11 +16,6 @@ public class MemberBiz extends BaseEntity {
     @Column(name = "member_code")
     private String memberCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "member_code", referencedColumnName = "member_code")
-    private Member member;
-
     @Column(name = "business_number", nullable = false)
     private String businessNumber;
 
@@ -36,9 +31,8 @@ public class MemberBiz extends BaseEntity {
     @Column(name = "business_item")
     private String businessItem;
 
-    public void setMember(Member member) {
-        this.member = member;
-        this.memberCode = member.getMemberCode();
+    public void setMemberCode(String memberCode) {
+        this.memberCode = memberCode;
     }
 }
 

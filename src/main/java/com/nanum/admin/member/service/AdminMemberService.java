@@ -143,7 +143,7 @@ public class AdminMemberService {
         // 기업 회원일 경우 MemberBiz 정보 저장
         if (memberType == MemberType.B) {
             MemberBiz memberBiz = MemberBiz.builder()
-                    .member(member)
+                    .memberCode(member.getMemberCode())
                     .businessNumber(memberDTO.getBusinessNumber())
                     .companyName(memberDTO.getCompanyName())
                     .ceoName(memberDTO.getCeoName())
@@ -224,10 +224,10 @@ public class AdminMemberService {
         // 기업 회원 정보 업데이트
         if (member.getMemberType() == MemberType.B) {
             MemberBiz memberBiz = memberBizRepository.findById(memberCode)
-                    .orElseGet(() -> MemberBiz.builder().member(member).build());
+                    .orElseGet(() -> MemberBiz.builder().memberCode(member.getMemberCode()).build());
 
             MemberBiz updatedBiz = MemberBiz.builder()
-                    .member(member)
+                    .memberCode(member.getMemberCode())
                     .businessNumber(memberDTO.getBusinessNumber() != null ? memberDTO.getBusinessNumber()
                             : memberBiz.getBusinessNumber())
                     .companyName(memberDTO.getCompanyName() != null ? memberDTO.getCompanyName()

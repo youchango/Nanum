@@ -32,6 +32,7 @@ public class Shipment extends BaseEntity {
     private String shipmentCode;
 
     @Column(name = "shipment_type", nullable = false, length = 20)
+    @ColumnDefault("'OUT'")
     @Builder.Default
     private String shipmentType = "OUT"; // IN(입고) / OUT(출고)
 

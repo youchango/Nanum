@@ -1,6 +1,7 @@
 package com.nanum.admin.claim.controller;
 
-import com.nanum.admin.claim.entity.Claim;
+import com.nanum.domain.claim.model.Claim;
+import com.nanum.domain.claim.model.ClaimStatus;
 import com.nanum.admin.claim.service.ClaimService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +11,11 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 
-@Tag(name = "Claim", description = "Claim API")
+@Tag(name = "Admin Claim", description = "관리자 클레임 API")
 @RestController
 @RequestMapping("/api/v1/admin/claims")
 @RequiredArgsConstructor
+@org.springframework.stereotype.Component("adminClaimController")
 public class ClaimController {
 
     private final ClaimService claimService;
@@ -34,7 +36,7 @@ public class ClaimController {
     @PutMapping("/{id}/status")
     public ResponseEntity<Claim> updateClaimStatus(
             @PathVariable Long id,
-            @RequestParam String status,
+            @RequestParam ClaimStatus status,
             @RequestParam String managerCode) {
         return ResponseEntity.ok(claimService.updateClaimStatus(id, status, managerCode));
     }

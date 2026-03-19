@@ -10,6 +10,14 @@ spring:
     username: root  
     password: ttcc1234
     driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
   servlet:
     multipart:
       max-file-size: 10MB
