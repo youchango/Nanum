@@ -113,7 +113,16 @@ public class AdminProductService {
                                                 .build())
                                 .collect(Collectors.toList());
 
-                return ProductDTO.Response.builder()
+                List<String> paths = product.getCategories().stream()
+                                .map(ProductCategory::getFullPath)
+                                .collect(Collectors.toList());
+                String categoryFullName = paths.stream()
+                                .filter(path -> paths.stream()
+                                                .noneMatch(other -> !other.equals(path)
+                                                                && other.startsWith(path + " > ")))
+                                .collect(Collectors.joining(", "));
+
+                ProductDTO.Response response = ProductDTO.Response.builder()
                                 .productId(product.getId())
                                 .categoryId(product.getCategories().stream().map(ProductCategory::getCategoryId)
                                                 .collect(Collectors.toList()))
@@ -156,6 +165,9 @@ public class AdminProductService {
                                 .options(options)
                                 .images(images)
                                 .build();
+
+                response.setCategoryFullName(categoryFullName);
+                return response;
         }
 
         @Transactional

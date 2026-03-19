@@ -180,8 +180,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // 5. 최종 DTO 매핑
         List<AdminProductListDTO> content = products.stream().map(p -> {
             String catName = p.getCategories().isEmpty() ? "" : p.getCategories().get(0).getCategoryName();
-            String catFullName = p.getCategories().stream()
+            List<String> paths = p.getCategories().stream()
                     .map(ProductCategory::getFullPath)
+                    .collect(Collectors.toList());
+            String catFullName = paths.stream()
+                    .filter(path -> paths.stream()
+                            .noneMatch(other -> !other.equals(path) && other.startsWith(path + " > ")))
                     .collect(Collectors.joining(", "));
             Long catId = p.getCategories().isEmpty() ? null : p.getCategories().get(0).getCategoryId();
             return AdminProductListDTO.builder()

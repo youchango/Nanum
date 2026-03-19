@@ -17,7 +17,7 @@ CREATE TABLE code (
     PRIMARY KEY (code_id),
     INDEX idx_code_type (code_type),
     CONSTRAINT fk_code_upper FOREIGN KEY (upper) REFERENCES code (code_id) ON DELETE SET NULL
-) COMMENT '코드관리';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '코드관리';
 
 
 -- Source: shop_info.sql
@@ -53,7 +53,7 @@ CREATE TABLE shop_info (
     shop_set_product_acc_point DECIMAL(19, 4) DEFAULT 0 NULL COMMENT '포인트적립율',
     shop_insert_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일시',
     PRIMARY KEY (shop_key)
-) COMMENT '쇼핑몰 기본정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '쇼핑몰 기본정보';
 
 
 
@@ -86,7 +86,7 @@ CREATE TABLE member (
     UNIQUE KEY uq_member_code (member_code),
     UNIQUE KEY uq_member_id (member_id),
     INDEX idx_member_mobile (mobile_phone)
-) COMMENT '회원';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '회원';
 
 
 -- Source: product.sql
@@ -101,7 +101,7 @@ CREATE TABLE product_category (
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
     PRIMARY KEY (category_id)
-) COMMENT '상품 카테고리';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 카테고리';
 
 -- 2. Product Master
 CREATE TABLE product (
@@ -143,7 +143,7 @@ CREATE TABLE product (
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     apply_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '승인여부',
     PRIMARY KEY (product_id)
-) COMMENT '상품 마스터';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 마스터';
 
 -- 3. Product Option (SKU)
 CREATE TABLE product_option (
@@ -160,7 +160,7 @@ CREATE TABLE product_option (
     use_yn           CHAR(1) DEFAULT 'Y' NOT NULL COMMENT '사용여부',
     PRIMARY KEY (option_id),
     CONSTRAINT fk_option_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 옵션';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 옵션';
 
 -- 4. Product Category Mapping (N:M)
 CREATE TABLE product_category_by (
@@ -169,7 +169,7 @@ CREATE TABLE product_category_by (
     PRIMARY KEY (product_id, category_id),
     CONSTRAINT fk_pcb_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     CONSTRAINT fk_pcb_category FOREIGN KEY (category_id) REFERENCES product_category (category_id) ON DELETE CASCADE
-) COMMENT '상품-카테고리 매핑';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품-카테고리 매핑';
 
 -- 5. Product Site (Multi-site Price/Display)
 CREATE TABLE product_site (
@@ -191,7 +191,7 @@ CREATE TABLE product_site (
     PRIMARY KEY (ps_id),
     UNIQUE KEY uq_ps_prod_site (product_id, site_cd),
     CONSTRAINT fk_ps_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '상품 사이트별 정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 사이트별 정보';
 
 -- 7. Product Stock (Warehouse)
 CREATE TABLE product_stock (
@@ -206,7 +206,7 @@ CREATE TABLE product_stock (
     UNIQUE KEY uq_stock_prod_opt (product_id, option_id),
     CONSTRAINT fk_stock_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     CONSTRAINT fk_stock_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
-) COMMENT '상품 재고(창고)';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 재고(창고)';
 
 -- Product Review
 CREATE TABLE product_review (
@@ -227,7 +227,7 @@ CREATE TABLE product_review (
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부(Y/N)',
     FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '상품리뷰';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품리뷰';
 
 -- Product Review Like
 CREATE TABLE product_review_like (
@@ -239,7 +239,7 @@ CREATE TABLE product_review_like (
     FOREIGN KEY (review_id) REFERENCES product_review (review_id) ON DELETE CASCADE,
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     UNIQUE KEY uq_review_like (review_id, member_code)
-) COMMENT '상품리뷰 좋아요';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품리뷰 좋아요';
 
 -- Source: file_store.sql
 CREATE TABLE file_store (
@@ -265,7 +265,7 @@ CREATE TABLE file_store (
     PRIMARY KEY (file_id),
     INDEX idx_file_ref (reference_type, reference_id),
     INDEX idx_file_reg (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='전사 통합 파일 관리';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='전사 통합 파일 관리';
 
 
 -- Source: banner.sql
@@ -291,7 +291,7 @@ CREATE TABLE banner (
     PRIMARY KEY (banner_id),
     INDEX idx_banner_sort (banner_type, sort_order),
     INDEX idx_banner_date (start_datetime, end_datetime)
-) COMMENT '배너 관리';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '배너 관리';
 
 
 
@@ -311,7 +311,7 @@ CREATE TABLE content (
     deleted_at   DATETIME NULL COMMENT '삭제일',
     delete_yn    CHAR(1) DEFAULT 'N' COMMENT '삭제유무',
     PRIMARY KEY (content_id)
-) COMMENT '공지사항 게시판 테이블';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '공지사항 게시판 테이블';
 
 
 -- Source: popup.sql
@@ -340,7 +340,7 @@ CREATE TABLE popup (
     delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (popup_id),
     INDEX idx_popup_date (start_datetime, end_datetime)
-) COMMENT '팝업 관리';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '팝업 관리';
 
 
 
@@ -367,7 +367,7 @@ CREATE TABLE coupon (
     deleted_by     VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn      CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (coupon_id)
-) COMMENT '쿠폰 마스터';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '쿠폰 마스터';
 
 -- 2. Member Coupon (Issued Coupons)
 CREATE TABLE member_coupon (
@@ -383,7 +383,7 @@ CREATE TABLE member_coupon (
     INDEX idx_mc_member (member_code),
     CONSTRAINT fk_mc_coupon FOREIGN KEY (coupon_id) REFERENCES coupon (coupon_id),
     CONSTRAINT fk_mc_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '회원 쿠폰 발급내역';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '회원 쿠폰 발급내역';
 
 
 -- Source: manager.sql
@@ -416,7 +416,7 @@ CREATE TABLE manager (
     PRIMARY KEY (manager_seq),
     UNIQUE KEY uq_manager_id (manager_id),
     UNIQUE KEY uq_manager_code (manager_code)
-) COMMENT '관리자 정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '관리자 정보';
 
 -- -----------------------------------------------------
 -- Manager Menu
@@ -437,7 +437,7 @@ CREATE TABLE manager_menu (
     deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (menu_seq)
-) COMMENT '관리자 메뉴';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '관리자 메뉴';
 
 -- -----------------------------------------------------
 -- Manager Auth Group
@@ -454,7 +454,7 @@ CREATE TABLE manager_auth_group (
     deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (auth_group_seq)
-) COMMENT '관리자 권한 그룹';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '관리자 권한 그룹';
 
 -- -----------------------------------------------------
 -- Manager Menu Group Mapping
@@ -467,7 +467,7 @@ CREATE TABLE manager_menu_group (
     PRIMARY KEY (auth_group_seq, menu_seq),
     CONSTRAINT fk_mmg_auth FOREIGN KEY (auth_group_seq) REFERENCES manager_auth_group (auth_group_seq) ON DELETE CASCADE,
     CONSTRAINT fk_mmg_menu FOREIGN KEY (menu_seq) REFERENCES manager_menu (menu_seq) ON DELETE CASCADE
-) COMMENT '관리자 메뉴 권한 매핑';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '관리자 메뉴 권한 매핑';
 
 -- -----------------------------------------------------
 -- Manager SCM Information
@@ -505,7 +505,7 @@ CREATE TABLE manager_scm (
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     CONSTRAINT PK_MANAGER_SCM PRIMARY KEY (manager_seq),
     CONSTRAINT FK_MANAGER_SCM_BASE FOREIGN KEY (manager_seq) REFERENCES manager (manager_seq)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SCM 관리자 상세정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SCM 관리자 상세정보';
 
 
 -- Source: member_biz.sql
@@ -519,7 +519,7 @@ CREATE TABLE member_biz (
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
     CONSTRAINT fk_member_biz_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '기업회원 상세정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '기업회원 상세정보';
 
 
 -- Source: order.sql
@@ -542,7 +542,7 @@ CREATE TABLE cart (
     INDEX idx_cart_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '장바구니';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '장바구니';
 
 -- 2. Order Master
 CREATE TABLE order_master (
@@ -579,7 +579,7 @@ CREATE TABLE order_master (
     UNIQUE KEY uq_order_no (order_no),
     INDEX idx_order_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code)
-) COMMENT '주문 마스터';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 마스터';
 
 -- 3. Order Detail (Line Items)
 CREATE TABLE order_detail (
@@ -620,7 +620,7 @@ CREATE TABLE order_detail (
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (order_detail_id),
     CONSTRAINT fk_detail_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
-) COMMENT '주문 상세';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 상세';
 
 
 -- Source: delivery.sql
@@ -646,7 +646,7 @@ CREATE TABLE delivery (
     PRIMARY KEY (delivery_id),
     UNIQUE KEY uq_delivery_order (order_id),
     FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
-) COMMENT '배송 정보';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '배송 정보';
 
 -- 2. Address Book
 CREATE TABLE address_book (
@@ -664,7 +664,7 @@ CREATE TABLE address_book (
     PRIMARY KEY (address_id),
     INDEX idx_addr_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '배송지 목록';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '배송지 목록';
 
 
 -- Source: claim.sql
@@ -709,7 +709,7 @@ CREATE TABLE claim (
     CONSTRAINT fk_claim_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     CONSTRAINT fk_claim_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE,
     CONSTRAINT fk_claim_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE SET NULL
-) COMMENT '주문 클레임';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 클레임';
 
 
 -- Source: payment_master.sql
@@ -750,7 +750,7 @@ CREATE TABLE payment_master (
     INDEX idx_payment_status (payment_status),
     CONSTRAINT fk_payment_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     CONSTRAINT fk_payment_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
-) COMMENT '결제 master';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '결제 master';
 
 
 -- Source: point.sql
@@ -791,18 +791,18 @@ CREATE TABLE inquiry (
     writer_code  VARCHAR(30) NOT NULL COMMENT '작성자(회원코드)',
     answerer_code VARCHAR(30) NULL COMMENT '답변자(회원코드)',
     answered_at  DATETIME NULL COMMENT '답변일',
-    created_at             DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by             VARCHAR(50) NULL COMMENT '생성자',
-    updated_at             DATETIME NULL COMMENT '수정일',
-    updated_by             VARCHAR(50) NULL COMMENT '수정자',
-    deleted_at             DATETIME NULL COMMENT '삭제일',
-    deleted_by             VARCHAR(50) NULL COMMENT '삭제자',
-    delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    is_secret    CHAR(1) NOT NULL DEFAULT 'N' COMMENT '비밀글 여부',
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by   VARCHAR(50) NULL COMMENT '생성자',
+    updated_at   DATETIME NULL COMMENT '수정일',
+    updated_by   VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at   DATETIME NULL COMMENT '삭제일',
+    deleted_by   VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn    CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (inquiry_id),
     INDEX idx_inquiry_status (status),
-    CONSTRAINT fk_inquiry_writer FOREIGN KEY (writer_code) REFERENCES member (member_code) ON DELETE CASCADE,
-    CONSTRAINT fk_inquiry_answerer FOREIGN KEY (answerer_code) REFERENCES member (member_code) ON DELETE SET NULL
-) COMMENT '문의';
+    CONSTRAINT fk_inquiry_writer FOREIGN KEY (writer_code) REFERENCES member (member_code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '문의';
 
 
 
@@ -817,7 +817,7 @@ CREATE TABLE product_biz_mapping (
     UNIQUE KEY uq_prod_biz (product_id, member_code),
     FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE,
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE
-) COMMENT '기업전용상품매핑';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '기업전용상품매핑';
 
 -- Source: wishlist.sql
 -- -----------------------------------------------------
@@ -862,7 +862,7 @@ CREATE TABLE site_policy_history (
     deleted_by        VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (seq)
-) COMMENT '사이트 정책 이력';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '사이트 정책 이력';
 
 -- Source: inout.sql
 CREATE TABLE inout_master (
@@ -883,7 +883,7 @@ CREATE TABLE inout_master (
   delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
   PRIMARY KEY (io_seq),
   UNIQUE KEY uq_inout_io_code (io_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입출고 Master';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='입출고 Master';
 
 
 CREATE TABLE inout_detail (
@@ -924,7 +924,7 @@ CREATE TABLE inout_detail (
   CONSTRAINT fk_inout_detail_io_code FOREIGN KEY (io_code) REFERENCES inout_master (io_code) ON DELETE CASCADE,
   CONSTRAINT fk_inout_detail_product FOREIGN KEY (product_id) REFERENCES product (product_id),
   KEY idx_inout_product_id (product_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='입출고 Detail';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='입출고 Detail';
 
 
 -- source: shipment.sql
@@ -954,5 +954,5 @@ CREATE TABLE shipment (
     deleted_by 		VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn 		CHAR(1) NOT NULL DEFAULT 'N' COMMENT '삭제유무',
     PRIMARY KEY (shipment_id),UNIQUE KEY uq_shipment_code (shipment_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='출고지/입고지 및 배송 정책';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='출고지/입고지 및 배송 정책';
 

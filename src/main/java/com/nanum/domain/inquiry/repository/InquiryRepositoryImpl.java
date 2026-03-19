@@ -1,7 +1,7 @@
 package com.nanum.domain.inquiry.repository;
 
 import com.nanum.domain.inquiry.dto.InquiryDTO;
-import com.nanum.domain.inquiry.model.Inquiry;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +16,9 @@ import java.util.List;
 
 import static com.nanum.domain.inquiry.model.QInquiry.inquiry;
 import static com.nanum.domain.member.model.QMember.member;
+import static com.nanum.domain.product.model.QProduct.product;
+import static com.nanum.domain.order.model.QOrderMaster.orderMaster;
+import static com.nanum.admin.manager.entity.QManager.manager;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,10 +27,31 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Inquiry> search(InquiryDTO.Search search, Pageable pageable) {
-        List<Inquiry> content = queryFactory
-                .selectFrom(inquiry)
-                .leftJoin(inquiry.writer, member).fetchJoin()
+    public Page<InquiryDTO.Response> search(InquiryDTO.Search search, Pageable pageable) {
+        List<InquiryDTO.Response> content = queryFactory
+                .select(Projections.fields(InquiryDTO.Response.class,
+                        inquiry.id,
+                        inquiry.type,
+                        inquiry.productId,
+                        inquiry.orderNo,
+                        inquiry.title,
+                        inquiry.content,
+                        inquiry.answer,
+                        inquiry.status,
+                        inquiry.writer.memberCode.as("writerCode"),
+                        inquiry.writer.memberName.as("writerName"),
+                        inquiry.siteCd,
+                        inquiry.isSecret.as("isSecret"),
+                        inquiry.createdAt,
+                        inquiry.answeredAt,
+                        manager.managerCode.as("answererCode"),
+                        product.name.as("productName"),
+                        orderMaster.orderName.as("orderName")))
+                .from(inquiry)
+                .leftJoin(inquiry.writer, member)
+                .leftJoin(manager).on(inquiry.answererCode.eq(manager.managerCode))
+                .leftJoin(product).on(inquiry.productId.eq(product.id))
+                .leftJoin(orderMaster).on(inquiry.orderNo.eq(orderMaster.orderNo))
                 .where(
                         typeEq(search),
                         statusEq(search),
@@ -69,7 +93,7 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
     private BooleanExpression statusEq(InquiryDTO.Search search) {
         return search.getStatus() != null ? inquiry.status.eq(search.getStatus()) : null;
     }
-    
+
     private BooleanExpression productIdEq(InquiryDTO.Search search) {
         return search.getProductId() != null ? inquiry.productId.eq(search.getProductId()) : null;
     }
@@ -95,6 +119,8 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
         if (search.getStartDate() == null || search.getEndDate() == null) {
             return null;
         }
-        return inquiry.createdAt.between(search.getStartDate(), search.getEndDate());
+        return inquiry.createdAt.between(
+                search.getStartDate().atStartOfDay(),
+                search.getEndDate().atTime(23, 59, 59, 999999999));
     }
 }

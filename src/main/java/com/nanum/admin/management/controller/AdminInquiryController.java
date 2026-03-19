@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -35,9 +33,8 @@ public class AdminInquiryController {
 
     @PostMapping("/{id}/reply")
     @Operation(summary = "문의 답변 등록", description = "특정 문의 ID에 대해 관리자의 답변 내용(ReplyRequest)을 등록하고 상태를 답변 완료로 변경합니다.")
-    public ApiResponse<Void> replyInquiry(@PathVariable Long id, @RequestBody InquiryDTO.ReplyRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        adminInquiryService.replyInquiry(id, request, userDetails.getUsername());
+    public ApiResponse<Void> replyInquiry(@PathVariable Long id, @RequestBody InquiryDTO.ReplyRequest request) {
+        adminInquiryService.replyInquiry(id, request);
         return ApiResponse.success(null);
     }
 }

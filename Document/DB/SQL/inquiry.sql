@@ -1,4 +1,4 @@
-﻿-- Source: inquiry.sql
+-- Source: inquiry.sql
 -- PRODUCT:상품, ORDER:주문, DELIVERY:배송, ETC:기타
 CREATE TABLE inquiry (
     inquiry_id   INT AUTO_INCREMENT COMMENT '문의코드',
@@ -13,15 +13,15 @@ CREATE TABLE inquiry (
     writer_code  VARCHAR(30) NOT NULL COMMENT '작성자(회원코드)',
     answerer_code VARCHAR(30) NULL COMMENT '답변자(회원코드)',
     answered_at  DATETIME NULL COMMENT '답변일',
-    created_at             DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
-    created_by             VARCHAR(50) NULL COMMENT '생성자',
-    updated_at             DATETIME NULL COMMENT '수정일',
-    updated_by             VARCHAR(50) NULL COMMENT '수정자',
-    deleted_at             DATETIME NULL COMMENT '삭제일',
-    deleted_by             VARCHAR(50) NULL COMMENT '삭제자',
-    delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
+    is_secret    CHAR(1) NOT NULL DEFAULT 'N' COMMENT '비밀글 여부',
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
+    created_by   VARCHAR(50) NULL COMMENT '생성자',
+    updated_at   DATETIME NULL COMMENT '수정일',
+    updated_by   VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at   DATETIME NULL COMMENT '삭제일',
+    deleted_by   VARCHAR(50) NULL COMMENT '삭제자',
+    delete_yn    CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (inquiry_id),
     INDEX idx_inquiry_status (status),
-    CONSTRAINT fk_inquiry_writer FOREIGN KEY (writer_code) REFERENCES member (member_code) ON DELETE CASCADE,
-    CONSTRAINT fk_inquiry_answerer FOREIGN KEY (answerer_code) REFERENCES member (member_code) ON DELETE SET NULL
-) COMMENT '문의';
+    CONSTRAINT fk_inquiry_writer FOREIGN KEY (writer_code) REFERENCES member (member_code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '문의';
