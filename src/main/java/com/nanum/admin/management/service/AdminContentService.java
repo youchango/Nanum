@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AdminContentService {
 
     private final ContentRepository contentRepository;
+
     public Page<ContentDTO.Response> getContents(ContentSearchDTO searchDTO, Pageable pageable) {
         Manager manager = getCurrentManager();
         // MASTER 또는 SCM 권한이 아니면 자신의 사이트 코드 강제 설정

@@ -44,6 +44,10 @@ public class BannerDTO {
         private LocalDateTime startDatetime;
         private LocalDateTime endDatetime;
         private String useYn;
+        private LocalDateTime createdAt;
+        /** 대표 이미지 전체 접근 URL (FileService.getFullUrl로 설정) */
+        private String imageUrl;
+        /** 파일 목록 (전체 파일 메타데이터) */
         private List<FileResponseDTO> files;
 
         public static Response from(Banner banner) {
@@ -58,8 +62,7 @@ public class BannerDTO {
                     .startDatetime(banner.getStartDatetime())
                     .endDatetime(banner.getEndDatetime())
                     .useYn(banner.getUseYn())
-                    // Files should be set separately as DTO doesn't have access to FileService here
-                    // or we can expect them to be set by the service
+                    .createdAt(banner.getCreatedAt())
                     .build();
         }
     }

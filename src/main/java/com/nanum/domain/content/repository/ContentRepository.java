@@ -18,7 +18,9 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
                         Pageable pageable);
 
         @org.springframework.data.jpa.repository.Query("SELECT c FROM Content c " +
-                        "WHERE c.type = :type AND c.siteCd = :siteCd AND c.deleteYn = :deleteYn " +
+                        "WHERE (:type IS NULL OR c.type = :type) " +
+                        "AND (:siteCd IS NULL OR :siteCd = '' OR c.siteCd = :siteCd) " +
+                        "AND (c.deleteYn = :deleteYn) " +
                         "AND (:keyword IS NULL OR :keyword = '' OR c.subject LIKE %:keyword% OR c.contentBody LIKE %:keyword%)")
         Page<Content> findBySearch(
                         @org.springframework.data.repository.query.Param("type") ContentType type,

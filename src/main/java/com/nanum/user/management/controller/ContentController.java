@@ -13,7 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Content", description = "Content API")

@@ -18,6 +18,7 @@ public class PopupDTO {
     @Builder
     public static class Request {
         private String title;
+        private String siteCd;          // 사이트 코드 (등록/수정 시 필수)
         private String contentHtml;
         private String linkUrl;
         private int width;
@@ -38,6 +39,7 @@ public class PopupDTO {
     @Builder
     public static class Response {
         private Long id;
+        private String siteCd;
         private String title;
         private String contentHtml;
         private String linkUrl;
@@ -50,11 +52,15 @@ public class PopupDTO {
         private LocalDateTime startDatetime;
         private LocalDateTime endDatetime;
         private String useYn;
+        /** 대표 이미지 전체 접근 URL (FileService.getFullUrl로 설정) */
+        private String imageUrl;
+        /** 파일 목록 (전체 파일 메타데이터) */
         private List<FileResponseDTO> files;
 
         public static Response from(Popup popup) {
             return Response.builder()
                     .id(popup.getId())
+                    .siteCd(popup.getSiteCd())
                     .title(popup.getTitle())
                     .contentHtml(popup.getContentHtml())
                     .linkUrl(popup.getLinkUrl())
