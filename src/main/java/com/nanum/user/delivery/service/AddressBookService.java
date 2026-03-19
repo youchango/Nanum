@@ -29,12 +29,20 @@ public class AddressBookService {
         return addresses.stream().map(this::toResponse).toList();
     }
 
+    private static final int MAX_ADDRESS_COUNT = 10;
+
     @Transactional
     public Long createAddress(String memberId, AddressBookDTO.CreateRequest request) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         String memberCode = member.getMemberCode();
+
+        // 최대 10개 제한
+        long count = addressBookRepository.countByMemberCode(memberCode);
+        if (count >= MAX_ADDRESS_COUNT) {
+            throw new IllegalArgumentException("배송지는 최대 " + MAX_ADDRESS_COUNT + "개까지 등록할 수 있습니다.");
+        }
 
         // 기본 배송지로 설정하는 경우 기존 기본 배송지 해제
         if (request.isDefault()) {

@@ -63,11 +63,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/files/editor-upload").authenticated() // 에디터 업로드는 모든 회원 허용
                         .requestMatchers("/api/v1/admin/auth/**").permitAll() // Allow Admin Auth API
                         .requestMatchers("/api/v1/members/check-id").permitAll() // Allow ID Check API
-                        .requestMatchers("/api/v1/members/reset-password").permitAll() // Allow Password Reset API
+                        .requestMatchers("/api/v1/members/reset-password", "/api/v1/members/send-code", "/api/v1/members/verify-code").permitAll()
                         .requestMatchers("/api/v1/categories/**", "/api/v1/products/**").permitAll() // Allow User
                                                                                                      // Public API
                         .requestMatchers("/api/v1/inquiries/product/**").permitAll() // Allow Product Q&A Public API
                         .requestMatchers("/api/v1/banners/**", "/api/v1/popups/**").permitAll() // Allow Banner & Popup Public API
+                        .requestMatchers("/api/v1/contents/**").permitAll() // Allow Notice/Content Public API
                         .requestMatchers("/api/v1/payments/webhook").permitAll() // Allow PG Webhook
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow Swagger
                         .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyRole("MASTER", "ADMIN", "SCM")

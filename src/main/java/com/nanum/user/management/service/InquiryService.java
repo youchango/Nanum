@@ -49,6 +49,16 @@ public class InquiryService {
 
     @Transactional
     public Long createInquiry(InquiryDTO.CreateRequest request, String memberId) {
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new BusinessException("제목을 입력해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (request.getContent() == null || request.getContent().trim().length() < 10) {
+            throw new BusinessException("내용을 10자 이상 입력해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (request.getType() == null) {
+            throw new BusinessException("문의 유형을 선택해주세요.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+
         Member writer = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
