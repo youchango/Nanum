@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.admin.manager.service.CustomManagerDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -43,7 +44,7 @@ public class AdminProductService {
 
         public Map<String, Object> getProducts(AdminProductSearchDTO searchDTO) {
                 Manager manager = getCurrentManager();
-                if ("MASTER".equals(manager.getMbType())) {
+                if (manager.getMbType() == ManagerType.MASTER) {
                 } else {
                         searchDTO.setSiteCd(manager.getSiteCd());
                 }

@@ -20,21 +20,8 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public List<ContentDTO.Response> getContents(ContentType type, String siteCd, String keyword) {
-        List<Content> contents;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            contents = contentRepository.findBySearch(type, siteCd, keyword);
-        } else {
-            contents = contentRepository.findByTypeAndSiteCd(type, siteCd);
-        }
-
-        return contents.stream()
-                .map(ContentDTO.Response::from)
-                .collect(Collectors.toList());
-    }
-
-    public Page<ContentDTO.Response> getContents(ContentType type, String siteCd, Pageable pageable) {
-        return contentRepository.findByTypeAndSiteCdAndDeleteYnOrderByCreatedAtDesc(type, siteCd, "N", pageable)
+    public Page<ContentDTO.Response> getContents(ContentType type, String siteCd, String keyword, Pageable pageable) {
+        return contentRepository.findBySearch(type, siteCd, "N", keyword, pageable)
                 .map(ContentDTO.Response::from);
     }
 

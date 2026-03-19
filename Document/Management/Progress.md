@@ -43,7 +43,7 @@
     - [x] 회원 등록 시 사업자 등록번호 필드 제거 및 유형별 권한(BIZ/USER/VETERAN) 최적화
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
-    - [x] 컨텐츠 통합 관리 (Content - 공지사항/FAQ 통합, SiteTab, Enum(String), **삭제 시 매니저 정보 연동 및 사용자 검색 기능 추가 완료**)
+    - [x] 컨텐츠 통합 관리 (공지사항/FAQ 통합, SiteTab, Enum(String), 삭제 매니저 연동, SearchDTO 페이징 검색, **Enum 기반 권한 필터링 예사 로직 추가 및 프로젝트 전반 Enum 전환 완료**)
     - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
     - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너 SiteTab 및 권한별 사이트 자동 할당 로직 적용 완료
     - [x] 관리자 로그인 및 권한 관리 (Back-end)

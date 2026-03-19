@@ -1,5 +1,6 @@
 package com.nanum.global.config;
 
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.global.security.jwt.JwtAuthenticationFilter;
 import com.nanum.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/contents/**").permitAll() // Allow Notice/Content Public API
                         .requestMatchers("/api/v1/payments/webhook").permitAll() // Allow PG Webhook
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Allow Swagger
-                        .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyRole("MASTER", "ADMIN", "SCM")
+                        .requestMatchers("/admin/**", "/api/v1/admin/**").hasAnyRole(ManagerType.MASTER.name(), ManagerType.ADMIN.name(), ManagerType.SCM.name())
                         .requestMatchers("/biz/**", "/api/v1/biz/**").hasRole("BIZ")
                         .requestMatchers("/user/**", "/api/v1/user/**").hasRole("USER")
                         .anyRequest().authenticated())

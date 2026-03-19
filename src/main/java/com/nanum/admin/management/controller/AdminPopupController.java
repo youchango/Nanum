@@ -1,6 +1,7 @@
 package com.nanum.admin.management.controller;
 
 import com.nanum.admin.management.service.AdminPopupService;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.domain.popup.dto.PopupDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class AdminPopupController {
     @Operation(summary = "팝업 삭제", description = "특정 팝업 ID를 식별자로 하여, 해당 팝업을 데이터베이스에서 논리적으로 삭제 처리합니다.")
     public ApiResponse<Void> deletePopup(@PathVariable Long id) {
         // TODO: Get actual logged-in member code
-        String memberCode = "ADMIN";
+        String memberCode = ManagerType.ADMIN.name();
         adminPopupService.deletePopup(id, memberCode);
         return ApiResponse.success(null);
     }

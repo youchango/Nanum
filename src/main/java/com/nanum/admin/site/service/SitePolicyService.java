@@ -1,6 +1,7 @@
 package com.nanum.admin.site.service;
 
 import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.domain.shop.repository.ShopInfoRepository;
 import com.nanum.admin.site.dto.SitePolicyDTO;
 import com.nanum.admin.site.repository.SitePolicyHistoryRepository;
@@ -29,7 +30,7 @@ public class SitePolicyService {
     @Transactional
     public void savePolicy(String siteCd, SitePolicyDTO dto, Manager manager) {
         // Validate permissions (Double-check, though Controller should intercept)
-        if ("ADMIN".equals(manager.getMbType()) && !siteCd.equals(manager.getSiteCd())) {
+        if (manager.getMbType() == ManagerType.ADMIN && !siteCd.equals(manager.getSiteCd())) {
             throw new IllegalArgumentException("본인의 사이트 정책만 수정할 수 있습니다.");
         }
 

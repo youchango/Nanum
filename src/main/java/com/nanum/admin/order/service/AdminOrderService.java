@@ -1,6 +1,7 @@
 package com.nanum.admin.order.service;
 
 import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.admin.manager.service.CustomManagerDetails;
 import com.nanum.domain.order.dto.OrderDTO;
 import com.nanum.domain.order.model.OrderMaster;
@@ -28,7 +29,7 @@ public class AdminOrderService {
         Manager manager = getCurrentManager();
         String targetSiteCd = manager.getSiteCd();
 
-        if ("MASTER".equals(manager.getMbType())) {
+        if (manager.getMbType() == ManagerType.MASTER) {
             if (StringUtils.hasText(siteCd)) {
                 targetSiteCd = siteCd;
             } else {
@@ -54,7 +55,7 @@ public class AdminOrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         // Check permission?
         Manager manager = getCurrentManager();
-        if (!"MASTER".equals(manager.getMbType()) && !manager.getSiteCd().equals(order.getSiteCd())) {
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
             throw new IllegalArgumentException("Access denied");
         }
 

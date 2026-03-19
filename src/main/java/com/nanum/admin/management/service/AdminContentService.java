@@ -2,16 +2,17 @@ package com.nanum.admin.management.service;
 
 import com.nanum.domain.content.dto.ContentDTO;
 import com.nanum.domain.content.model.Content;
-import com.nanum.domain.content.model.ContentType;
 import com.nanum.domain.content.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.admin.manager.service.CustomManagerDetails;
+import com.nanum.domain.content.dto.ContentSearchDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
@@ -20,29 +21,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AdminContentService {
 
     private final ContentRepository contentRepository;
-
-    public List<ContentDTO.Response> getContents(String siteCd, ContentType type) {
+    public Page<ContentDTO.Response> getContents(ContentSearchDTO searchDTO, Pageable pageable) {
         Manager manager = getCurrentManager();
-        // MASTER 권한이 아니면 자신의 사이트 코드 강정 설정
-        String filterSiteCd = siteCd;
-        if (!"MASTER".equals(manager.getMbType())) {
+        // MASTER 또는 SCM 권한이 아니면 자신의 사이트 코드 강제 설정
+        String filterSiteCd = searchDTO.getSiteCd();
+        if (manager.getMbType() != ManagerType.MASTER && manager.getMbType() != ManagerType.SCM) {
             filterSiteCd = manager.getSiteCd();
         }
 
-        List<Content> contents;
-        if (filterSiteCd != null && type != null) {
-            contents = contentRepository.findByTypeAndSiteCd(type, filterSiteCd);
-        } else if (filterSiteCd != null) {
-            contents = contentRepository.findBySiteCd(filterSiteCd);
-        } else if (type != null) {
-            contents = contentRepository.findByType(type);
-        } else {
-            contents = contentRepository.findAll();
-        }
-
-        return contents.stream()
-                .map(ContentDTO.Response::from)
-                .collect(Collectors.toList());
+        return contentRepository.findBySearch(
+                searchDTO.getType(),
+                filterSiteCd,
+                "N",
+                searchDTO.getKeyword(),
+                pageable)
+                .map(ContentDTO.Response::from);
     }
 
     public ContentDTO.Response getContent(Long id) {

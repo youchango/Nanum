@@ -1,6 +1,7 @@
 package com.nanum.admin.management.controller;
 
 import com.nanum.admin.management.service.AdminBannerService;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.global.common.dto.ApiResponse;
 import com.nanum.domain.banner.dto.BannerDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class AdminBannerController {
     @Operation(summary = "배너 삭제", description = "특정 배너 ID를 식별자로 하여, 해당 배너를 데이터베이스에서 논리적으로 삭제(비활성화) 처리합니다.")
     public ApiResponse<Void> deleteBanner(@PathVariable Long id) {
         // TODO: Get actual logged-in member code
-        String memberCode = "ADMIN";
+        String memberCode = ManagerType.ADMIN.name();
         adminBannerService.deleteBanner(id, memberCode);
         return ApiResponse.success(null);
     }

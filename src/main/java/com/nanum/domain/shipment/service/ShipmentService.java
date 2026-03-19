@@ -1,5 +1,6 @@
 package com.nanum.domain.shipment.service;
 
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.domain.shipment.dto.ShipmentDTO;
 import com.nanum.domain.shipment.model.Shipment;
 import com.nanum.domain.shipment.repository.ShipmentRepository;
@@ -19,7 +20,7 @@ public class ShipmentService {
 
     public List<ShipmentDTO.Response> getShipments(String managerCode, String mbType) {
         List<Shipment> shipments;
-        if ("MASTER".equals(mbType)) {
+        if (ManagerType.MASTER.name().equals(mbType)) {
             shipments = shipmentRepository.findByDeleteYn("N");
         } else {
             shipments = shipmentRepository.findByManagerCodeAndDeleteYn(managerCode, "N");
