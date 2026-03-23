@@ -8,6 +8,12 @@ import com.nanum.domain.payment.model.PaymentMaster;
 
 import java.util.List;
 
+import com.nanum.admin.payment.dto.AdminPaymentDTO;
+import com.nanum.domain.payment.model.PaymentStatus;
+import com.nanum.global.common.dto.SearchDTO;
+
 public interface PaymentRepositoryCustom {
     Page<PaymentMaster> searchPayments(PaymentSearchDto paymentSearchDto, Pageable pageable);
+    
+    Page<AdminPaymentDTO> findAdminPayments(SearchDTO searchDTO, PaymentStatus status, String siteCd, Pageable pageable);
 }
