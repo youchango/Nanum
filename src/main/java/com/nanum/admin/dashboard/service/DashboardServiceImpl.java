@@ -59,8 +59,8 @@ public class DashboardServiceImpl implements DashboardService {
                 List<DashboardDTO.ClaimSummary> claimSummaries = claims.stream()
                                 .map(c -> DashboardDTO.ClaimSummary.builder()
                                                 .claimId(c.getClaimId())
-                                                .reason(c.getClaimReason().name())
-                                                .status(c.getClaimStatus().name())
+                                                .reason(c.getClaimReason() != null ? c.getClaimReason().getDescription() : "")
+                                                .status(c.getClaimStatus() != null ? c.getClaimStatus().getDescription() : "")
                                                 .requestDate(c.getRequestedAt())
                                                 .build())
                                 .toList();

@@ -843,8 +843,9 @@ CREATE TABLE wishlist (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='상품 찜 목록';
 
 
--- Source: site_policy_history.sql
-CREATE TABLE site_policy_history (
+-- Source: site_policy.sql
+-- 🏗️ 사이트 정책 설정 테이블 (단일 행 UPDATE 방식 관리)
+CREATE TABLE site_policy (
     seq               INT AUTO_INCREMENT COMMENT '시퀀스',
     site_cd           VARCHAR(20) NOT NULL COMMENT '사이트코드',
     
@@ -861,8 +862,9 @@ CREATE TABLE site_policy_history (
     deleted_at        DATETIME NULL COMMENT '삭제일',
     deleted_by        VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
-    PRIMARY KEY (seq)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '사이트 정책 이력';
+    PRIMARY KEY (seq),
+    UNIQUE KEY uk_site_policy_site_cd (site_cd)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '사이트 정책 설정';
 
 -- Source: inout.sql
 CREATE TABLE inout_master (

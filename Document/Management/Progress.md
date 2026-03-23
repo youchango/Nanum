@@ -181,6 +181,7 @@
   - [x] 프론트엔드 `SiteSettingsPage` 및 `siteService` 통합 이전 (`system` 메뉴 하위)
   - [x] `TermsManagePage` 및 `termService` 삭제
   - [x] 사이트 정책 관리 UI 개선 (저장 버튼 하단 이동)
+  - [x] **사이트 정책 관리 고도화 (마케팅활용동의 추가 및 단일 레코드 업데이트 구조로 개편 완료)**
 
 
 ## 프론트엔드 리팩토링 (Nanum_Master)
