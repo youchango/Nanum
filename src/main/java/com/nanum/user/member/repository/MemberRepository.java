@@ -21,4 +21,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Optional<Member> findTopByMemberCodeStartingWithOrderByMemberCodeDesc(String prefix);
 
     Optional<Member> findByMemberCode(String memberCode);
+
+    boolean existsByEmail(String email);
 }

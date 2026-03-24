@@ -12,6 +12,6 @@ public class PasswordResetRequest {
     @NotBlank(message = "이름을 입력해주세요.")
     private String memberName;
 
-    @NotBlank(message = "휴대전화번호를 입력해주세요.")
-    private String mobilePhone;
+    @NotBlank(message = "이메일을 입력해주세요.")
+    private String email;
 }

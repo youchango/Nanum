@@ -51,6 +51,12 @@ public class MemberServiceImpl implements MemberService {
             throw new com.nanum.global.error.exception.DuplicateMemberException(memberDTO.getMemberId());
         }
 
+        // 이메일 중복 체크
+        if (memberDTO.getEmail() != null && !memberDTO.getEmail().isBlank()
+                && memberRepository.existsByEmail(memberDTO.getEmail())) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+        }
+
         Member member = new Member();
         member.setMemberName(memberDTO.getMemberName());
         member.setMemberId(memberDTO.getMemberId());
@@ -176,9 +182,9 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByMemberId(request.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
-        // 본인 확인 (이름 + 휴대전화번호)
+        // 본인 확인 (이름 + 이메일)
         if (!member.getMemberName().equals(request.getMemberName()) ||
-                !member.getMobilePhone().equals(request.getMobilePhone())) {
+                !request.getEmail().equals(member.getEmail())) {
             throw new IllegalArgumentException("입력하신 정보가 일치하지 않습니다.");
         }
 

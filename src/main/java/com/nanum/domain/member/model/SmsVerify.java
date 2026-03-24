@@ -18,14 +18,21 @@ public class SmsVerify {
     @Column(name = "verify_id")
     private Long id;
 
-    @Column(name = "mobile_phone", nullable = false, length = 20)
+    @Column(name = "mobile_phone", length = 20)
     private String mobilePhone;
+
+    @Column(name = "target", length = 100)
+    private String target; // 이메일 또는 전화번호
 
     @Column(name = "verify_code", nullable = false, length = 6)
     private String verifyCode;
 
     @Column(name = "purpose", nullable = false, length = 20)
-    private String purpose; // RESET_PASSWORD, SIGNUP, etc.
+    private String purpose; // RESET_PASSWORD, SIGNUP
+
+    @Column(name = "channel", nullable = false, length = 10)
+    @Builder.Default
+    private String channel = "SMS"; // SMS, EMAIL
 
     @Builder.Default
     @Column(name = "verified", nullable = false)

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface SmsVerifyRepository extends JpaRepository<SmsVerify, Long> {
 
     Optional<SmsVerify> findTopByMobilePhoneAndPurposeOrderByCreatedAtDesc(String mobilePhone, String purpose);
+
+    Optional<SmsVerify> findTopByTargetAndPurposeOrderByCreatedAtDesc(String target, String purpose);
 }

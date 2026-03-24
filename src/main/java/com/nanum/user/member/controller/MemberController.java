@@ -31,7 +31,7 @@ public class MemberController {
     private final SmsVerifyService smsVerifyService;
 
     @Value("${sms.dev-mode:true}")
-    private boolean smsDevMode;
+    private boolean devMode;
 
     @Operation(summary = "아이디 중복 확인")
     @GetMapping("/check-id")
@@ -42,28 +42,27 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success(exists));
     }
 
-    @Operation(summary = "SMS 인증번호 발송", description = "회원정보 확인 후 휴대전화번호로 6자리 인증번호를 발송합니다.")
-    @PostMapping("/send-code")
-    public ResponseEntity<ApiResponse<Map<String, String>>> sendCode(@RequestBody Map<String, String> body) {
-        String memberId = body.get("memberId");
-        String memberName = body.get("memberName");
-        String mobilePhone = body.get("mobilePhone");
-        String purpose = body.getOrDefault("purpose", "RESET_PASSWORD");
+    // ==================== 이메일 인증 (회원가입 / 비밀번호 찾기) ====================
 
-        if (mobilePhone == null || mobilePhone.isBlank()) {
-            return ResponseEntity.ok(ApiResponse.error("휴대전화번호를 입력해주세요."));
+    @Operation(summary = "이메일 인증번호 발송", description = "이메일로 6자리 인증번호를 발송합니다.")
+    @PostMapping("/send-email-code")
+    public ResponseEntity<ApiResponse<Map<String, String>>> sendEmailCode(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String purpose = body.getOrDefault("purpose", "SIGNUP");
+
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.ok(ApiResponse.error("이메일을 입력해주세요."));
         }
 
-        // 비밀번호 재설정 목적일 경우 회원정보 사전 검증
+        // 비밀번호 재설정: 아이디+이름+이메일 검증
         if ("RESET_PASSWORD".equals(purpose)) {
+            String memberId = body.get("memberId");
+            String memberName = body.get("memberName");
             if (memberId == null || memberId.isBlank() || memberName == null || memberName.isBlank()) {
                 return ResponseEntity.ok(ApiResponse.error("아이디와 이름을 입력해주세요."));
             }
             var member = memberRepository.findByMemberId(memberId).orElse(null);
-            if (member == null) {
-                return ResponseEntity.ok(ApiResponse.error("입력하신 정보와 일치하는 회원을 찾을 수 없습니다."));
-            }
-            if (!member.getMemberName().equals(memberName) || !member.getMobilePhone().equals(mobilePhone)) {
+            if (member == null || !member.getMemberName().equals(memberName) || !email.equals(member.getEmail())) {
                 return ResponseEntity.ok(ApiResponse.error("입력하신 정보와 일치하는 회원을 찾을 수 없습니다."));
             }
             if ("Y".equals(member.getWithdrawYn())) {
@@ -71,20 +70,67 @@ public class MemberController {
             }
         }
 
-        String code = smsVerifyService.sendCode(mobilePhone, purpose);
+        // 회원가입: 이메일 중복 확인
+        if ("SIGNUP".equals(purpose)) {
+            boolean emailExists = memberRepository.existsByEmail(email);
+            if (emailExists) {
+                return ResponseEntity.ok(ApiResponse.error("이미 가입된 이메일입니다."));
+            }
+        }
 
-        if (smsDevMode) {
+        String code = smsVerifyService.sendEmailCode(email, purpose);
+
+        if (devMode) {
             return ResponseEntity.ok(ApiResponse.success("인증번호가 발송되었습니다. (개발모드)",
                     Map.of("devCode", code)));
         }
         return ResponseEntity.ok(ApiResponse.success("인증번호가 발송되었습니다.", null));
     }
 
-    @Operation(summary = "SMS 인증번호 확인", description = "발송된 인증번호를 검증합니다.")
+    @Operation(summary = "이메일 인증번호 확인")
+    @PostMapping("/verify-email-code")
+    public ResponseEntity<ApiResponse<Boolean>> verifyEmailCode(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String purpose = body.getOrDefault("purpose", "SIGNUP");
+        String code = body.get("code");
+
+        if (email == null || code == null) {
+            return ResponseEntity.ok(ApiResponse.error("이메일과 인증번호를 입력해주세요."));
+        }
+
+        boolean result = smsVerifyService.verifyCode(email, purpose, code);
+        if (result) {
+            return ResponseEntity.ok(ApiResponse.success("인증이 완료되었습니다.", true));
+        }
+        return ResponseEntity.ok(ApiResponse.error("인증번호가 일치하지 않거나 만료되었습니다."));
+    }
+
+    // ==================== SMS 인증 (기존 유지) ====================
+
+    @Operation(summary = "SMS 인증번호 발송")
+    @PostMapping("/send-code")
+    public ResponseEntity<ApiResponse<Map<String, String>>> sendCode(@RequestBody Map<String, String> body) {
+        String mobilePhone = body.get("mobilePhone");
+        String purpose = body.getOrDefault("purpose", "SIGNUP");
+
+        if (mobilePhone == null || mobilePhone.isBlank()) {
+            return ResponseEntity.ok(ApiResponse.error("휴대전화번호를 입력해주세요."));
+        }
+
+        String code = smsVerifyService.sendCode(mobilePhone, purpose);
+
+        if (devMode) {
+            return ResponseEntity.ok(ApiResponse.success("인증번호가 발송되었습니다. (개발모드)",
+                    Map.of("devCode", code)));
+        }
+        return ResponseEntity.ok(ApiResponse.success("인증번호가 발송되었습니다.", null));
+    }
+
+    @Operation(summary = "SMS 인증번호 확인")
     @PostMapping("/verify-code")
     public ResponseEntity<ApiResponse<Boolean>> verifyCode(@RequestBody Map<String, String> body) {
         String mobilePhone = body.get("mobilePhone");
-        String purpose = body.getOrDefault("purpose", "RESET_PASSWORD");
+        String purpose = body.getOrDefault("purpose", "SIGNUP");
         String code = body.get("code");
 
         if (mobilePhone == null || code == null) {
@@ -98,14 +144,16 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.error("인증번호가 일치하지 않거나 만료되었습니다."));
     }
 
-    @Operation(summary = "비밀번호 찾기", description = "SMS 인증 완료 후 임시 비밀번호를 발급합니다.")
+    // ==================== 비밀번호 찾기 (이메일 인증 기반) ====================
+
+    @Operation(summary = "비밀번호 찾기", description = "이메일 인증 완료 후 임시 비밀번호를 발급합니다.")
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<PasswordResetResponse>> resetPassword(
             @Valid @RequestBody PasswordResetRequest request) {
         try {
-            // SMS 인증 완료 여부 확인
-            if (!smsVerifyService.isVerified(request.getMobilePhone(), "RESET_PASSWORD")) {
-                return ResponseEntity.ok(ApiResponse.error("휴대전화 인증을 먼저 완료해주세요."));
+            // 이메일 인증 완료 여부 확인
+            if (!smsVerifyService.isVerified(request.getEmail(), "RESET_PASSWORD")) {
+                return ResponseEntity.ok(ApiResponse.error("이메일 인증을 먼저 완료해주세요."));
             }
             return ResponseEntity.ok(ApiResponse.success("임시 비밀번호가 발급되었습니다.",
                     memberService.resetPassword(request)));
@@ -113,6 +161,8 @@ public class MemberController {
             return ResponseEntity.ok(ApiResponse.error(e.getMessage()));
         }
     }
+
+    // ==================== 프로필 / 탈퇴 ====================
 
     @Operation(summary = "내 프로필 조회")
     @GetMapping("/me")

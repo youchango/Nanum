@@ -17,7 +17,29 @@ public class SmsVerifyService {
     private final SmsVerifyRepository smsVerifyRepository;
 
     /**
-     * 인증번호 발송 (SMS 연동 전 개발모드: 로그에 출력)
+     * 이메일 인증번호 발송
+     */
+    @Transactional
+    public String sendEmailCode(String email, String purpose) {
+        String code = generateCode();
+
+        SmsVerify verify = SmsVerify.builder()
+                .target(email)
+                .channel("EMAIL")
+                .verifyCode(code)
+                .purpose(purpose)
+                .build();
+
+        smsVerifyRepository.save(verify);
+
+        // TODO: 실제 이메일 발송 연동 (SMTP, AWS SES 등)
+        log.info("[EMAIL 개발모드] {} → 인증번호: {}", email, code);
+
+        return code;
+    }
+
+    /**
+     * SMS 인증번호 발송
      */
     @Transactional
     public String sendCode(String mobilePhone, String purpose) {
@@ -25,6 +47,8 @@ public class SmsVerifyService {
 
         SmsVerify verify = SmsVerify.builder()
                 .mobilePhone(mobilePhone)
+                .target(mobilePhone)
+                .channel("SMS")
                 .verifyCode(code)
                 .purpose(purpose)
                 .build();
@@ -34,16 +58,16 @@ public class SmsVerifyService {
         // TODO: 실제 SMS 발송 연동 (CoolSMS, NHN Cloud 등)
         log.info("[SMS 개발모드] {} → 인증번호: {}", mobilePhone, code);
 
-        return code; // 개발모드에서만 반환, 운영 시 제거
+        return code;
     }
 
     /**
-     * 인증번호 검증
+     * 인증번호 검증 (target 기반 - 이메일/전화 공용)
      */
     @Transactional
-    public boolean verifyCode(String mobilePhone, String purpose, String code) {
+    public boolean verifyCode(String target, String purpose, String code) {
         SmsVerify verify = smsVerifyRepository
-                .findTopByMobilePhoneAndPurposeOrderByCreatedAtDesc(mobilePhone, purpose)
+                .findTopByTargetAndPurposeOrderByCreatedAtDesc(target, purpose)
                 .orElse(null);
 
         if (verify == null) return false;
@@ -56,12 +80,12 @@ public class SmsVerifyService {
     }
 
     /**
-     * 인증 완료 여부 확인
+     * 인증 완료 여부 확인 (target 기반)
      */
     @Transactional(readOnly = true)
-    public boolean isVerified(String mobilePhone, String purpose) {
+    public boolean isVerified(String target, String purpose) {
         return smsVerifyRepository
-                .findTopByMobilePhoneAndPurposeOrderByCreatedAtDesc(mobilePhone, purpose)
+                .findTopByTargetAndPurposeOrderByCreatedAtDesc(target, purpose)
                 .map(v -> v.isVerified() && !v.isExpired())
                 .orElse(false);
     }

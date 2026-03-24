@@ -63,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/files/editor-upload").authenticated() // 에디터 업로드는 모든 회원 허용
                         .requestMatchers("/api/v1/admin/auth/**").permitAll() // Allow Admin Auth API
                         .requestMatchers("/api/v1/members/check-id").permitAll() // Allow ID Check API
-                        .requestMatchers("/api/v1/members/reset-password", "/api/v1/members/send-code", "/api/v1/members/verify-code").permitAll()
+                        .requestMatchers("/api/v1/members/reset-password", "/api/v1/members/send-code", "/api/v1/members/verify-code",
+                                "/api/v1/members/send-email-code", "/api/v1/members/verify-email-code").permitAll()
                         .requestMatchers("/api/v1/categories/**", "/api/v1/products/**").permitAll() // Allow User
                                                                                                      // Public API
                         .requestMatchers("/api/v1/inquiries/product/**").permitAll() // Allow Product Q&A Public API
