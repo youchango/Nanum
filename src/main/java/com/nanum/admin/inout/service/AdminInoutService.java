@@ -88,7 +88,7 @@ public class AdminInoutService {
             inoutDetailRepository.save(detail);
 
             // 재고 업데이트
-            updateInventoryStock(item.getProductId(), item.getOptionId(), item.getQty(), "IN");
+            updateInoutStock(item.getProductId(), item.getOptionId(), item.getQty(), "IN");
         }
 
         return ioCode;
@@ -138,7 +138,7 @@ public class AdminInoutService {
             inoutDetailRepository.save(detail);
 
             // 재고 업데이트
-            updateInventoryStock(item.getProductId(), item.getOptionId(), item.getQty(), "OUT");
+            updateInoutStock(item.getProductId(), item.getOptionId(), item.getQty(), "OUT");
         }
 
         return ioCode;
@@ -470,7 +470,79 @@ public class AdminInoutService {
         return String.format("IO%08d", nextId);
     }
 
-    private void updateInventoryStock(Long productId, Long optionId, Integer qty, String type) {
+    /**
+     * 상품 생성/수정 시 초기 재고 생성 및 전환 대응
+     * - 기존 재고(stock_quantity)는 유지함 (Update 시 덮어쓰지 않음)
+     * - 전환 시나리오(단품<->옵션) 발생 시 불필요한 기존 데이터 정리 후 신규 생성(0)
+     */
+    public void initializeStock(Product product, List<ProductOption> options) {
+        // 1. 현재 이 상품에 저장된 모든 재고 레코드를 가져옴
+        List<ProductStock> existingStocks = productStockRepository.findByProduct(product);
+
+        if (options == null || options.isEmpty()) {
+            // [옵션 미사용 상품]
+            // 기존에 옵션별 재고가 있었다면 모두 삭제
+            List<ProductStock> toDelete = existingStocks.stream()
+                    .filter(s -> s.getOption() != null)
+                    .collect(java.util.stream.Collectors.toList());
+            if (!toDelete.isEmpty()) {
+                productStockRepository.deleteAll(toDelete);
+            }
+
+            // 기존에 단품 재고가 없으면 새로 생성(0)
+            boolean hasBaseStock = existingStocks.stream().anyMatch(s -> s.getOption() == null);
+            if (!hasBaseStock) {
+                ProductStock stock = ProductStock.builder()
+                        .product(product)
+                        .option(null)
+                        .stockQuantity(0)
+                        .build();
+                productStockRepository.save(stock);
+            } else {
+                log.debug("상품 {}의 기존 재고 데이터가 존재하여 생성을 건너뜜", product.getId());
+            }
+        } else {
+            // [옵션 사용 상품]
+            // 기존에 단품 재고(option_id is null)가 있었다면 삭제
+            List<ProductStock> baseStocks = existingStocks.stream()
+                    .filter(s -> s.getOption() == null)
+                    .collect(java.util.stream.Collectors.toList());
+            if (!baseStocks.isEmpty()) {
+                productStockRepository.deleteAll(baseStocks);
+            }
+
+            // 각 옵션별로 재고 레코드가 없으면 새로 생성(0)
+            for (ProductOption option : options) {
+                boolean exists = existingStocks.stream()
+                        .anyMatch(s -> s.getOption() != null && s.getOption().getId().equals(option.getId()));
+
+                if (!exists) {
+                    ProductStock stock = ProductStock.builder()
+                            .product(product)
+                            .option(option)
+                            .stockQuantity(0)
+                            .build();
+                    productStockRepository.save(stock);
+                }
+            }
+
+            // (추가) 현재 옵션 리스트에 없는 기존 재고 레코드가 있다면 삭제 (옵션 삭제 대응)
+            List<Long> currentOptionIds = options.stream()
+                    .map(ProductOption::getId)
+                    .filter(id -> id != null)
+                    .collect(java.util.stream.Collectors.toList());
+
+            List<ProductStock> orphanedStocks = existingStocks.stream()
+                    .filter(s -> s.getOption() != null && !currentOptionIds.contains(s.getOption().getId()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            if (!orphanedStocks.isEmpty()) {
+                productStockRepository.deleteAll(orphanedStocks);
+            }
+        }
+    }
+
+    private void updateInoutStock(Long productId, Long optionId, Integer qty, String type) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 

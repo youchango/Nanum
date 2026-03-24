@@ -1,6 +1,7 @@
 package com.nanum.admin.site.controller;
 
 import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.admin.manager.service.CustomManagerDetails;
 import com.nanum.admin.site.dto.SitePolicyDTO;
 import com.nanum.admin.site.service.SitePolicyService;
@@ -26,7 +27,7 @@ public class SitePolicyController {
     @Operation(summary = "전체 사이트 목록 조회", description = "[MASTER] 시스템에 등록된 모든 사이트(ShopInfo) 목록을 조회합니다. MASTER 권한이 필요합니다.")
     @GetMapping("/")
     public ResponseEntity<List<ShopInfo>> getAllSites(@AuthenticationPrincipal CustomManagerDetails details) {
-        if (!"MASTER".equals(details.getManager().getMbType())) {
+        if (details.getManager().getMbType() != ManagerType.MASTER) {
             return ResponseEntity.status(403).build();
         }
         return ResponseEntity.ok(sitePolicyService.getAllSites());
@@ -52,7 +53,7 @@ public class SitePolicyController {
         Manager manager = details.getManager();
 
         // 권한 체크: MASTER는 통과, ADMIN은 본인 사이트만 가능
-        if (!"MASTER".equals(manager.getMbType())) {
+        if (manager.getMbType() != ManagerType.MASTER) {
             if (!siteCd.equals(manager.getSiteCd())) {
                 return ResponseEntity.status(403).build();
             }
@@ -71,7 +72,7 @@ public class SitePolicyController {
         Manager manager = details.getManager();
 
         // 권한 체크: MASTER는 통과, ADMIN은 본인 사이트만 가능
-        if (!"MASTER".equals(manager.getMbType())) {
+        if (manager.getMbType() != ManagerType.MASTER) {
             if (!siteCd.equals(manager.getSiteCd())) {
                 return ResponseEntity.status(403).build();
             }

@@ -45,8 +45,11 @@ public class InquiryDTO {
         private String orderNo;
         private String keyword; // Title or Content or Writer
         private String writerCode;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
+        private String siteCd;
+        @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
+        private java.time.LocalDate startDate;
+        @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
+        private java.time.LocalDate endDate;
     }
 
     @Getter
@@ -57,18 +60,29 @@ public class InquiryDTO {
     public static class Response {
         private Long id;
         private InquiryType type;
-        private String typeDesc;
+        
+        public String getTypeDesc() {
+            return type != null ? type.getDescription() : null;
+        }
+
         private Long productId;
         private String orderNo;
         private String title;
         private String content;
         private String answer;
         private InquiryStatus status;
-        private String statusDesc;
+
+        public String getStatusDesc() {
+            return status != null ? status.getDescription() : null;
+        }
+
         private String writerCode;
         private String writerName;
-        @com.fasterxml.jackson.annotation.JsonProperty("isSecret")
-        private boolean isSecret;
+        private String siteCd;
+        private String shopName;
+        private String productName;
+        private String orderName;
+        private String isSecret;
         private LocalDateTime createdAt;
         private LocalDateTime answeredAt;
         private String answererCode;
@@ -77,20 +91,20 @@ public class InquiryDTO {
             return Response.builder()
                     .id(inquiry.getId())
                     .type(inquiry.getType())
-                    .typeDesc(inquiry.getType().getDescription())
                     .productId(inquiry.getProductId())
                     .orderNo(inquiry.getOrderNo())
                     .title(inquiry.getTitle())
                     .content(inquiry.getContent())
                     .answer(inquiry.getAnswer())
                     .status(inquiry.getStatus())
-                    .statusDesc(inquiry.getStatus().getDescription())
                     .writerCode(inquiry.getWriter().getMemberCode())
                     .writerName(inquiry.getWriter().getMemberName())
-                    .isSecret("Y".equals(inquiry.getIsSecret()))
+                    .siteCd(inquiry.getSiteCd())
+                    .shopName(null) // Service에서 보정
+                    .isSecret(inquiry.getIsSecret())
                     .createdAt(inquiry.getCreatedAt())
                     .answeredAt(inquiry.getAnsweredAt())
-                    .answererCode(inquiry.getAnswerer() != null ? inquiry.getAnswerer().getMemberCode() : null)
+                    .answererCode(inquiry.getAnswerer() != null ? inquiry.getAnswerer().getManagerCode() : null)
                     .build();
         }
     }

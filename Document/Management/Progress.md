@@ -43,9 +43,9 @@
     - [x] 회원 등록 시 사업자 등록번호 필드 제거 및 유형별 권한(BIZ/USER/VETERAN) 최적화
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
     - [x] 클레임 관리 (Claim)
-    - [x] 공지사항 관리 (Content)
-    - [x] 1:1문의 관리 (Inquiry) - Schema 변경 대응 (type: VARCHAR, product_id/order_no 추가 및 연동 완료)
-    - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너 SiteTab 및 권한별 사이트 자동 할당 로직 적용 완료
+    - [x] 컨텐츠 통합 관리 (공지사항/FAQ 통합, SearchDTO 1-based Pagination 연동 필드명(type) 일괄 수정 및 MASTER 권한 전체 조회 쿼리 고도화 완료)
+    - [x] 1:1문의 관리 (Inquiry) - 사이트 필터링(SiteTab), 검색 및 페이징 고도화, API 규격 정규화 및 답변 등록 로직 개선 완료
+    - [x] 배너 및 팝업 관리 (Banner, Popup) - 배너/팝업 타입 최신화(메인 상/중/하, 서브 좌/우), 목록 컬럼 고도화(타입, 노출순서, 등록일 표시), 파일 업로드 및 수정 시 이미지 동기화(syncFiles) 로직 적용 완료
     - [x] 관리자 로그인 및 권한 관리 (Back-end)
 - **Biz (기업회원)**
     - [x] 기업 정보 등록 및 가입 프로세스 고도화 (member_biz 연동 및 스키마 정규화 완료)
@@ -116,6 +116,7 @@
   - [x] 입출고 관리 모듈 구조 리팩토링 (Controller/Service/Repository/DTO를 Admin 영역으로 분리)
   - [x] **InoutController API 응답 표준화(ApiResponse) 및 Swagger-UI 문서화 적용**
   - [x] 실재고(ProductStock)와 전시재고(Product/Option) 간 자동 동기화
+  - [x] **재고 관리 로직 통합 (InventoryService 제거 및 AdminInoutService로 일원화 완료)**
 
 ### 6. 관리자 시스템 (Admin Back-Office)
 - [x] 관리자 인증 (로그인/토큰 갱신)
@@ -180,6 +181,7 @@
   - [x] 프론트엔드 `SiteSettingsPage` 및 `siteService` 통합 이전 (`system` 메뉴 하위)
   - [x] `TermsManagePage` 및 `termService` 삭제
   - [x] 사이트 정책 관리 UI 개선 (저장 버튼 하단 이동)
+  - [x] **사이트 정책 관리 고도화 (마케팅활용동의 추가 및 단일 레코드 업데이트 구조로 개편 완료)**
 
 
 ## 프론트엔드 리팩토링 (Nanum_Master)

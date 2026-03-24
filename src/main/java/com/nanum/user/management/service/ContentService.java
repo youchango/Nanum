@@ -10,9 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,15 +17,8 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public List<ContentDTO.Response> getContents(ContentType type, String siteCd) {
-        return contentRepository.findByTypeAndSiteCd(type, siteCd).stream()
-                .filter(c -> "N".equals(c.getDeleteYn()))
-                .map(ContentDTO.Response::from)
-                .collect(Collectors.toList());
-    }
-
-    public Page<ContentDTO.Response> getContents(ContentType type, String siteCd, Pageable pageable) {
-        return contentRepository.findByTypeAndSiteCdAndDeleteYnOrderByCreatedAtDesc(type, siteCd, "N", pageable)
+    public Page<ContentDTO.Response> getContents(ContentType type, String siteCd, String keyword, Pageable pageable) {
+        return contentRepository.findBySearch(type, siteCd, "N", keyword, pageable)
                 .map(ContentDTO.Response::from);
     }
 

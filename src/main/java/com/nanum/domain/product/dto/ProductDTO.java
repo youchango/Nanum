@@ -89,6 +89,7 @@ public class ProductDTO {
         // private List<Long> categoryIds; // Removed in favor of single field
         // 'categoryId' being a List
         private String categoryName; // Representing primary or first category name for display
+        private String categoryFullName;
         private String name;
         private String brandName;
         private int supplyPrice;
@@ -134,6 +135,7 @@ public class ProductDTO {
         private Long productId;
         private List<Long> categoryIds;
         private String categoryName;
+        private String categoryFullName;
         private String name;
         private String brandName;
         private int supplyPrice;

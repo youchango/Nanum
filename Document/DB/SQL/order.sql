@@ -10,6 +10,8 @@ CREATE TABLE cart (
     created_by       VARCHAR(50) NULL COMMENT '등록자',
     updated_at       DATETIME NULL COMMENT '수정일',
     updated_by       VARCHAR(50) NULL COMMENT '수정자',
+    deleted_at       DATETIME NULL COMMENT '삭제일',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     
     PRIMARY KEY (cart_id),
@@ -43,11 +45,11 @@ CREATE TABLE order_master (
     tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
     -- BaseEntity Information
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시(주문일시)',
-    created_by       VARCHAR(20) NULL COMMENT '생성자',
+    created_by       VARCHAR(50) NULL COMMENT '생성자',
     updated_at       DATETIME NULL COMMENT '수정일시',
-    updated_by       VARCHAR(20) NULL COMMENT '수정자',
+    updated_by       VARCHAR(50) NULL COMMENT '수정자',
     deleted_at       DATETIME NULL COMMENT '삭제일시',
-    deleted_by       VARCHAR(20) NULL COMMENT '삭제자',
+    deleted_by       VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn        CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제여부',
     PRIMARY KEY (order_id),
     UNIQUE KEY uq_order_no (order_no),

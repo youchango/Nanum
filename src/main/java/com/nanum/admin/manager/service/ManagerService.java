@@ -97,7 +97,7 @@ public class ManagerService {
         }
 
         // Validate Site Code for ADMIN type
-        if ("ADMIN".equals(request.getType())) {
+        if (com.nanum.admin.manager.entity.ManagerType.ADMIN.equals(request.getType())) {
             if (request.getSiteCd() == null || request.getSiteCd().isEmpty()) {
                 throw new IllegalArgumentException("상점 관리자(ADMIN) 생성 시 사이트 코드는 필수입니다.");
             }
@@ -119,8 +119,8 @@ public class ManagerService {
         // Policy: ADMIN -> ADM + 6 digits, SCM -> SCM + 6 digits (handled in
         // AdminAuthService but duplicated here for Admin creation or SCM creation by
         // Admin)
-        String prefix = "ADMIN".equals(request.getType() != null ? request.getType().name() : "") ? "ADM"
-                : ("SCM".equals(request.getType() != null ? request.getType().name() : "") ? "SCM" : "MGR");
+        String prefix = com.nanum.admin.manager.entity.ManagerType.ADMIN.equals(request.getType()) ? "ADM"
+                : (com.nanum.admin.manager.entity.ManagerType.SCM.equals(request.getType()) ? "SCM" : "MGR");
         String managerCode = generateManagerCode(prefix);
 
         Manager manager = Manager.builder()
@@ -332,7 +332,7 @@ public class ManagerService {
             // 5. Create Manager
             // Find default SCM Auth Group (fallback to ID 1)
             ManagerAuthGroup authGroup = managerAuthGroupRepository.findAll().stream()
-                    .filter(g -> "SCM".equals(g.getAuthGroupName()))
+                    .filter(g -> com.nanum.admin.manager.entity.ManagerType.SCM.name().equals(g.getAuthGroupName()))
                     .findFirst()
                     .orElse(managerAuthGroupRepository.findById(1L)
                             .orElseThrow(() -> new IllegalArgumentException("기본 권한 그룹을 찾을 수 없습니다.")));

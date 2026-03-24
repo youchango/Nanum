@@ -4,6 +4,10 @@ shop:
 spring:
   profiles:
     active: local # Default to local
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
 
 jwt:
   # Base64 Encoded Secret Key (Must be at least 256 bits / 32 bytes)

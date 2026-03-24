@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum BannerType {
     MAIN_TOP("메인 상단"),
-    SUB_MID("서브 중간");
+    MAIN_MID("메인 중간"),
+    MAIN_BOTTOM("메인 하단"),
+    SUB_LEFT("서브 좌측"),
+    SUB_RIGHT("서브 우측");
 
     private final String description;
 }

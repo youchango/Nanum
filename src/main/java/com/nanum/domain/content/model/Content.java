@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE content SET delete_yn = 'Y', deleted_at = NOW() WHERE content_id = ?")
+@Where(clause = "delete_yn = 'N'")
 public class Content extends BaseEntity {
 
     @Id

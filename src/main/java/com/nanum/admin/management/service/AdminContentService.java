@@ -7,8 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.nanum.admin.manager.entity.Manager;
+import com.nanum.admin.manager.entity.ManagerType;
+import com.nanum.admin.manager.service.CustomManagerDetails;
+import com.nanum.domain.content.dto.ContentSearchDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +22,21 @@ public class AdminContentService {
 
     private final ContentRepository contentRepository;
 
-    public List<ContentDTO.Response> getContents() {
-        return contentRepository.findAll().stream()
-                .map(ContentDTO.Response::from)
-                .collect(Collectors.toList());
+    public Page<ContentDTO.Response> getContents(ContentSearchDTO searchDTO, Pageable pageable) {
+        Manager manager = getCurrentManager();
+        // MASTER 또는 SCM 권한이 아니면 자신의 사이트 코드 강제 설정
+        String filterSiteCd = searchDTO.getSiteCd();
+        if (manager.getMbType() != ManagerType.MASTER && manager.getMbType() != ManagerType.SCM) {
+            filterSiteCd = manager.getSiteCd();
+        }
+
+        return contentRepository.findBySearch(
+                searchDTO.getType(),
+                filterSiteCd,
+                "N",
+                searchDTO.getKeyword(),
+                pageable)
+                .map(ContentDTO.Response::from);
     }
 
     public ContentDTO.Response getContent(Long id) {
@@ -51,9 +67,18 @@ public class AdminContentService {
     }
 
     @Transactional
-    public void deleteContent(Long id, String memberCode) {
+    public void deleteContent(Long id) {
+        Manager manager = getCurrentManager();
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        content.delete(memberCode);
+        content.delete(manager.getManagerCode());
+    }
+
+    private Manager getCurrentManager() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomManagerDetails) {
+            return ((CustomManagerDetails) principal).getManager();
+        }
+        throw new IllegalStateException("인증된 관리자 정보가 없습니다.");
     }
 }

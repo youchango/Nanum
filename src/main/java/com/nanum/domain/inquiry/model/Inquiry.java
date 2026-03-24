@@ -54,9 +54,12 @@ public class Inquiry extends BaseEntity {
     @JoinColumn(name = "writer_code", nullable = false, referencedColumnName = "member_code")
     private Member writer;
 
+    @Column(name = "answerer_code", insertable = false, updatable = false)
+    private String answererCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answerer_code", referencedColumnName = "member_code")
-    private Member answerer;
+    @JoinColumn(name = "answerer_code", referencedColumnName = "manager_code")
+    private com.nanum.admin.manager.entity.Manager answerer;
 
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
@@ -66,7 +69,7 @@ public class Inquiry extends BaseEntity {
     @Builder.Default
     private String isSecret = "N";
 
-    public void reply(String answer, Member answerer) {
+    public void reply(String answer, com.nanum.admin.manager.entity.Manager answerer) {
         this.answer = answer;
         this.answerer = answerer;
         this.answeredAt = LocalDateTime.now();
