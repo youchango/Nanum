@@ -1,3 +1,6 @@
+shop:
+  site-cd: SITECD000001
+
 server:
   port: 9013
   servlet:

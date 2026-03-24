@@ -1,3 +1,6 @@
+shop:
+  site-cd: NANUM # 기본 사이트 코드 (프로필별 오버라이드 가능)
+
 spring:
   profiles:
     active: local # Default to local

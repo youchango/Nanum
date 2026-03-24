@@ -25,8 +25,8 @@ public class Content extends BaseEntity {
     @Column(name = "site_cd", length = 20)
     private String siteCd;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "content_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "content_type", nullable = false, length = 50)
     private ContentType type;
 
     @Column(nullable = false, length = 200)
