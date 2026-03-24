@@ -3,15 +3,20 @@ package com.nanum.admin.product.service;
 import com.nanum.domain.product.dto.ProductCategoryDTO;
 import com.nanum.domain.product.model.ProductCategory;
 import com.nanum.domain.product.repository.ProductCategoryRepository;
+import com.nanum.domain.file.model.FileStore;
+import com.nanum.domain.file.model.ReferenceType;
+import com.nanum.domain.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class AdminProductCategoryService {
 
     private final ProductCategoryRepository productCategoryRepository;
     private final com.nanum.domain.product.repository.ProductRepository productRepository;
+    private final FileService fileService;
 
     /**
      * 카테고리 생성
@@ -42,7 +48,13 @@ public class AdminProductCategoryService {
                 .parent(parent)
                 .build();
 
-        return productCategoryRepository.save(category);
+        ProductCategory saved = productCategoryRepository.save(category);
+
+        if (dto.getImageFileId() != null && !dto.getImageFileId().isEmpty()) {
+            fileService.syncFiles(Collections.singletonList(dto.getImageFileId()), ReferenceType.CATEGORY, String.valueOf(saved.getCategoryId()));
+        }
+
+        return saved;
     }
 
     /**
@@ -60,6 +72,17 @@ public class AdminProductCategoryService {
         category.setCategoryName(dto.getCategoryName());
         category.setDisplayOrder(dto.getDisplayOrder());
         category.setUseYn(dto.getUseYn());
+
+        // 파일 연동 로직
+        if (dto.getImageFileId() != null && !dto.getImageFileId().isEmpty()) {
+            // 새 파일이 지정된 경우
+            fileService.syncFiles(Collections.singletonList(dto.getImageFileId()), ReferenceType.CATEGORY, String.valueOf(category.getCategoryId()));
+        } else if (dto.getImageUrl() == null || dto.getImageUrl().isEmpty()) {
+            // 이미지가 명시적으로 삭제된 경우
+            fileService.syncFiles(Collections.emptyList(), ReferenceType.CATEGORY, String.valueOf(category.getCategoryId()));
+        } else {
+            // 기존 이미지 유지
+        }
 
         // 상위 카테고리 변경 시 Depth 및 Parent 업데이트
         if (dto.getParentId() != null) {
@@ -99,6 +122,7 @@ public class AdminProductCategoryService {
             throw new IllegalStateException("해당 카테고리에 속한 상품이 존재하여 삭제할 수 없습니다.");
         }
 
+        fileService.syncFiles(Collections.emptyList(), ReferenceType.CATEGORY, String.valueOf(category.getCategoryId()));
         productCategoryRepository.delete(category);
     }
 
@@ -126,6 +150,16 @@ public class AdminProductCategoryService {
         List<ProductCategory> allCategories = productCategoryRepository
                 .findAll(Sort.by(Sort.Direction.ASC, "depth", "displayOrder"));
 
+        // 1.5. 이미지 URL 정보 일괄 로드 (N+1 방지)
+        List<String> categoryIds = allCategories.stream()
+                .map(c -> String.valueOf(c.getCategoryId()))
+                .collect(Collectors.toList());
+        List<FileStore> files = fileService.getFiles(ReferenceType.CATEGORY, categoryIds);
+        Map<String, String> imageUrlMap = new HashMap<>();
+        for (FileStore file : files) {
+            imageUrlMap.put(file.getReferenceId(), fileService.getFullUrl(file.getPath()));
+        }
+
         // 2. DTO 변환 및 Map핑 (ID -> DTO)
         Map<Long, ProductCategoryDTO> dtoMap = new HashMap<>();
         List<ProductCategoryDTO> rootCategories = new ArrayList<>();
@@ -138,6 +172,8 @@ public class AdminProductCategoryService {
                     category.getDepth(),
                     category.getDisplayOrder(),
                     category.getUseYn(),
+                    imageUrlMap.get(String.valueOf(category.getCategoryId())), // imageUrl
+                    null, // imageFileId
                     new ArrayList<>() // Children 초기화
             );
             dtoMap.put(dto.getCategoryId(), dto);

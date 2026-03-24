@@ -17,5 +17,7 @@ public class ProductCategoryDTO {
     private int depth;
     private int displayOrder;
     private String useYn;
+    private String imageUrl;
+    private String imageFileId;
     private List<ProductCategoryDTO> children;
 }

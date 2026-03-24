@@ -3,6 +3,7 @@ package com.nanum.domain.product.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class ProductCategory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private ProductCategory parent;
 
     @Column(name = "category_name", nullable = false)
@@ -42,6 +44,7 @@ public class ProductCategory {
 
     @OneToMany(mappedBy = "parent")
     @Builder.Default
+    @JsonIgnore
     private List<ProductCategory> children = new ArrayList<>();
 
     /**
