@@ -13,6 +13,7 @@ import java.math.BigDecimal;
         @UniqueConstraint(name = "uq_order_no", columnNames = "order_no")
 })
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

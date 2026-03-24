@@ -53,7 +53,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class OrderService {
 
-    private static final String SITE_CD = "NANUM";
+    @org.springframework.beans.factory.annotation.Value("${shop.site-cd:NANUM}")
+    private String SITE_CD;
+
     private static final BigDecimal FREE_DELIVERY_THRESHOLD = new BigDecimal("50000");
     private static final BigDecimal DELIVERY_FEE = new BigDecimal("3000");
 
@@ -550,8 +552,9 @@ public class OrderService {
                 .stream()
                 .collect(Collectors.toMap(ps -> ps.getProduct().getId(), ps -> ps, (a, b) -> a));
 
-        // 가격 계산 (재고 차감 없이)
+        // 가격 계산 (재고 차감 없이) + 스냅샷 생성
         List<String> productNames = new ArrayList<>();
+        List<java.util.Map<String, Object>> itemSnapshots = new ArrayList<>();
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         for (OrderDTO.OrderDetailItem item : request.getItems()) {
@@ -563,10 +566,24 @@ public class OrderService {
 
             int basePrice = resolveBasePrice(product, siteMap.get(product.getId()), member);
             int optionExtraPrice = resolveOptionExtraPrice(product, item.getOptionId());
+            String optionName = resolveOptionName(product, item.getOptionId());
             int unitPrice = basePrice + optionExtraPrice;
             BigDecimal itemTotal = BigDecimal.valueOf((long) unitPrice * item.getQuantity());
             totalPrice = totalPrice.add(itemTotal);
             productNames.add(product.getName());
+
+            // 가격 포함 스냅샷
+            java.util.Map<String, Object> snapshot = new java.util.LinkedHashMap<>();
+            snapshot.put("productId", product.getId());
+            snapshot.put("optionId", item.getOptionId());
+            snapshot.put("quantity", item.getQuantity());
+            snapshot.put("productName", product.getName());
+            snapshot.put("optionName", optionName);
+            snapshot.put("basePrice", basePrice);
+            snapshot.put("optionExtraPrice", optionExtraPrice);
+            snapshot.put("unitPrice", unitPrice);
+            snapshot.put("itemTotal", itemTotal);
+            itemSnapshots.add(snapshot);
         }
 
         // 배송비
@@ -599,10 +616,10 @@ public class OrderService {
             orderName += " 외 " + (productNames.size() - 1) + "건";
         }
 
-        // items JSON 스냅샷
+        // items JSON 스냅샷 (가격 포함)
         String itemsJson;
         try {
-            itemsJson = objectMapper.writeValueAsString(request.getItems());
+            itemsJson = objectMapper.writeValueAsString(itemSnapshots);
         } catch (JsonProcessingException e) {
             throw new BusinessException("주문 상품 직렬화 실패", ErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -672,106 +689,107 @@ public class OrderService {
             throw new BusinessException("결제 승인 실패: " + pgResult.getErrorMessage(), ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
-        // 5. items 복원
-        List<OrderDTO.OrderDetailItem> items;
+        // 5. 스냅샷 복원 (가격 포함)
+        List<java.util.Map<String, Object>> snapshots;
         try {
-            items = objectMapper.readValue(orderTemp.getItemsJson(), new TypeReference<>() {});
+            snapshots = objectMapper.readValue(orderTemp.getItemsJson(), new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new BusinessException("주문 상품 복원 실패", ErrorCode.INTERNAL_SERVER_ERROR);
         }
 
-        // 6. 상품/사이트 가격 조회
-        List<Long> productIds = items.stream()
-                .map(OrderDTO.OrderDetailItem::getProductId)
+        // 6. 상품 조회 (상태 검증 + 재고 차감용, 가격은 스냅샷 사용)
+        List<Long> productIds = snapshots.stream()
+                .map(s -> ((Number) s.get("productId")).longValue())
                 .collect(Collectors.toList());
-        List<Product> products = productRepository.findAllByIdWithOptions(productIds);
-        java.util.Map<Long, Product> productMap = products.stream()
+        java.util.Map<Long, Product> productMap = productRepository.findAllById(productIds).stream()
                 .collect(Collectors.toMap(Product::getId, p -> p));
-        java.util.Map<Long, ProductSite> siteMap = productSiteRepository.findByProductInAndSiteCd(products, SITE_CD)
-                .stream()
-                .collect(Collectors.toMap(ps -> ps.getProduct().getId(), ps -> ps, (a, b) -> a));
 
-        // 7. 주문 상세 생성 + 재고 차감
+        // 7. 결제수단 파싱 + 상태 결정
+        PaymentMethod paymentMethod = parsePaymentMethod(orderTemp.getPaymentMethod());
+        boolean isDepositWait = paymentMethod == PaymentMethod.VIRTUAL_ACCOUNT
+                || paymentMethod == PaymentMethod.BANK_TRANSFER;
+        OrderStatus orderStatus = isDepositWait ? OrderStatus.PAYMENT_WAIT : OrderStatus.PAID;
+        PaymentStatus paymentStatus = isDepositWait ? PaymentStatus.DEPOSIT_WAIT : PaymentStatus.PAID;
+
+        // 8. 스냅샷 기반 주문 상세 생성 + 재고 차감
         List<OrderDetail> orderDetails = new ArrayList<>();
         List<String> productNames = new ArrayList<>();
         List<Long> orderedProductIds = new ArrayList<>();
-        BigDecimal totalPrice = BigDecimal.ZERO;
 
-        for (int i = 0; i < items.size(); i++) {
-            OrderDTO.OrderDetailItem item = items.get(i);
-            Product product = productMap.get(item.getProductId());
+        for (int i = 0; i < snapshots.size(); i++) {
+            java.util.Map<String, Object> snap = snapshots.get(i);
+            Long productId = ((Number) snap.get("productId")).longValue();
+            Long optionId = snap.get("optionId") != null ? ((Number) snap.get("optionId")).longValue() : null;
+            int quantity = ((Number) snap.get("quantity")).intValue();
+            String productName = (String) snap.get("productName");
+            String optionName = (String) snap.get("optionName");
+            int basePrice = ((Number) snap.get("basePrice")).intValue();
+            int optionExtraPrice = ((Number) snap.get("optionExtraPrice")).intValue();
+            BigDecimal itemTotal = new BigDecimal(snap.get("itemTotal").toString());
+
+            // 상품 상태 검증 (가격은 스냅샷 사용, 판매중/삭제 여부만 확인)
+            Product product = productMap.get(productId);
             if (product == null) {
                 pgPaymentService.refund(request.getPaymentKey(), orderTemp.getPaymentPrice());
-                throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+                throw new BusinessException("'" + productName + "' 상품을 찾을 수 없습니다.", ErrorCode.ENTITY_NOT_FOUND);
             }
-
             validateProductForOrder(product);
 
-            int basePrice = resolveBasePrice(product, siteMap.get(product.getId()), member);
-            int optionExtraPrice = resolveOptionExtraPrice(product, item.getOptionId());
-            String optionName = resolveOptionName(product, item.getOptionId());
-            int unitPrice = basePrice + optionExtraPrice;
-            BigDecimal itemTotal = BigDecimal.valueOf((long) unitPrice * item.getQuantity());
-            totalPrice = totalPrice.add(itemTotal);
-
             // 재고 차감
-            int updated = productRepository.decreaseStockQuantity(product.getId(), item.getQuantity());
+            int updated = productRepository.decreaseStockQuantity(productId, quantity);
             if (updated == 0) {
                 pgPaymentService.refund(request.getPaymentKey(), orderTemp.getPaymentPrice());
                 throw new BusinessException(
-                        "'" + product.getName() + "' 상품의 재고가 부족합니다.",
+                        "'" + productName + "' 상품의 재고가 부족합니다.",
                         ErrorCode.INVALID_INPUT_VALUE);
             }
 
-            productNames.add(product.getName());
-            orderedProductIds.add(product.getId());
+            productNames.add(productName);
+            orderedProductIds.add(productId);
 
             OrderDetail detail = OrderDetail.builder()
                     .orderSeq(i + 1)
                     .siteCd(SITE_CD)
-                    .productId(product.getId())
-                    .optionId(item.getOptionId())
-                    .productName(product.getName())
+                    .productId(productId)
+                    .optionId(optionId)
+                    .productName(productName)
                     .optionName(optionName)
                     .productPrice(BigDecimal.valueOf(basePrice))
                     .optionPrice(BigDecimal.valueOf(optionExtraPrice))
-                    .quantity(item.getQuantity())
+                    .quantity(quantity)
                     .totalPrice(itemTotal)
-                    .orderStatus(OrderStatus.PAID)
+                    .orderStatus(orderStatus)
                     .build();
             orderDetails.add(detail);
         }
 
-        // 8. 배송비 / 결제금액 계산
-        BigDecimal deliveryPrice = totalPrice.compareTo(FREE_DELIVERY_THRESHOLD) >= 0
-                ? BigDecimal.ZERO : DELIVERY_FEE;
-        BigDecimal paymentPrice = totalPrice.add(deliveryPrice);
+        // 9. 스냅샷 금액 그대로 사용 (prepare 시점 가격 보장)
+        BigDecimal totalPrice = orderTemp.getTotalPrice();
+        BigDecimal deliveryPrice = orderTemp.getDeliveryPrice();
+        BigDecimal paymentPrice = orderTemp.getPaymentPrice();
 
-        // 포인트 처리
+        // 포인트 차감
         BigDecimal usedPointAmount = BigDecimal.ZERO;
         final int requestedPoint = orderTemp.getUsedPoint();
         if (requestedPoint > 0) {
-            validatePointUsage(member, requestedPoint, totalPrice);
+            // 잔액만 재검증 (금액은 스냅샷)
+            int currentBalance = pointRepository.calculateBalance(member.getMemberCode());
+            if (currentBalance < requestedPoint) {
+                pgPaymentService.refund(request.getPaymentKey(), orderTemp.getPaymentPrice());
+                throw new BusinessException("포인트 잔액이 부족합니다.", ErrorCode.INVALID_INPUT_VALUE);
+            }
             usedPointAmount = BigDecimal.valueOf(requestedPoint);
-            paymentPrice = paymentPrice.subtract(usedPointAmount);
         }
 
-        // 쿠폰 처리
+        // 쿠폰 사용 처리
         BigDecimal usedCouponAmount = BigDecimal.ZERO;
         MemberCoupon memberCoupon = null;
         if (orderTemp.getMemberCouponId() != null) {
-            int couponDiscount = calculateCouponDiscount(member, orderTemp.getMemberCouponId(), totalPrice);
-            usedCouponAmount = BigDecimal.valueOf(couponDiscount);
-            paymentPrice = paymentPrice.subtract(usedCouponAmount);
             memberCoupon = memberCouponRepository.findByIdAndMemberMemberCode(
                     orderTemp.getMemberCouponId(), member.getMemberCode()).orElse(null);
-        }
-
-        if (paymentPrice.compareTo(BigDecimal.ZERO) < 0) {
-            pgPaymentService.refund(request.getPaymentKey(), orderTemp.getPaymentPrice());
-            throw new BusinessException(
-                    "포인트와 쿠폰 할인 합계가 결제 금액을 초과합니다.",
-                    ErrorCode.INVALID_INPUT_VALUE);
+            if (memberCoupon != null && "N".equals(memberCoupon.getUsedYn())) {
+                usedCouponAmount = totalPrice.subtract(paymentPrice.add(usedPointAmount).subtract(deliveryPrice)).max(BigDecimal.ZERO);
+            }
         }
 
         // 주문명
@@ -780,19 +798,22 @@ public class OrderService {
             orderName += " 외 " + (productNames.size() - 1) + "건";
         }
 
-        // 9. OrderMaster 저장
+        // 할인금액 역산 (스냅샷 기준)
+        BigDecimal discountPrice = totalPrice.add(deliveryPrice).subtract(paymentPrice);
+
+        // 10. OrderMaster 저장
         OrderMaster order = OrderMaster.builder()
                 .orderNo(orderTemp.getOrderNo())
                 .orderName(orderName)
                 .siteCd(SITE_CD)
                 .member(member)
-                .status(OrderStatus.PAID)
+                .status(orderStatus)
                 .totalPrice(totalPrice)
                 .deliveryPrice(deliveryPrice)
                 .paymentPrice(paymentPrice)
-                .discountPrice(usedPointAmount.add(usedCouponAmount))
+                .discountPrice(discountPrice)
                 .usedPoint(usedPointAmount)
-                .usedCoupon(usedCouponAmount)
+                .usedCoupon(discountPrice.subtract(usedPointAmount).max(BigDecimal.ZERO))
                 .receiverName(orderTemp.getReceiverName())
                 .receiverPhone(orderTemp.getReceiverPhone())
                 .receiverAddress(orderTemp.getReceiverAddress())
@@ -825,8 +846,7 @@ public class OrderService {
             memberCoupon.markUsed(order.getOrderId());
         }
 
-        // 10. PaymentMaster 생성 (PAID, paymentKey 포함)
-        PaymentMethod paymentMethod = parsePaymentMethod(orderTemp.getPaymentMethod());
+        // 10. PaymentMaster 생성
         PaymentMaster payment = PaymentMaster.builder()
                 .orderMaster(order)
                 .member(member)
@@ -836,7 +856,7 @@ public class OrderService {
                 .usedCoupon(usedCouponAmount)
                 .deliveryPrice(deliveryPrice)
                 .paymentPrice(paymentPrice)
-                .paymentStatus(PaymentStatus.PAID)
+                .paymentStatus(paymentStatus)
                 .paymentMethod(paymentMethod)
                 .build();
         payment.setPaymentKey(request.getPaymentKey());
@@ -880,6 +900,48 @@ public class OrderService {
                 .build();
 
         return confirmOrder(member.getMemberId(), confirmRequest);
+    }
+
+    /**
+     * 무통장입금/가상계좌 입금 확인 처리
+     * PAYMENT_WAIT → PAID, DEPOSIT_WAIT → PAID
+     */
+    @Transactional
+    public void confirmDeposit(Long orderId) {
+        OrderMaster order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException("주문을 찾을 수 없습니다.", ErrorCode.ENTITY_NOT_FOUND));
+
+        if (order.getStatus() != OrderStatus.PAYMENT_WAIT) {
+            throw new BusinessException("입금 대기 상태의 주문만 입금 확인 처리할 수 있습니다.", ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        order.setStatus(OrderStatus.PAID);
+
+        // OrderDetail 상태도 변경
+        List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
+        for (OrderDetail detail : details) {
+            if (detail.getOrderStatus() == OrderStatus.PAYMENT_WAIT) {
+                detail.setOrderStatus(OrderStatus.PAID);
+            }
+        }
+
+        // PaymentMaster 상태 변경
+        paymentRepository.findByOrderMasterOrderId(orderId).ifPresent(payment -> {
+            payment.setPaymentStatus(PaymentStatus.PAID);
+            payment.setPaymentDate(java.time.LocalDateTime.now());
+        });
+
+        log.info("입금 확인 완료 - orderId: {}, orderNo: {}", orderId, order.getOrderNo());
+    }
+
+    /**
+     * Webhook용 — orderNo 기반 입금 확인
+     */
+    @Transactional
+    public void confirmDepositByOrderNo(String orderNo) {
+        OrderMaster order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException("주문을 찾을 수 없습니다.", ErrorCode.ENTITY_NOT_FOUND));
+        confirmDeposit(order.getOrderId());
     }
 
     // --- Private Helpers ---

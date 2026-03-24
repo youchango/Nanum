@@ -55,6 +55,7 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "total_price", precision = 19, scale = 4, nullable = false)
     private BigDecimal totalPrice;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false, length = 20)
     private OrderStatus orderStatus;

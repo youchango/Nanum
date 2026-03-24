@@ -1,6 +1,7 @@
 package com.nanum.user.order.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -11,6 +12,8 @@ public interface OrderRepository extends JpaRepository<OrderMaster, Long>, Query
     List<OrderMaster> findTop5BySiteCdOrderByCreatedAtDesc(String siteCd);
 
     List<OrderMaster> findTop5ByOrderByCreatedAtDesc();
+
+    Optional<OrderMaster> findByOrderNo(String orderNo);
 
     List<OrderMaster> findByMemberMemberCodeOrderByCreatedAtDesc(String memberCode);
 

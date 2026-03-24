@@ -31,6 +31,9 @@ public class PaymentWebhookController {
         try {
             if ("DONE".equalsIgnoreCase(request.getStatus()) || "APPROVED".equalsIgnoreCase(request.getStatus())) {
                 orderService.confirmOrderByOrderNo(request.getOrderNo(), request.getPaymentKey());
+            } else if ("DEPOSIT_CONFIRMED".equalsIgnoreCase(request.getStatus())) {
+                // 가상계좌/무통장 입금 확인
+                orderService.confirmDepositByOrderNo(request.getOrderNo());
             } else {
                 log.warn("[PG Webhook] 미처리 상태: {}", request.getStatus());
             }
