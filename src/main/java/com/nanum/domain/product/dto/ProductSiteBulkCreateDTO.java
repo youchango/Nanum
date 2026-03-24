@@ -37,5 +37,9 @@ public class ProductSiteBulkCreateDTO {
         @Schema(description = "보훈회원가(C)")
         @JsonProperty("cPrice")
         private BigDecimal cPrice;
+
+        @Schema(description = "포인트 적립률")
+        @JsonProperty("pointRate")
+        private BigDecimal pointRate;
     }
 }

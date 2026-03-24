@@ -25,6 +25,8 @@ public class ProductSitePriceDTO {
     private BigDecimal bPrice;
     @JsonProperty("cPrice")
     private BigDecimal cPrice;
+    @JsonProperty("pointRate")
+    private BigDecimal pointRate;
     @JsonProperty("extraPrice")
     private Integer extraPrice;
     @JsonProperty("stockQuantity")

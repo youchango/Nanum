@@ -148,6 +148,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         productSite.aPrice,
                         productSite.bPrice,
                         productSite.cPrice,
+                        productSite.pointRate,
                         productOption.extraPrice,
                         productOption.stockQuantity)
                 .from(productSite)
@@ -173,6 +174,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                                 .aPrice(t.get(productSite.aPrice))
                                 .bPrice(t.get(productSite.bPrice))
                                 .cPrice(t.get(productSite.cPrice))
+                                .pointRate(t.get(productSite.pointRate))
                                 .extraPrice(t.get(productOption.extraPrice))
                                 .stockQuantity(t.get(productOption.stockQuantity))
                                 .build(), Collectors.toList())));

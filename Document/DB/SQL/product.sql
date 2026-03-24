@@ -92,6 +92,7 @@ CREATE TABLE product_site (
     a_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'A등급 가격',
     b_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'B등급 가격',
     c_price          DECIMAL(19, 4) DEFAULT 0.0000 NOT NULL COMMENT 'C등급 가격',
+    point_rate       DECIMAL(10, 4) DEFAULT 0.0000 NOT NULL COMMENT '포인트 적립률',
     pdt_click        INT DEFAULT 0 NOT NULL COMMENT '클릭횟수',
     
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '등록일',

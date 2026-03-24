@@ -443,7 +443,8 @@ public class AdminProductService {
                                 request.getViewYn() != null ? request.getViewYn() : productSite.getViewYn(),
                                 request.getAPrice(),
                                 request.getBPrice(),
-                                request.getCPrice());
+                                request.getCPrice(),
+                                request.getPointRate());
                 // 옵션별 가격 정보 일괄 업데이트 로직 제거 완료
         }
 
@@ -477,6 +478,7 @@ public class AdminProductService {
                                         .aPrice(siteReq.getAPrice() != null ? siteReq.getAPrice() : BigDecimal.ZERO)
                                         .bPrice(siteReq.getBPrice() != null ? siteReq.getBPrice() : BigDecimal.ZERO)
                                         .cPrice(siteReq.getCPrice() != null ? siteReq.getCPrice() : BigDecimal.ZERO)
+                                        .pointRate(siteReq.getPointRate() != null ? siteReq.getPointRate() : BigDecimal.ZERO)
                                         .pdtClick(0)
                                         .viewYn("Y") // 일괄 등록 시 기본 노출 처리
                                         .build();

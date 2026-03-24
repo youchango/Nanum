@@ -33,4 +33,8 @@ public class ProductSitePriceUpdateDTO {
     @JsonProperty("cPrice")
     private BigDecimal cPrice;
 
+    @Schema(description = "포인트 적립률", example = "0.0100")
+    @JsonProperty("pointRate")
+    private BigDecimal pointRate;
+
 }

@@ -46,6 +46,11 @@ public class ProductSite extends BaseEntity {
     @Builder.Default
     private BigDecimal cPrice = BigDecimal.ZERO;
 
+    @Column(name = "point_rate", nullable = false, precision = 10, scale = 4)
+    @ColumnDefault("0.0000")
+    @Builder.Default
+    private BigDecimal pointRate = BigDecimal.ZERO;
+
     @Column(name = "pdt_click", nullable = false)
     @ColumnDefault("0")
     @Builder.Default
@@ -59,8 +64,9 @@ public class ProductSite extends BaseEntity {
      * @param aPrice 기업회원가, null이면 기존 값 유지
      * @param bPrice 일반회원가, null이면 기존 값 유지
      * @param cPrice 보훈회원가, null이면 기존 값 유지
+     * @param pointRate 포인트 적립률, null이면 기존 값 유지
      */
-    public void update(String viewYn, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice) {
+    public void update(String viewYn, BigDecimal aPrice, BigDecimal bPrice, BigDecimal cPrice, BigDecimal pointRate) {
         if (viewYn != null)
             this.viewYn = viewYn;
         if (aPrice != null)
@@ -69,5 +75,7 @@ public class ProductSite extends BaseEntity {
             this.bPrice = bPrice;
         if (cPrice != null)
             this.cPrice = cPrice;
+        if (pointRate != null)
+            this.pointRate = pointRate;
     }
 }

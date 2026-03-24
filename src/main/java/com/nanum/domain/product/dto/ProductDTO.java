@@ -118,6 +118,7 @@ public class ProductDTO {
         private BigDecimal exchangeFee;
         private String deliveryIslandYn;
         private BigDecimal deliveryIslandFee;
+        private BigDecimal pointRate; // 사이트별 통합된 적립률 (User 단일 사이트 기준)
 
         private com.nanum.domain.shipment.dto.ShipmentDTO.Response outboundShipment;
         private com.nanum.domain.shipment.dto.ShipmentDTO.Response inboundShipment;
@@ -165,6 +166,7 @@ public class ProductDTO {
         private BigDecimal exchangeFee;
         private String deliveryIslandYn;
         private BigDecimal deliveryIslandFee;
+        private BigDecimal pointRate;
 
         private com.nanum.domain.shipment.dto.ShipmentDTO.Response outboundShipment;
         private com.nanum.domain.shipment.dto.ShipmentDTO.Response inboundShipment;

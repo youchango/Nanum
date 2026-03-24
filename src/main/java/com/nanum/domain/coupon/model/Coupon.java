@@ -48,12 +48,19 @@ public class Coupon {
     @Column(name = "valid_end_date", nullable = false)
     private LocalDateTime validEndDate;
 
-    @Column(name = "target_type", nullable = false, length = 20)
+    @Column(name = "target_member_type", nullable = false, length = 10)
     @ColumnDefault("'ALL'")
-    private String targetType; // ALL, USER, BIZ
+    private String targetMemberType; // ALL, U, B, V
+
+    @Column(name = "target_product_id")
+    private Long targetProductId;
 
     @Column(name = "issue_limit")
     private Integer issueLimit;
+
+    @Column(name = "member_issue_limit", nullable = false)
+    @ColumnDefault("1")
+    private Integer memberIssueLimit;
 
     @Column(name = "issue_count", nullable = false)
     @ColumnDefault("0")
@@ -65,4 +72,8 @@ public class Coupon {
 
     @Column(name = "created_by")
     private Long createdBy;
+
+    public void incrementIssueCount() {
+        this.issueCount = this.issueCount == null ? 1 : this.issueCount + 1;
+    }
 }

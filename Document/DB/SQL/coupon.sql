@@ -1,4 +1,4 @@
-﻿-- 1. Coupon Master
+-- 1. Coupon Master
 CREATE TABLE coupon (
     coupon_id        INT AUTO_INCREMENT COMMENT '쿠폰ID',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
@@ -9,8 +9,10 @@ CREATE TABLE coupon (
     min_order_price  INT DEFAULT 0 NOT NULL COMMENT '최소주문금액',
     valid_start_date DATETIME NOT NULL COMMENT '유효시작일시',
     valid_end_date   DATETIME NOT NULL COMMENT '유효종료일시',
-    target_type      VARCHAR(20) DEFAULT 'ALL' NOT NULL COMMENT '적용대상(ALL:전체, USER:개인, BIZ:기업)',
-    issue_limit      INT NULL COMMENT '발급제한수량',
+    target_member_type VARCHAR(10) DEFAULT 'ALL' NOT NULL COMMENT '발급대상회원등급(ALL, U:일반, B:기업, V:보훈)',
+    target_product_id INT NULL COMMENT '특정상품적용(NULL이면 전체상품)',
+    issue_limit      INT NULL COMMENT '총 발급제한수량(NULL이면 무제한)',
+    member_issue_limit INT DEFAULT 1 NOT NULL COMMENT '1인당 발급제한수량',
     issue_count      INT DEFAULT 0 NOT NULL COMMENT '발급수량',
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     created_by     VARCHAR(50) NULL COMMENT '생성자',

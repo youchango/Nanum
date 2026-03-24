@@ -23,4 +23,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     Optional<Member> findByMemberCode(String memberCode);
 
     boolean existsByEmail(String email);
+
+    java.util.List<Member> findByMemberType(MemberType memberType);
+
+    java.util.List<Member> findAllByMemberCodeIn(java.util.List<String> memberCodes);
 }

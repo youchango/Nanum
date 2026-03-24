@@ -39,4 +39,40 @@ public class CouponDTO {
                     .build();
         }
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DownloadableResponse {
+        private Long couponId;
+        private String couponName;
+        private String discountType;
+        private Integer discountValue;
+        private Integer maxDiscount;
+        private Integer minOrderPrice;
+        private LocalDateTime validStartDate;
+        private LocalDateTime validEndDate;
+        private Integer issueLimit;
+        private Integer issueCount;
+        private Integer memberIssueLimit;
+        private boolean canDownload;
+
+        public static DownloadableResponse from(Coupon coupon) {
+            return DownloadableResponse.builder()
+                    .couponId(coupon.getId())
+                    .couponName(coupon.getName())
+                    .discountType(coupon.getDiscountType())
+                    .discountValue(coupon.getDiscountValue())
+                    .maxDiscount(coupon.getMaxDiscount())
+                    .minOrderPrice(coupon.getMinOrderPrice())
+                    .validStartDate(coupon.getValidStartDate())
+                    .validEndDate(coupon.getValidEndDate())
+                    .issueLimit(coupon.getIssueLimit())
+                    .issueCount(coupon.getIssueCount())
+                    .memberIssueLimit(coupon.getMemberIssueLimit())
+                    .build();
+        }
+    }
 }
