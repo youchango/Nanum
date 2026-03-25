@@ -46,6 +46,7 @@ public class ProductDTO {
 
         private List<Option> options;
         private List<Image> images;
+        private List<DeliveryRule> deliveryRules;
     }
 
     @Getter
@@ -63,6 +64,18 @@ public class ProductDTO {
         private String name3;
         private int extraPrice;
         private int stockQuantity;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DeliveryRule {
+        private Long deliveryId;
+        private int minQuantity;
+        private Integer maxQuantity;
+        private BigDecimal deliveryFee;
     }
 
     @Getter
@@ -125,6 +138,7 @@ public class ProductDTO {
 
         private List<Option> options;
         private List<Image> images;
+        private List<DeliveryRule> deliveryRules;
     }
 
     @Getter
@@ -173,6 +187,7 @@ public class ProductDTO {
 
         private List<MallOptionResponse> options;
         private List<Image> images;
+        private List<DeliveryRule> deliveryRules;
     }
 
     @Getter

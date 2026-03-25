@@ -1,6 +1,7 @@
 package com.nanum.domain.coupon.repository;
 
 import com.nanum.domain.coupon.model.MemberCoupon;
+import com.nanum.domain.coupon.model.MemberCouponStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,17 +11,17 @@ import java.util.Optional;
 
 public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long> {
 
-    List<MemberCoupon> findByMemberMemberCodeAndUsedYnOrderByIssuedAtDesc(String memberCode, String usedYn);
+    List<MemberCoupon> findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(String memberCode, MemberCouponStatus status);
 
-    Page<MemberCoupon> findByMemberMemberCodeAndUsedYnOrderByIssuedAtDesc(String memberCode, String usedYn, Pageable pageable);
+    Page<MemberCoupon> findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(String memberCode, MemberCouponStatus status, Pageable pageable);
 
     List<MemberCoupon> findByMemberMemberCodeOrderByIssuedAtDesc(String memberCode);
 
     Page<MemberCoupon> findByMemberMemberCodeOrderByIssuedAtDesc(String memberCode, Pageable pageable);
 
-    Optional<MemberCoupon> findByIdAndMemberMemberCode(Long id, String memberCode);
+    Optional<MemberCoupon> findByIssueIdAndMemberMemberCode(Long issueId, String memberCode);
 
-    Optional<MemberCoupon> findByOrderIdAndUsedYn(Long orderId, String usedYn);
+    Optional<MemberCoupon> findByOrderIdAndStatus(Long orderId, MemberCouponStatus status);
 
     int countByCouponIdAndMemberMemberCode(Long couponId, String memberCode);
 }

@@ -4,6 +4,7 @@ import com.nanum.global.error.ErrorCode;
 import com.nanum.global.error.exception.BusinessException;
 import com.nanum.domain.cart.repository.CartRepository;
 import com.nanum.domain.coupon.model.MemberCoupon;
+import com.nanum.domain.coupon.model.MemberCouponStatus;
 import com.nanum.domain.coupon.repository.MemberCouponRepository;
 import com.nanum.domain.member.model.Member;
 import com.nanum.domain.member.model.MemberRole;
@@ -225,10 +226,10 @@ public class OrderService {
         BigDecimal usedCouponAmount = BigDecimal.ZERO;
         MemberCoupon memberCoupon = null;
         if (request.getMemberCouponId() != null) {
-            memberCoupon = memberCouponRepository.findByIdAndMemberMemberCode(request.getMemberCouponId(), member.getMemberCode())
+            memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(request.getMemberCouponId(), member.getMemberCode())
                     .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
 
-            if ("Y".equals(memberCoupon.getUsedYn())) {
+            if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
                 throw new BusinessException("이미 사용된 쿠폰입니다.", ErrorCode.INVALID_INPUT_VALUE);
             }
 
@@ -509,9 +510,9 @@ public class OrderService {
 
         // 쿠폰 복원
         if (order.getUsedCoupon() != null && order.getUsedCoupon().compareTo(BigDecimal.ZERO) > 0) {
-            memberCouponRepository.findByOrderIdAndUsedYn(order.getOrderId(), "Y")
+            memberCouponRepository.findByOrderIdAndStatus(order.getOrderId(), MemberCouponStatus.USED)
                     .ifPresent(mc -> {
-                        mc.setUsedYn("N");
+                        mc.setStatus(MemberCouponStatus.UNUSED);
                         mc.setUsedAt(null);
                         mc.setOrderId(null);
                     });
@@ -785,9 +786,9 @@ public class OrderService {
         BigDecimal usedCouponAmount = BigDecimal.ZERO;
         MemberCoupon memberCoupon = null;
         if (orderTemp.getMemberCouponId() != null) {
-            memberCoupon = memberCouponRepository.findByIdAndMemberMemberCode(
+            memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(
                     orderTemp.getMemberCouponId(), member.getMemberCode()).orElse(null);
-            if (memberCoupon != null && "N".equals(memberCoupon.getUsedYn())) {
+            if (memberCoupon != null && MemberCouponStatus.UNUSED.equals(memberCoupon.getStatus())) {
                 usedCouponAmount = totalPrice.subtract(paymentPrice.add(usedPointAmount).subtract(deliveryPrice)).max(BigDecimal.ZERO);
             }
         }
@@ -1014,9 +1015,9 @@ public class OrderService {
     }
 
     private int calculateCouponDiscount(Member member, Long memberCouponId, BigDecimal totalPrice) {
-        MemberCoupon memberCoupon = memberCouponRepository.findByIdAndMemberMemberCode(memberCouponId, member.getMemberCode())
+        MemberCoupon memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(memberCouponId, member.getMemberCode())
                 .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
-        if ("Y".equals(memberCoupon.getUsedYn())) {
+        if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
             throw new BusinessException("이미 사용된 쿠폰입니다.", ErrorCode.INVALID_INPUT_VALUE);
         }
         LocalDateTime now = LocalDateTime.now();

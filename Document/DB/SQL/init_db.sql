@@ -210,6 +210,19 @@ CREATE TABLE product_stock (
     CONSTRAINT fk_stock_option FOREIGN KEY (option_id) REFERENCES product_option (option_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '상품 재고(창고)';
 
+-- 8. Product Delivery (Quantity-based Policy)
+CREATE TABLE product_delivery (
+    pd_id           INT AUTO_INCREMENT COMMENT '배송비규칙ID',
+    product_id       INT NOT NULL COMMENT '상품ID',
+    min_quantity     INT NOT NULL COMMENT '최소수량(또는 반복단위)',
+    max_quantity     INT NULL COMMENT '최대수량(NULL이면 해당 수량 이상 또는 반복)',
+    delivery_fee     DECIMAL(19,4) NOT NULL DEFAULT 0.0000 COMMENT '배송비',
+    
+    PRIMARY KEY (pd_id),
+    CONSTRAINT fk_pd_product FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
+) COMMENT '상품 수량별 배송비 정책';
+
+
 -- Product Review
 CREATE TABLE product_review (
     review_id        INT AUTO_INCREMENT PRIMARY KEY,

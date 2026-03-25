@@ -164,6 +164,14 @@ public class AdminProductService {
                                                 .orElse(null) : null)
                                 .options(options)
                                 .images(images)
+                                .deliveryRules(product.getProductDeliveries().stream()
+                                                .map(pd -> ProductDTO.DeliveryRule.builder()
+                                                                .deliveryId(pd.getId())
+                                                                .minQuantity(pd.getMinQuantity())
+                                                                .maxQuantity(pd.getMaxQuantity())
+                                                                .deliveryFee(pd.getDeliveryFee())
+                                                                .build())
+                                                .collect(Collectors.toList()))
                                 .build();
 
                 response.setCategoryFullName(categoryFullName);
@@ -235,6 +243,19 @@ public class AdminProductService {
                                                         .build())
                                         .collect(Collectors.toList());
                         product.getOptions().addAll(options);
+                }
+
+                // 배송 정책(반복/구간) 처리
+                if (("REPEAT".equals(request.getDeliveryType()) || "SECTION".equals(request.getDeliveryType())) && request.getDeliveryRules() != null) {
+                        List<ProductDelivery> deliveries = request.getDeliveryRules().stream()
+                                        .map(rule -> ProductDelivery.builder()
+                                                        .product(product)
+                                                        .minQuantity(rule.getMinQuantity())
+                                                        .maxQuantity(rule.getMaxQuantity())
+                                                        .deliveryFee(rule.getDeliveryFee() != null ? rule.getDeliveryFee() : BigDecimal.ZERO)
+                                                        .build())
+                                        .collect(Collectors.toList());
+                        product.getProductDeliveries().addAll(deliveries);
                 }
 
                 productRepository.save(product);
@@ -353,6 +374,27 @@ public class AdminProductService {
                         for (ProductOption optToRemove : new ArrayList<>(existingOptions)) {
                                 existingOptions.remove(optToRemove);
                         }
+                }
+
+                // 배송 정책(반복/구간) 업데이트
+                List<ProductDelivery> existingDeliveries = product.getProductDeliveries();
+                List<ProductDTO.DeliveryRule> requestRules = request.getDeliveryRules();
+
+                if (("REPEAT".equals(request.getDeliveryType()) || "SECTION".equals(request.getDeliveryType())) && requestRules != null) {
+                    // 1. 기존 데이터 삭제
+                    existingDeliveries.clear();
+                    // 2. 신규 데이터 추가 (수량별 구간은 일반적으로 개수가 적으므로 전체 교체 방식으로 처리)
+                    List<ProductDelivery> newDeliveries = requestRules.stream()
+                                .map(rule -> ProductDelivery.builder()
+                                            .product(product)
+                                            .minQuantity(rule.getMinQuantity())
+                                            .maxQuantity(rule.getMaxQuantity())
+                                            .deliveryFee(rule.getDeliveryFee() != null ? rule.getDeliveryFee() : BigDecimal.ZERO)
+                                            .build())
+                                .collect(Collectors.toList());
+                    existingDeliveries.addAll(newDeliveries);
+                } else {
+                    existingDeliveries.clear();
                 }
 
                 // Files Update

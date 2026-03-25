@@ -22,12 +22,12 @@ public class CouponDTO {
         private Integer minOrderPrice;
         private LocalDateTime validStartDate;
         private LocalDateTime validEndDate;
-        private String usedYn;
+        private String status;
 
         public static Response from(MemberCoupon mc) {
             Coupon coupon = mc.getCoupon();
             return Response.builder()
-                    .memberCouponId(mc.getId())
+                    .memberCouponId(mc.getIssueId())
                     .couponName(coupon.getName())
                     .discountType(coupon.getDiscountType())
                     .discountValue(coupon.getDiscountValue())
@@ -35,7 +35,7 @@ public class CouponDTO {
                     .minOrderPrice(coupon.getMinOrderPrice())
                     .validStartDate(coupon.getValidStartDate())
                     .validEndDate(coupon.getValidEndDate())
-                    .usedYn(mc.getUsedYn())
+                    .status(mc.getStatus().name())
                     .build();
         }
     }

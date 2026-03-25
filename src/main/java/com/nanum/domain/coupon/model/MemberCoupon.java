@@ -21,8 +21,8 @@ public class MemberCoupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "issue_id")
+    private Long issueId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
@@ -32,10 +32,11 @@ public class MemberCoupon {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    @Column(name = "used_yn", length = 1, nullable = false)
-    @ColumnDefault("'N'")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 10, nullable = false)
+    @ColumnDefault("'UNUSED'")
     @Builder.Default
-    private String usedYn = "N";
+    private MemberCouponStatus status = MemberCouponStatus.UNUSED; // UNUSED, USED, EXPIRED
 
     @Column(name = "used_at")
     private LocalDateTime usedAt;
@@ -47,11 +48,14 @@ public class MemberCoupon {
     @Column(name = "issued_at", updatable = false)
     private LocalDateTime issuedAt;
 
+    @Column(name = "expired_at", nullable = false)
+    private LocalDateTime expiredAt;
+
     /**
      * 쿠폰 사용 처리
      */
     public void markUsed(Long orderId) {
-        this.usedYn = "Y";
+        this.status = MemberCouponStatus.USED;
         this.usedAt = LocalDateTime.now();
         this.orderId = orderId;
     }

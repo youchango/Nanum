@@ -11,6 +11,7 @@ import com.nanum.user.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.nanum.domain.coupon.model.MemberCouponStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +93,8 @@ public class AdminCouponService {
             MemberCoupon memberCoupon = MemberCoupon.builder()
                     .coupon(coupon)
                     .member(member)
-                    .usedYn("N")
+                    .status(MemberCouponStatus.UNUSED)
+                    .expiredAt(coupon.getValidEndDate())
                     .build();
             memberCouponRepository.save(memberCoupon);
             

@@ -155,6 +155,10 @@ public class Product extends BaseEntity {
     @Builder.Default
     private List<ProductOption> options = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductDelivery> productDeliveries = new ArrayList<>();
+
     // Business Methods
     public void update(String name, String brandName, int supplyPrice, Integer mapPrice, Integer retailPrice,
             Integer suggestedPrice, Integer safetyStock,

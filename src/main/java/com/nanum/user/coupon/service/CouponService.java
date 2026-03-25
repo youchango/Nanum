@@ -9,6 +9,7 @@ import com.nanum.global.error.exception.BusinessException;
 import com.nanum.admin.coupon.repository.CouponRepository;
 import com.nanum.user.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import com.nanum.domain.coupon.model.MemberCouponStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class CouponService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         return memberCouponRepository
-                .findByMemberMemberCodeAndUsedYnOrderByIssuedAtDesc(member.getMemberCode(), "N", pageable)
+                .findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(member.getMemberCode(), MemberCouponStatus.UNUSED, pageable)
                 .map(CouponDTO.Response::from);
     }
 
@@ -116,7 +117,8 @@ public class CouponService {
         MemberCoupon newMemberCoupon = MemberCoupon.builder()
                 .coupon(coupon)
                 .member(member)
-                .usedYn("N")
+                .status(MemberCouponStatus.UNUSED)
+                .expiredAt(coupon.getValidEndDate())
                 .build();
         memberCouponRepository.save(newMemberCoupon);
 
