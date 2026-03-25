@@ -12,7 +12,7 @@ import com.nanum.domain.order.dto.OrderDTO;
 import com.nanum.domain.order.model.OrderDetail;
 import com.nanum.domain.order.model.OrderMaster;
 import com.nanum.domain.order.model.OrderStatus;
-import com.nanum.domain.payment.model.PaymentMaster;
+import com.nanum.domain.payment.model.Payment;
 import com.nanum.domain.payment.model.PaymentMethod;
 import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.domain.point.model.Point;
@@ -79,7 +79,7 @@ public class OrderService {
      * - 상품별 Role 기반 가격 조회 (ProductSite)
      * - 옵션 추가금 반영
      * - 배송비 계산 (5만원 이상 무료배송, 미만 3,000원)
-     * - PaymentMaster PENDING 상태 생성
+     * - Payment PENDING 상태 생성
      * - 장바구니 항목 삭제
      */
     @Deprecated
@@ -123,10 +123,12 @@ public class OrderService {
                 throw new BusinessException("'" + product.getName() + "' 상품은 삭제된 상품입니다.", ErrorCode.ENTITY_NOT_FOUND);
             }
             if (!"Y".equals(product.getApplyYn())) {
-                throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 승인되지 않은 상품입니다.", ErrorCode.INVALID_INPUT_VALUE);
+                throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 승인되지 않은 상품입니다.",
+                        ErrorCode.INVALID_INPUT_VALUE);
             }
             if (product.getStatus() != ProductStatus.SALE) {
-                throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 중이 아닙니다.", ErrorCode.INVALID_INPUT_VALUE);
+                throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 중이 아닙니다.",
+                        ErrorCode.INVALID_INPUT_VALUE);
             }
 
             // Role 기반 가격 산출
@@ -226,7 +228,8 @@ public class OrderService {
         BigDecimal usedCouponAmount = BigDecimal.ZERO;
         MemberCoupon memberCoupon = null;
         if (request.getMemberCouponId() != null) {
-            memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(request.getMemberCouponId(), member.getMemberCode())
+            memberCoupon = memberCouponRepository
+                    .findByIssueIdAndMemberMemberCode(request.getMemberCouponId(), member.getMemberCode())
                     .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
 
             if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
@@ -234,13 +237,15 @@ public class OrderService {
             }
 
             LocalDateTime now = LocalDateTime.now();
-            if (now.isBefore(memberCoupon.getCoupon().getValidStartDate()) || now.isAfter(memberCoupon.getCoupon().getValidEndDate())) {
+            if (now.isBefore(memberCoupon.getCoupon().getValidStartDate())
+                    || now.isAfter(memberCoupon.getCoupon().getValidEndDate())) {
                 throw new BusinessException("쿠폰 유효기간이 아닙니다.", ErrorCode.INVALID_INPUT_VALUE);
             }
 
             if (memberCoupon.getCoupon().getMinOrderPrice() != null
                     && totalPrice.compareTo(BigDecimal.valueOf(memberCoupon.getCoupon().getMinOrderPrice())) < 0) {
-                throw new BusinessException("최소 주문 금액(" + memberCoupon.getCoupon().getMinOrderPrice() + "원) 이상이어야 쿠폰을 사용할 수 있습니다.",
+                throw new BusinessException(
+                        "최소 주문 금액(" + memberCoupon.getCoupon().getMinOrderPrice() + "원) 이상이어야 쿠폰을 사용할 수 있습니다.",
                         ErrorCode.INVALID_INPUT_VALUE);
             }
 
@@ -250,7 +255,8 @@ public class OrderService {
                 discount = totalPrice.multiply(BigDecimal.valueOf(memberCoupon.getCoupon().getDiscountValue()))
                         .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.FLOOR)
                         .intValue();
-                if (memberCoupon.getCoupon().getMaxDiscount() != null && discount > memberCoupon.getCoupon().getMaxDiscount()) {
+                if (memberCoupon.getCoupon().getMaxDiscount() != null
+                        && discount > memberCoupon.getCoupon().getMaxDiscount()) {
                     discount = memberCoupon.getCoupon().getMaxDiscount();
                 }
             } else {
@@ -320,9 +326,9 @@ public class OrderService {
             memberCoupon.markUsed(order.getOrderId());
         }
 
-        // PaymentMaster 생성 (PENDING)
+        // Payment 생성 (PENDING)
         PaymentMethod paymentMethod = parsePaymentMethod(request.getPaymentMethod());
-        PaymentMaster payment = PaymentMaster.builder()
+        Payment payment = Payment.builder()
                 .orderMaster(order)
                 .member(member)
                 .totalPrice(totalPrice)
@@ -346,7 +352,8 @@ public class OrderService {
     /**
      * 내 주문 목록 조회
      */
-    public org.springframework.data.domain.Page<OrderDTO.Response> getMyOrders(String memberId, String startDate, String endDate, org.springframework.data.domain.Pageable pageable) {
+    public org.springframework.data.domain.Page<OrderDTO.Response> getMyOrders(String memberId, String startDate,
+            String endDate, org.springframework.data.domain.Pageable pageable) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -417,8 +424,9 @@ public class OrderService {
         // 결제 정보 조회
         String paymentMethodDesc = null;
         PaymentStatus paymentStatus = null;
-        PaymentMaster payment = paymentRepository.findByOrderMasterOrderId(orderId).orElse(null);
-        if (payment != null) {
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(orderId);
+        if (!payments.isEmpty()) {
+            Payment payment = payments.get(payments.size() - 1);
             paymentMethodDesc = payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null;
             paymentStatus = payment.getPaymentStatus();
         }
@@ -475,7 +483,7 @@ public class OrderService {
         }
 
         // 취소 가능 상태 검증
-        if (order.getStatus() != OrderStatus.PAYMENT_WAIT && order.getStatus() != OrderStatus.PAID) {
+        if (order.getStatus() != OrderStatus.PAYMENT_WAIT && order.getStatus() != OrderStatus.PREPARING) {
             throw new BusinessException(
                     "배송 준비 이후에는 주문을 취소할 수 없습니다. 1:1 문의를 이용해주세요.",
                     ErrorCode.INVALID_INPUT_VALUE);
@@ -484,10 +492,13 @@ public class OrderService {
         // 주문 상태 변경
         order.changeStatus(OrderStatus.CANCELLED);
 
-        // 결제 상태 변경
-        PaymentMaster payment = paymentRepository.findByOrderMasterOrderId(orderId).orElse(null);
-        if (payment != null) {
-            payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        // 결제 상태 변경 및 PG 환불
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(orderId);
+        Payment latestPayment = null;
+        if (!payments.isEmpty()) {
+            latestPayment = payments.get(payments.size() - 1);
+            latestPayment.setPaymentStatus(PaymentStatus.CANCELLED);
+            paymentRepository.save(latestPayment);
         }
 
         // 가용재고 복원
@@ -519,8 +530,8 @@ public class OrderService {
         }
 
         // PG 환불
-        if (payment != null && payment.getPaymentKey() != null) {
-            pgPaymentService.refund(payment.getPaymentKey(), order.getPaymentPrice());
+        if (latestPayment != null && latestPayment.getPaymentKey() != null) {
+            pgPaymentService.refund(latestPayment.getPaymentKey(), order.getPaymentPrice());
         }
 
         log.info("주문 취소 완료 - orderId: {}, memberId: {}", orderId, memberId);
@@ -589,7 +600,8 @@ public class OrderService {
 
         // 배송비
         BigDecimal deliveryPrice = totalPrice.compareTo(FREE_DELIVERY_THRESHOLD) >= 0
-                ? BigDecimal.ZERO : DELIVERY_FEE;
+                ? BigDecimal.ZERO
+                : DELIVERY_FEE;
         BigDecimal paymentPrice = totalPrice.add(deliveryPrice);
 
         // 포인트 사전 검증
@@ -693,7 +705,8 @@ public class OrderService {
         // 5. 스냅샷 복원 (가격 포함)
         List<java.util.Map<String, Object>> snapshots;
         try {
-            snapshots = objectMapper.readValue(orderTemp.getItemsJson(), new TypeReference<>() {});
+            snapshots = objectMapper.readValue(orderTemp.getItemsJson(), new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new BusinessException("주문 상품 복원 실패", ErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -709,7 +722,7 @@ public class OrderService {
         PaymentMethod paymentMethod = parsePaymentMethod(orderTemp.getPaymentMethod());
         boolean isDepositWait = paymentMethod == PaymentMethod.VIRTUAL_ACCOUNT
                 || paymentMethod == PaymentMethod.BANK_TRANSFER;
-        OrderStatus orderStatus = isDepositWait ? OrderStatus.PAYMENT_WAIT : OrderStatus.PAID;
+        OrderStatus orderStatus = isDepositWait ? OrderStatus.PAYMENT_WAIT : OrderStatus.PREPARING;
         PaymentStatus paymentStatus = isDepositWait ? PaymentStatus.DEPOSIT_WAIT : PaymentStatus.PAID;
 
         // 8. 스냅샷 기반 주문 상세 생성 + 재고 차감
@@ -789,7 +802,8 @@ public class OrderService {
             memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(
                     orderTemp.getMemberCouponId(), member.getMemberCode()).orElse(null);
             if (memberCoupon != null && MemberCouponStatus.UNUSED.equals(memberCoupon.getStatus())) {
-                usedCouponAmount = totalPrice.subtract(paymentPrice.add(usedPointAmount).subtract(deliveryPrice)).max(BigDecimal.ZERO);
+                usedCouponAmount = totalPrice.subtract(paymentPrice.add(usedPointAmount).subtract(deliveryPrice))
+                        .max(BigDecimal.ZERO);
             }
         }
 
@@ -847,8 +861,8 @@ public class OrderService {
             memberCoupon.markUsed(order.getOrderId());
         }
 
-        // 10. PaymentMaster 생성
-        PaymentMaster payment = PaymentMaster.builder()
+        // 10. Payment 생성
+        Payment payment = Payment.builder()
                 .orderMaster(order)
                 .member(member)
                 .totalPrice(totalPrice)
@@ -869,7 +883,8 @@ public class OrderService {
         // 11. OrderTemp 완료 처리
         orderTemp.setStatus("COMPLETED");
 
-        log.info("주문 확정 완료 - orderNo: {}, memberId: {}, paymentPrice: {}", orderTemp.getOrderNo(), memberId, paymentPrice);
+        log.info("주문 확정 완료 - orderNo: {}, memberId: {}, paymentPrice: {}", orderTemp.getOrderNo(), memberId,
+                paymentPrice);
         return order.getOrderId();
     }
 
@@ -916,21 +931,25 @@ public class OrderService {
             throw new BusinessException("입금 대기 상태의 주문만 입금 확인 처리할 수 있습니다.", ErrorCode.INVALID_INPUT_VALUE);
         }
 
-        order.setStatus(OrderStatus.PAID);
+        order.setStatus(OrderStatus.PREPARING);
 
         // OrderDetail 상태도 변경
         List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
         for (OrderDetail detail : details) {
             if (detail.getOrderStatus() == OrderStatus.PAYMENT_WAIT) {
-                detail.setOrderStatus(OrderStatus.PAID);
+                detail.setOrderStatus(OrderStatus.PREPARING);
             }
         }
 
-        // PaymentMaster 상태 변경
-        paymentRepository.findByOrderMasterOrderId(orderId).ifPresent(payment -> {
-            payment.setPaymentStatus(PaymentStatus.PAID);
-            payment.setPaymentDate(java.time.LocalDateTime.now());
-        });
+        // Payment 상태 변경
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(orderId);
+        if (!payments.isEmpty()) {
+            // 가장 최근 결제 건 업데이트 (ID 순)
+            Payment latestPayment = payments.get(payments.size() - 1);
+            latestPayment.setPaymentStatus(PaymentStatus.PAID);
+            latestPayment.setPaymentDate(java.time.LocalDateTime.now());
+            paymentRepository.save(latestPayment);
+        }
 
         log.info("입금 확인 완료 - orderId: {}, orderNo: {}", orderId, order.getOrderNo());
     }
@@ -952,10 +971,12 @@ public class OrderService {
             throw new BusinessException("'" + product.getName() + "' 상품은 삭제된 상품입니다.", ErrorCode.ENTITY_NOT_FOUND);
         }
         if (!"Y".equals(product.getApplyYn())) {
-            throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 승인되지 않은 상품입니다.", ErrorCode.INVALID_INPUT_VALUE);
+            throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 승인되지 않은 상품입니다.",
+                    ErrorCode.INVALID_INPUT_VALUE);
         }
         if (product.getStatus() != ProductStatus.SALE) {
-            throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 중이 아닙니다.", ErrorCode.INVALID_INPUT_VALUE);
+            throw new BusinessException("'" + product.getName() + "' 상품은 현재 판매 중이 아닙니다.",
+                    ErrorCode.INVALID_INPUT_VALUE);
         }
     }
 
@@ -975,7 +996,8 @@ public class OrderService {
     }
 
     private int resolveOptionExtraPrice(Product product, Long optionId) {
-        if (optionId == null) return 0;
+        if (optionId == null)
+            return 0;
         ProductOption found = product.getOptions().stream()
                 .filter(opt -> opt.getId().equals(optionId) && "Y".equals(opt.getUseYn()))
                 .findFirst()
@@ -986,12 +1008,14 @@ public class OrderService {
     }
 
     private String resolveOptionName(Product product, Long optionId) {
-        if (optionId == null) return null;
+        if (optionId == null)
+            return null;
         ProductOption found = product.getOptions().stream()
                 .filter(opt -> opt.getId().equals(optionId) && "Y".equals(opt.getUseYn()))
                 .findFirst()
                 .orElse(null);
-        if (found == null) return null;
+        if (found == null)
+            return null;
         return found.getName1() + (found.getName2() != null ? " " + found.getName2() : "");
     }
 
@@ -1015,25 +1039,29 @@ public class OrderService {
     }
 
     private int calculateCouponDiscount(Member member, Long memberCouponId, BigDecimal totalPrice) {
-        MemberCoupon memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(memberCouponId, member.getMemberCode())
+        MemberCoupon memberCoupon = memberCouponRepository
+                .findByIssueIdAndMemberMemberCode(memberCouponId, member.getMemberCode())
                 .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
         if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
             throw new BusinessException("이미 사용된 쿠폰입니다.", ErrorCode.INVALID_INPUT_VALUE);
         }
         LocalDateTime now = LocalDateTime.now();
-        if (now.isBefore(memberCoupon.getCoupon().getValidStartDate()) || now.isAfter(memberCoupon.getCoupon().getValidEndDate())) {
+        if (now.isBefore(memberCoupon.getCoupon().getValidStartDate())
+                || now.isAfter(memberCoupon.getCoupon().getValidEndDate())) {
             throw new BusinessException("쿠폰 유효기간이 아닙니다.", ErrorCode.INVALID_INPUT_VALUE);
         }
         if (memberCoupon.getCoupon().getMinOrderPrice() != null
                 && totalPrice.compareTo(BigDecimal.valueOf(memberCoupon.getCoupon().getMinOrderPrice())) < 0) {
-            throw new BusinessException("최소 주문 금액(" + memberCoupon.getCoupon().getMinOrderPrice() + "원) 이상이어야 쿠폰을 사용할 수 있습니다.",
+            throw new BusinessException(
+                    "최소 주문 금액(" + memberCoupon.getCoupon().getMinOrderPrice() + "원) 이상이어야 쿠폰을 사용할 수 있습니다.",
                     ErrorCode.INVALID_INPUT_VALUE);
         }
         int discount;
         if ("RATE".equals(memberCoupon.getCoupon().getDiscountType())) {
             discount = totalPrice.multiply(BigDecimal.valueOf(memberCoupon.getCoupon().getDiscountValue()))
                     .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.FLOOR).intValue();
-            if (memberCoupon.getCoupon().getMaxDiscount() != null && discount > memberCoupon.getCoupon().getMaxDiscount()) {
+            if (memberCoupon.getCoupon().getMaxDiscount() != null
+                    && discount > memberCoupon.getCoupon().getMaxDiscount()) {
                 discount = memberCoupon.getCoupon().getMaxDiscount();
             }
         } else {

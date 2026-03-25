@@ -31,6 +31,7 @@ public class AdminTaxInvoiceDetailDTO {
     private BigDecimal vat;
 
     private InvoiceStatus invoiceStatus;
+    private String invoiceStatusDesc;
     private String invoiceUrl;
     private LocalDateTime issueDate;
 }

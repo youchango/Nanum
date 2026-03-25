@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.nanum.domain.payment.dto.PaymentSearchDto;
-import com.nanum.domain.payment.model.PaymentMaster;
+import com.nanum.domain.payment.model.Payment;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.global.common.dto.SearchDTO;
 
 public interface PaymentRepositoryCustom {
-    Page<PaymentMaster> searchPayments(PaymentSearchDto paymentSearchDto, Pageable pageable);
+    Page<Payment> searchPayments(PaymentSearchDto paymentSearchDto, Pageable pageable);
     
     Page<AdminPaymentDTO> findAdminPayments(SearchDTO searchDTO, PaymentStatus status, String siteCd, Pageable pageable);
 }

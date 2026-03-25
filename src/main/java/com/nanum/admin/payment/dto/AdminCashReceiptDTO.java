@@ -19,8 +19,10 @@ public class AdminCashReceiptDTO {
     private String siteCd;
     private String ordererName;
     private ReceiptType receiptType;
+    private String receiptTypeDesc;
     private String identityNum;
     private BigDecimal issueAmount;
     private ReceiptStatus receiptStatus;
+    private String receiptStatusDesc;
     private LocalDateTime issueDate;
 }

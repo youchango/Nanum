@@ -21,5 +21,6 @@ public class AdminTaxInvoiceDTO {
     private String businessRegNum;
     private BigDecimal issueAmount;
     private InvoiceStatus invoiceStatus;
+    private String invoiceStatusDesc;
     private LocalDateTime issueDate;
 }

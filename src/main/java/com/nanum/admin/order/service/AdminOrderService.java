@@ -3,20 +3,30 @@ package com.nanum.admin.order.service;
 import com.nanum.admin.manager.entity.Manager;
 import com.nanum.admin.manager.entity.ManagerType;
 import com.nanum.admin.manager.service.CustomManagerDetails;
+import com.nanum.domain.order.dto.AdminOrderSearchDTO;
 import com.nanum.domain.order.dto.OrderDTO;
+import com.nanum.domain.order.model.OrderDetail;
 import com.nanum.domain.order.model.OrderMaster;
 import com.nanum.domain.order.model.QOrderMaster;
+import com.nanum.domain.payment.model.Payment;
+import com.nanum.domain.payment.model.PaymentStatus;
+import com.nanum.user.order.repository.OrderDetailRepository;
 import com.nanum.user.order.repository.OrderRepository;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.nanum.user.payment.repository.PaymentRepository;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -24,29 +34,111 @@ import java.util.stream.StreamSupport;
 public class AdminOrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final PaymentRepository paymentRepository;
 
-    public List<OrderDTO.Response> getOrders(String siteCd) {
+    public Map<String, Object> getOrders(AdminOrderSearchDTO searchDTO) {
         Manager manager = getCurrentManager();
-        String targetSiteCd = manager.getSiteCd();
+        
+        BooleanBuilder builder = new BooleanBuilder();
+        QOrderMaster qOrderMaster = QOrderMaster.orderMaster;
 
-        if (manager.getMbType() == ManagerType.MASTER) {
-            if (StringUtils.hasText(siteCd)) {
-                targetSiteCd = siteCd;
+        // 권한 필터링
+        if (manager.getMbType() == ManagerType.MASTER || manager.getMbType() == ManagerType.SCM) {
+            if (StringUtils.hasText(searchDTO.getSiteCd())) {
+                builder.and(qOrderMaster.siteCd.eq(searchDTO.getSiteCd()));
+            }
+        } else {
+            builder.and(qOrderMaster.siteCd.eq(manager.getSiteCd()));
+        }
+
+        // 상태 필터링
+        if (searchDTO.getStatus() != null) {
+            builder.and(qOrderMaster.status.eq(searchDTO.getStatus()));
+        }
+
+        // 기간 필터링
+        if (searchDTO.getStartDate() != null) {
+            builder.and(qOrderMaster.createdAt.goe(searchDTO.getStartDate().atStartOfDay()));
+        }
+        if (searchDTO.getEndDate() != null) {
+            builder.and(qOrderMaster.createdAt.loe(searchDTO.getEndDate().atTime(23, 59, 59)));
+        }
+
+        // 키워드 검색
+        if (StringUtils.hasText(searchDTO.getSearchKeyword())) {
+            String keyword = searchDTO.getSearchKeyword();
+            String type = searchDTO.getSearchType();
+            if ("orderNo".equals(type)) {
+                builder.and(qOrderMaster.orderNo.contains(keyword));
+            } else if ("orderName".equals(type)) {
+                builder.and(qOrderMaster.orderName.contains(keyword));
+            } else if ("receiverName".equals(type)) {
+                builder.and(qOrderMaster.receiverName.contains(keyword));
             } else {
-                targetSiteCd = null; // ALL
+                // Default search
+                builder.and(qOrderMaster.orderName.contains(keyword)
+                        .or(qOrderMaster.orderNo.contains(keyword))
+                        .or(qOrderMaster.receiverName.contains(keyword)));
             }
         }
 
-        Iterable<OrderMaster> orders;
-        if (targetSiteCd != null) {
-            orders = orderRepository.findAll(QOrderMaster.orderMaster.siteCd.eq(targetSiteCd));
-        } else {
-            orders = orderRepository.findAll();
-        }
+        PageRequest pageRequest = PageRequest.of(searchDTO.getPage() - 1, searchDTO.getRecordSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<OrderMaster> orderPage = orderRepository.findAll(builder, pageRequest);
 
-        return StreamSupport.stream(orders.spliterator(), false)
+        List<OrderDTO.Response> orderList = orderPage.getContent().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderList", orderList);
+        result.put("totalCount", orderPage.getTotalElements());
+
+        return result;
+    }
+
+    public OrderDTO.DetailResponse getOrderDetail(Long id) {
+        OrderMaster order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + id));
+
+        // 권한 체크
+        Manager manager = getCurrentManager();
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        List<OrderDetail> items = orderDetailRepository.findByOrderId(order.getOrderId());
+
+        // 결제 정보 조회
+        String paymentMethodDesc = null;
+        PaymentStatus paymentStatus = null;
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(id);
+        if (!payments.isEmpty()) {
+            Payment payment = payments.get(payments.size() - 1);
+            paymentMethodDesc = payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null;
+            paymentStatus = payment.getPaymentStatus();
+        }
+
+        return OrderDTO.DetailResponse.builder()
+                .orderId(order.getOrderId())
+                .orderNo(order.getOrderNo())
+                .orderName(order.getOrderName())
+                .status(order.getStatus())
+                .totalPrice(order.getTotalPrice())
+                .deliveryPrice(order.getDeliveryPrice())
+                .paymentPrice(order.getPaymentPrice())
+                .receiverName(order.getReceiverName())
+                .receiverPhone(order.getReceiverPhone())
+                .receiverAddress(order.getReceiverAddress())
+                .receiverDetail(order.getReceiverDetail())
+                .receiverZipcode(order.getReceiverZipcode())
+                .deliveryMemo(order.getDeliveryMemo())
+                .trackingNumber(order.getTrackingNumber())
+                .paymentMethod(paymentMethodDesc)
+                .paymentStatus(paymentStatus)
+                .createdAt(order.getCreatedAt())
+                .items(items.stream().map(this::convertToDetailItemResponse).collect(Collectors.toList()))
+                .build();
     }
 
     @Transactional
@@ -66,18 +158,27 @@ public class AdminOrderService {
     private OrderDTO.Response convertToResponse(OrderMaster order) {
         return OrderDTO.Response.builder()
                 .orderId(order.getOrderId())
+                .orderNo(order.getOrderNo())
                 .orderName(order.getOrderName())
                 .totalPrice(order.getTotalPrice())
+                .deliveryPrice(order.getDeliveryPrice())
+                .paymentPrice(order.getPaymentPrice())
                 .status(order.getStatus())
                 .receiverName(order.getReceiverName())
                 .createdAt(order.getCreatedAt())
-                // items logic if needed. OrderMaster vs OrderDetail?
-                // OrderMaster entity doesn't show List<OrderDetail>.
-                // Check OrderMaster.java again?
-                // It didn't have @OneToMany items.
-                // So items might not be fetched here easily without repo changes.
-                // For now, return empty items or fetch if repository supports.
-                // Since user requested "Order List", maybe items are not needed in list view.
+                .build();
+    }
+
+    private OrderDTO.OrderDetailResponse convertToDetailItemResponse(OrderDetail detail) {
+        return OrderDTO.OrderDetailResponse.builder()
+                .orderDetailId(detail.getId())
+                .productId(detail.getProductId())
+                .productName(detail.getProductName())
+                .optionName(detail.getOptionName())
+                .quantity(detail.getQuantity())
+                .pricePerUnit(detail.getProductPrice().add(detail.getOptionPrice()))
+                .totalPrice(detail.getTotalPrice())
+                .reviewYn("Y".equals(detail.getReviewYn()))
                 .build();
     }
 

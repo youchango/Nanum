@@ -20,6 +20,7 @@ public class AdminCashReceiptDetailDTO {
     private String ordererName;
     
     private ReceiptType receiptType;
+    private String receiptTypeDesc;
     private String identityNum;
     
     private BigDecimal issueAmount;
@@ -27,6 +28,7 @@ public class AdminCashReceiptDetailDTO {
     private BigDecimal vat;
     
     private ReceiptStatus receiptStatus;
+    private String receiptStatusDesc;
     private String receiptUrl;
     private LocalDateTime issueDate;
 }

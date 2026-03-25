@@ -123,7 +123,7 @@ SET @config_parent_seq = (SELECT LAST_INSERT_ID());
     VALUES (@config_parent_seq, '정책/약관 관리', '/admin/system/settings', 'Y', 2, '', 'SYSTEM');
 
 -- 12. 임의 더미 데이터: 현금영수증 및 세금계산서 
--- (주의: payment_master 테이블에 payment_id 1~8이 존재해야 정상 작동합니다.)
+-- (주의: payment 테이블에 payment_id 1~8이 존재해야 정상 작동합니다.)
 INSERT INTO cash_receipt (payment_id, receipt_type, identity_num, issue_amount, supply_value, vat, receipt_status, issue_date, created_by, created_at)
 VALUES 
 (1, 'INCOME_DEDUCTION', '010-1234-5678', 72800.0000, 66182.0000, 6618.0000, 'ISSUED', NOW(), 'SYSTEM', NOW()),

@@ -727,8 +727,8 @@ CREATE TABLE claim (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 클레임';
 
 
--- Source: payment_master.sql
-CREATE TABLE payment_master (
+-- Source: payment.sql
+CREATE TABLE payment (
     payment_id             INT AUTO_INCREMENT COMMENT '결제코드',
     order_id               INT NOT NULL COMMENT '주문ID',
     member_code            VARCHAR(30) NOT NULL COMMENT '회원코드',
@@ -761,11 +761,11 @@ CREATE TABLE payment_master (
     deleted_by             VARCHAR(50) NULL COMMENT '삭제자',
     delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     PRIMARY KEY (payment_id),
-    UNIQUE KEY uq_payment_order (order_id),
+    INDEX idx_payment_order (order_id),
     INDEX idx_payment_status (payment_status),
     CONSTRAINT fk_payment_member FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     CONSTRAINT fk_payment_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '결제 master';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '결제';
 
 
 -- 2. 현금영수증 내역 테이블
@@ -793,7 +793,7 @@ CREATE TABLE cash_receipt (
     delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     
     PRIMARY KEY (receipt_id),
-    CONSTRAINT fk_cash_receipt_payment FOREIGN KEY (payment_id) REFERENCES payment_master (payment_id) ON DELETE CASCADE
+    CONSTRAINT fk_cash_receipt_payment FOREIGN KEY (payment_id) REFERENCES payment (payment_id) ON DELETE CASCADE
 ) COMMENT '현금영수증 내역';
 
 
@@ -827,7 +827,7 @@ CREATE TABLE tax_invoice (
     delete_yn              CHAR(1) DEFAULT 'N' NOT NULL COMMENT '삭제유무',
     
     PRIMARY KEY (invoice_id),
-    CONSTRAINT fk_tax_invoice_payment FOREIGN KEY (payment_id) REFERENCES payment_master (payment_id) ON DELETE CASCADE
+    CONSTRAINT fk_tax_invoice_payment FOREIGN KEY (payment_id) REFERENCES payment (payment_id) ON DELETE CASCADE
 ) COMMENT '세금계산서 내역';
 
 

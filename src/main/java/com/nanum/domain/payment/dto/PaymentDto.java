@@ -3,7 +3,7 @@ package com.nanum.domain.payment.dto;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-import com.nanum.domain.payment.model.PaymentMaster;
+import com.nanum.domain.payment.model.Payment;
 import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.domain.payment.model.PaymentMethod;
 
@@ -26,7 +26,7 @@ public class PaymentDto {
     private LocalDateTime paymentDate;
     private LocalDateTime createdAt;
 
-    public PaymentDto(PaymentMaster payment) {
+    public PaymentDto(Payment payment) {
         this.paymentId = payment.getPaymentId();
         this.orderId = payment.getOrderMaster() != null ? payment.getOrderMaster().getOrderId() : null;
         this.memberCode = payment.getMember().getMemberCode();

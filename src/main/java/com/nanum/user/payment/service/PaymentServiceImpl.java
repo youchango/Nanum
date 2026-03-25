@@ -1,16 +1,16 @@
 package com.nanum.user.payment.service;
-
+ 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+ 
 import com.nanum.domain.member.model.Member;
 import com.nanum.user.member.repository.MemberRepository;
 import com.nanum.domain.payment.dto.PaymentDto;
 import com.nanum.domain.payment.dto.PaymentSearchDto;
-import com.nanum.domain.payment.model.PaymentMaster;
+import com.nanum.domain.payment.model.Payment;
 import com.nanum.domain.payment.model.PaymentMethod;
 import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.user.payment.repository.PaymentRepository;
@@ -18,27 +18,27 @@ import com.nanum.domain.point.dto.PointDto;
 import com.nanum.domain.point.dto.PointSearchDto;
 import com.nanum.domain.point.model.Point;
 import com.nanum.user.point.repository.PointRepository;
-
+ 
 import java.math.BigDecimal;
-
+ 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PaymentServiceImpl implements PaymentService {
-
+ 
     private final PaymentRepository paymentRepository;
     private final PointRepository pointRepository;
     private final MemberRepository memberRepository;
-
+ 
     @Override
     @Transactional
     public void createPayment(String memberCode, Integer amount) {
         // TODO: Update this method to handle Order creation or linking if needed.
-        // For now, adapting to PaymentMaster creation.
+        // For now, adapting to Payment creation.
         Member member = memberRepository.findByMemberCode(memberCode)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-
-        PaymentMaster payment = PaymentMaster.builder()
+ 
+        Payment payment = Payment.builder()
                 .member(member)
                 .totalPrice(BigDecimal.valueOf(amount))
                 .paymentPrice(BigDecimal.valueOf(amount))
@@ -49,22 +49,22 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentStatus(PaymentStatus.PENDING)
                 // .paymentMethod(PaymentMethod.CARD) // Default or null?
                 .build();
-
+ 
         paymentRepository.save(payment);
     }
-
+ 
     @Override
     @Transactional
     public void processPayment(Long paymentId, String method, Integer usedPoint) {
-        PaymentMaster payment = paymentRepository.findById(paymentId)
+        Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-
+ 
         if (PaymentStatus.PAID.equals(payment.getPaymentStatus())) {
             throw new IllegalStateException("Already paid");
         }
-
+ 
         BigDecimal pointUsage = BigDecimal.valueOf(usedPoint);
-
+ 
         // Logic for point usage
         if (usedPoint > 0) {
             // Check if user has enough points - Need logic to calculate total points
@@ -74,12 +74,12 @@ public class PaymentServiceImpl implements PaymentService {
                     .pointUse(-usedPoint)
                     .pointBigo("Payment usage for payment: " + paymentId)
                     .pointGubun("USE")
-                    .orderNo(null) // PaymentMaster doesn't have orderNo readily available in this context, using
+                    .orderNo(null) // Payment doesn't have orderNo readily available in this context, using
                                    // null as permitted
                     .build();
             pointRepository.save(point);
         }
-
+ 
         payment.setPaymentStatus(PaymentStatus.PAID);
         // payment.setPaymentMethod(PaymentMethod.valueOf(method)); // Need to handle
         // String to Enum conversion safely
@@ -88,10 +88,10 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (IllegalArgumentException e) {
             // Handle invalid method or Default
         }
-
+ 
         payment.setUsedPoint(pointUsage);
         payment.setPaymentDate(java.time.LocalDateTime.now());
-
+ 
         // Point accumulation (e.g., 1%)
         /*
          * BigDecimal pointEarn =
@@ -107,20 +107,20 @@ public class PaymentServiceImpl implements PaymentService {
          * }
          */
     }
-
+ 
     @Override
     @Transactional
     public void cancelPayment(Long paymentId) {
-        PaymentMaster payment = paymentRepository.findById(paymentId)
+        Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
-
+ 
         if (!PaymentStatus.PAID.equals(payment.getPaymentStatus())) {
             throw new IllegalStateException("Cannot cancel unpaid payment");
         }
-
+ 
         payment.setPaymentStatus(PaymentStatus.CANCELLED);
         payment.setCancelTotalPrice(payment.getPaymentPrice()); // Simple cancel logic
-
+ 
         // Refund points if used
         if (payment.getUsedPoint().compareTo(BigDecimal.ZERO) > 0) {
             Point pointRefund = Point.builder()
@@ -132,23 +132,23 @@ public class PaymentServiceImpl implements PaymentService {
                     .build();
             pointRepository.save(pointRefund);
         }
-
+ 
         // Revert accumulation?
     }
-
+ 
     @Override
     public Page<PaymentDto> searchPayments(PaymentSearchDto searchDto, Pageable pageable) {
         return paymentRepository.searchPayments(searchDto, pageable)
                 .map(PaymentDto::new);
     }
-
+ 
     @Override
     public PaymentDto getPaymentDetail(Long paymentId) {
-        PaymentMaster payment = paymentRepository.findById(paymentId)
+        Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
         return new PaymentDto(payment);
     }
-
+ 
     @Override
     public Page<PointDto> searchPoints(PointSearchDto searchDto, Pageable pageable) {
         return pointRepository.searchPoints(searchDto, pageable)
