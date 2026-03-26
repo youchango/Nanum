@@ -20,6 +20,7 @@ import com.nanum.domain.product.model.Product;
 import com.nanum.domain.product.model.ProductStatus;
 import com.nanum.domain.product.model.ProductOption;
 import com.nanum.domain.product.model.ProductSite;
+import com.nanum.domain.product.repository.ProductOptionRepository;
 import com.nanum.domain.product.repository.ProductRepository;
 import com.nanum.domain.product.repository.ProductSiteRepository;
 import com.nanum.user.member.repository.MemberRepository;
@@ -68,6 +69,7 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final CartRepository cartRepository;
     private final PointRepository pointRepository;
+    private final ProductOptionRepository productOptionRepository;
     private final MemberCouponRepository memberCouponRepository;
     private final com.nanum.domain.shop.repository.ShopInfoRepository shopInfoRepository;
     private final OrderTempRepository orderTempRepository;
@@ -164,7 +166,17 @@ public class OrderService {
             totalPrice = totalPrice.add(itemTotal);
 
             // 가용재고 차감 (원자적 처리)
-            int updated = productRepository.decreaseStockQuantity(product.getId(), item.getQuantity());
+            int updated;
+            if (item.getOptionId() != null) {
+                // 옵션 재고 차감
+                productOptionRepository.decreaseStockQuantity(item.getOptionId(), item.getQuantity());
+                // 상품 마스터 재고 차감 (합산 관리용)
+                updated = productRepository.decreaseStockQuantity(product.getId(), item.getQuantity());
+            } else {
+                // 단품 재고 차감
+                updated = productRepository.decreaseStockQuantity(product.getId(), item.getQuantity());
+            }
+
             if (updated == 0) {
                 throw new BusinessException(
                         "'" + product.getName() + "' 상품의 재고가 부족합니다.",
@@ -506,7 +518,15 @@ public class OrderService {
         // 가용재고 복원
         List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
         for (OrderDetail detail : details) {
-            productRepository.increaseStockQuantity(detail.getProductId(), detail.getQuantity());
+            if (detail.getOptionId() != null) {
+                // 옵션 재고 복구
+                productOptionRepository.increaseStockQuantity(detail.getOptionId(), detail.getQuantity());
+                // 상품 마스터 재고 복구 (합산 관리용)
+                productRepository.increaseStockQuantity(detail.getProductId(), detail.getQuantity());
+            } else {
+                // 단품 재고 복구
+                productRepository.increaseStockQuantity(detail.getProductId(), detail.getQuantity());
+            }
         }
 
         // 포인트 복원
@@ -753,7 +773,17 @@ public class OrderService {
             validateProductForOrder(product);
 
             // 재고 차감
-            int updated = productRepository.decreaseStockQuantity(productId, quantity);
+            int updated;
+            if (optionId != null) {
+                // 옵션 재고 차감
+                productOptionRepository.decreaseStockQuantity(optionId, quantity);
+                // 상품 마스터 재고 차감 (합산 관리용)
+                updated = productRepository.decreaseStockQuantity(productId, quantity);
+            } else {
+                // 단품 재고 차감
+                updated = productRepository.decreaseStockQuantity(productId, quantity);
+            }
+
             if (updated == 0) {
                 pgPaymentService.refund(request.getPaymentKey(), orderTemp.getPaymentPrice());
                 throw new BusinessException(

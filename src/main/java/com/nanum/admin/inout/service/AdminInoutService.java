@@ -542,7 +542,15 @@ public class AdminInoutService {
         }
     }
 
-    private void updateInoutStock(Long productId, Long optionId, Integer qty, String type) {
+    /**
+     * 배송(출고)에 의한 실재고 차감 처리
+     */
+    @Transactional
+    public void decreasePhysicalStock(Long productId, Long optionId, Integer qty, String remark) {
+        updateInoutStock(productId, optionId, qty, "OUT");
+    }
+
+    public void updateInoutStock(Long productId, Long optionId, Integer qty, String type) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 

@@ -107,6 +107,43 @@ public class OrderDTO {
         private PaymentStatus paymentStatus;
         private LocalDateTime createdAt;
         private List<OrderDetailResponse> items;
+        private List<PaymentResponse> payments;
+        private List<DeliveryResponse> deliveries;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PaymentResponse {
+        private Long paymentId;
+        private BigDecimal totalPrice;
+        private BigDecimal discountPrice;
+        private BigDecimal usedPoint;
+        private BigDecimal usedCoupon;
+        private BigDecimal paymentPrice;
+        private PaymentStatus paymentStatus;
+        private String paymentMethod;
+        private String bankName;
+        private String bankAccountNum;
+        private String depositorName;
+        private LocalDateTime paymentDate;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DeliveryResponse {
+        private Long deliveryId;
+        private Long orderDetailId;
+        private String deliveryCorp;
+        private String trackingNumber;
+        private String status; // DeliveryStatus name
+        private LocalDateTime shippedAt;
+        private LocalDateTime completedAt;
     }
 
     @Getter
@@ -194,5 +231,16 @@ public class OrderDTO {
 
         @NotBlank(message = "결제키는 필수입니다.")
         private String paymentKey;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeliveryRegisterRequest {
+        private Long orderDetailId;
+        private String deliveryCorp;
+        private String trackingNumber;
     }
 }

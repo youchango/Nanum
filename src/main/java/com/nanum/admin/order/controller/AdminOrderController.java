@@ -7,6 +7,7 @@ import com.nanum.admin.order.service.AdminOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,5 +51,12 @@ public class AdminOrderController {
     public ApiResponse<String> cancelOrder(@PathVariable Long id) {
         adminOrderService.cancelOrder(id);
         return ApiResponse.success("Order Cancelled");
+    }
+
+    @Operation(summary = "배송 송장 등록", description = "특정 주문에 대해 상세 품목별 송장 정보를 등록하고 실재고를 차감합니다.")
+    @PostMapping("/{id}/delivery")
+    public ApiResponse<String> registerDelivery(@PathVariable Long id, @RequestBody List<OrderDTO.DeliveryRegisterRequest> requests) {
+        adminOrderService.registerDelivery(id, requests);
+        return ApiResponse.success("Delivery Registered");
     }
 }

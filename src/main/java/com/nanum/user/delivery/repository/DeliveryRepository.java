@@ -10,4 +10,5 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     List<Delivery> findTop5ByOrderByCreatedAtDesc();
 
     List<Delivery> findTop5BySiteCdOrderByCreatedAtDesc(String siteCd);
+    List<Delivery> findByOrderId(Long orderId);
 }
