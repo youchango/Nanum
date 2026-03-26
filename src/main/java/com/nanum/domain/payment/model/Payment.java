@@ -30,6 +30,12 @@ public class Payment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private OrderMaster orderMaster;
+
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
+
+    @Column(name = "order_no", length = 50)
+    private String orderNo;
  
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
@@ -108,10 +114,12 @@ public class Payment extends BaseEntity {
     private LocalDateTime paymentDate;
  
     @Builder
-    public Payment(OrderMaster orderMaster, Member member, BigDecimal totalPrice, BigDecimal discountPrice,
+    public Payment(OrderMaster orderMaster, String siteCd, String orderNo, Member member, BigDecimal totalPrice, BigDecimal discountPrice,
             BigDecimal usedPoint, BigDecimal usedCoupon, BigDecimal deliveryPrice, BigDecimal paymentPrice,
-            PaymentStatus paymentStatus, PaymentMethod paymentMethod) {
+            PaymentStatus paymentStatus, PaymentMethod paymentMethod, LocalDateTime paymentDate) {
         this.orderMaster = orderMaster;
+        this.siteCd = siteCd;
+        this.orderNo = orderNo;
         this.member = member;
         this.totalPrice = totalPrice;
         this.discountPrice = discountPrice;
@@ -121,6 +129,6 @@ public class Payment extends BaseEntity {
         this.paymentPrice = paymentPrice;
         this.paymentStatus = paymentStatus;
         this.paymentMethod = paymentMethod;
-        this.paymentDate = LocalDateTime.now();
+        this.paymentDate = paymentDate;
     }
 }

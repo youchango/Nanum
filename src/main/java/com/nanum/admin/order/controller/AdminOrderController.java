@@ -37,4 +37,18 @@ public class AdminOrderController {
         adminOrderService.updateStatus(id, request);
         return ApiResponse.success("Order Status Updated");
     }
+
+    @Operation(summary = "결제 확인 처리", description = "결제대기 상태의 주문을 결제완료 처리하고 배송준비 상태로 변경합니다.")
+    @PostMapping("/{id}/confirm-payment")
+    public ApiResponse<String> confirmPayment(@PathVariable Long id) {
+        adminOrderService.confirmPayment(id);
+        return ApiResponse.success("Payment Confirmed");
+    }
+
+    @Operation(summary = "주문 취소 처리", description = "결제대기 또는 배송준비 상태의 주문을 취소 처리합니다.")
+    @PostMapping("/{id}/cancel")
+    public ApiResponse<String> cancelOrder(@PathVariable Long id) {
+        adminOrderService.cancelOrder(id);
+        return ApiResponse.success("Order Cancelled");
+    }
 }

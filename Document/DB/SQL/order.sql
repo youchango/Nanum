@@ -18,7 +18,7 @@ CREATE TABLE cart (
     INDEX idx_cart_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES product (product_id) ON DELETE CASCADE
-) COMMENT '장바구니';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '장바구니';
 
 -- 2. Order Master
 CREATE TABLE order_master (
@@ -55,7 +55,7 @@ CREATE TABLE order_master (
     UNIQUE KEY uq_order_no (order_no),
     INDEX idx_order_member (member_code),
     FOREIGN KEY (member_code) REFERENCES member (member_code)
-) COMMENT '주문 마스터';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 마스터';
 
 -- 3. Order Detail (Line Items)
 CREATE TABLE order_detail (
@@ -104,4 +104,30 @@ CREATE TABLE order_detail (
     
     PRIMARY KEY (order_detail_id),
     CONSTRAINT fk_detail_order FOREIGN KEY (order_id) REFERENCES order_master (order_id) ON DELETE CASCADE
-) COMMENT '주문 상세';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT '주문 상세';
+
+CREATE TABLE order_temp (
+  temp_id int(11) NOT NULL AUTO_INCREMENT,
+  order_no varchar(50) NOT NULL,
+  member_code varchar(50) NOT NULL,
+  site_cd varchar(20) DEFAULT NULL,
+  receiver_name varchar(100) DEFAULT NULL,
+  receiver_phone varchar(20) DEFAULT NULL,
+  receiver_address varchar(500) DEFAULT NULL,
+  receiver_detail varchar(500) DEFAULT NULL,
+  receiver_zipcode varchar(10) DEFAULT NULL,
+  delivery_memo varchar(500) DEFAULT NULL,
+  payment_method varchar(30) DEFAULT NULL,
+  used_point int(11) NOT NULL DEFAULT 0,
+  member_coupon_id int(11) DEFAULT NULL,
+  total_price decimal(19,4) DEFAULT 0.0000,
+  delivery_price decimal(19,4) DEFAULT 0.0000,
+  payment_price decimal(19,4) DEFAULT 0.0000,
+  tax_bill_type varchar(20) DEFAULT 'NONE',
+  items_json text DEFAULT NULL,
+  status varchar(20) NOT NULL DEFAULT 'PENDING',
+  version bigint(20) DEFAULT NULL,
+  created_at datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (temp_id),
+  UNIQUE KEY uq_order_temp_no (order_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='임시 주문';

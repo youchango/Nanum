@@ -112,7 +112,7 @@ public class AdminOrderService {
         // 결제 정보 조회
         String paymentMethodDesc = null;
         PaymentStatus paymentStatus = null;
-        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(id);
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderIdAndSiteCdAndOrderNo(id, order.getSiteCd(), order.getOrderNo());
         if (!payments.isEmpty()) {
             Payment payment = payments.get(payments.size() - 1);
             paymentMethodDesc = payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null;
@@ -133,6 +133,7 @@ public class AdminOrderService {
                 .receiverDetail(order.getReceiverDetail())
                 .receiverZipcode(order.getReceiverZipcode())
                 .deliveryMemo(order.getDeliveryMemo())
+                .memberCode(order.getMember() != null ? order.getMember().getMemberCode() : null)
                 .trackingNumber(order.getTrackingNumber())
                 .paymentMethod(paymentMethodDesc)
                 .paymentStatus(paymentStatus)
@@ -144,15 +145,70 @@ public class AdminOrderService {
     @Transactional
     public void updateStatus(Long id, OrderDTO.StatusUpdateRequest request) {
         OrderMaster order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        // Check permission?
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + id));
+        
         Manager manager = getCurrentManager();
         if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
-            throw new IllegalArgumentException("Access denied");
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
         }
 
         order.changeStatus(request.getStatus());
-        // save is implicit in transaction but explicit save is fine
+    }
+
+    @Transactional
+    public void confirmPayment(Long id) {
+        OrderMaster order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + id));
+
+        // 권한 체크
+        Manager manager = getCurrentManager();
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        if (order.getStatus() != com.nanum.domain.order.model.OrderStatus.PAYMENT_WAIT) {
+            throw new IllegalStateException("결제대기 상태의 주문만 결제 처리가 가능합니다.");
+        }
+
+        // 1. 주문 상태 변경
+        order.changeStatus(com.nanum.domain.order.model.OrderStatus.PREPARING);
+
+        // 2. 결제 상태 변경
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderIdAndSiteCdAndOrderNo(id, order.getSiteCd(), order.getOrderNo());
+        if (!payments.isEmpty()) {
+            Payment payment = payments.get(payments.size() - 1);
+            payment.setPaymentStatus(PaymentStatus.PAID);
+            payment.setPaymentDate(java.time.LocalDateTime.now());
+            paymentRepository.save(payment);
+        }
+    }
+
+    @Transactional
+    public void cancelOrder(Long id) {
+        OrderMaster order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + id));
+
+        // 권한 체크
+        Manager manager = getCurrentManager();
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        com.nanum.domain.order.model.OrderStatus currentStatus = order.getStatus();
+        if (currentStatus != com.nanum.domain.order.model.OrderStatus.PAYMENT_WAIT && 
+            currentStatus != com.nanum.domain.order.model.OrderStatus.PREPARING) {
+            throw new IllegalStateException("결제대기 또는 배송준비 상태의 주문만 취소가 가능합니다.");
+        }
+
+        // 1. 주문 상태 변경
+        order.changeStatus(com.nanum.domain.order.model.OrderStatus.CANCELLED);
+
+        // 2. 결제 상태 변경 (해당 주문의 모든 결제 건 취소)
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderIdAndSiteCdAndOrderNo(id, order.getSiteCd(), order.getOrderNo());
+        for (Payment payment : payments) {
+            payment.setPaymentStatus(PaymentStatus.CANCELLED);
+            paymentRepository.save(payment);
+        }
     }
 
     private OrderDTO.Response convertToResponse(OrderMaster order) {
@@ -164,6 +220,7 @@ public class AdminOrderService {
                 .deliveryPrice(order.getDeliveryPrice())
                 .paymentPrice(order.getPaymentPrice())
                 .status(order.getStatus())
+                .memberCode(order.getMember() != null ? order.getMember().getMemberCode() : null)
                 .receiverName(order.getReceiverName())
                 .createdAt(order.getCreatedAt())
                 .build();

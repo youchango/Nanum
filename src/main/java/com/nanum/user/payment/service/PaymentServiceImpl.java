@@ -46,7 +46,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .usedCoupon(BigDecimal.ZERO)
                 .deliveryPrice(BigDecimal.ZERO)
                 .discountPrice(BigDecimal.ZERO)
-                .paymentStatus(PaymentStatus.PENDING)
+                .paymentStatus(PaymentStatus.PAYMENT_WAIT)
                 // .paymentMethod(PaymentMethod.CARD) // Default or null?
                 .build();
  

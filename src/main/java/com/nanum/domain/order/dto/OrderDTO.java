@@ -72,6 +72,7 @@ public class OrderDTO {
         private BigDecimal totalPrice;
         private BigDecimal deliveryPrice;
         private BigDecimal paymentPrice;
+        private String memberCode;
         private String receiverName;
         private String receiverPhone;
         private String receiverAddress;
@@ -94,6 +95,7 @@ public class OrderDTO {
         private BigDecimal totalPrice;
         private BigDecimal deliveryPrice;
         private BigDecimal paymentPrice;
+        private String memberCode;
         private String receiverName;
         private String receiverPhone;
         private String receiverAddress;

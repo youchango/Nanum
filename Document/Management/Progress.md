@@ -42,6 +42,8 @@
     - [x] 매니저 할당 및 조회 기능 제거 (DB 미존재로 인한 500 에러 해결)
     - [x] 회원 등록 시 사업자 등록번호 필드 제거 및 유형별 권한(BIZ/USER/VETERAN) 최적화
     - [x] **회원 관리 고도화 (ROLE_MASTER/ADMIN 제외 및 기업 회원 상세 정보(MemberBiz) 연동 완료)**
+    - [x] **회원 관리 모달 구조 개선 (기존 MemberDetailModal -> MemberEditModal 명칭 변경 및 검색/선택 용도로 정립)**
+    - [x] **회원 상세 조회 모달(MemberDetailModal) 신규 구현 및 연동**
     - [x] 클레임 관리 (Claim)
     - [x] 컨텐츠 통합 관리 (공지사항/FAQ 통합, SearchDTO 1-based Pagination 연동 필드명(type) 일괄 수정 및 MASTER 권한 전체 조회 쿼리 고도화 완료)
     - [x] 1:1문의 관리 (Inquiry) - 사이트 필터링(SiteTab), 검색 및 페이징 고도화, API 규격 정규화 및 답변 등록 로직 개선 완료
@@ -109,6 +111,10 @@
   - [x] `CartService` 구현 (중복 상품 체크 로직)
   - [x] `CartController` 구현 (409 Conflict 처리)
 - [ ] **주문 (Order)**
+    - [x] 주문 관리: 주문자 클릭 시 회원 상세 모달 연동 및 모달 구조 리팩토링 (@2026-03-26)
+- [x] 주문 관리: 결제처리 및 주문취소 기능 구현 (백엔드 API 및 프론트엔드 UI 연동) (@2026-03-26)
+- [x] 결제 관리: Payment 데이터 정합성 강화 (site_cd, order_no 추가 및 삼중 매칭 적용) (@2026-03-26)
+- [x] 결제 관리: PaymentStatus 중복 제거 및 PAYEMNT_WAIT 통합 리팩토링 (@2026-03-26)
 - [ ] 결제 시스템 연동 (PG/가상계좌)
 - [x] **입출고 및 재고 동기화 시스템 (완료)**
   - [x] 입고 관리 (입고 등록, 실재고 연동, 정산 로직)

@@ -337,8 +337,10 @@ public class OrderService {
                 .usedCoupon(usedCouponAmount)
                 .deliveryPrice(deliveryPrice)
                 .paymentPrice(paymentPrice)
-                .paymentStatus(PaymentStatus.PENDING)
+                .paymentStatus(PaymentStatus.PAYMENT_WAIT)
                 .paymentMethod(paymentMethod)
+                .siteCd(order.getSiteCd())
+                .orderNo(order.getOrderNo())
                 .build();
         paymentRepository.save(payment);
 
@@ -424,7 +426,7 @@ public class OrderService {
         // 결제 정보 조회
         String paymentMethodDesc = null;
         PaymentStatus paymentStatus = null;
-        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(orderId);
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderIdAndSiteCdAndOrderNo(orderId, order.getSiteCd(), order.getOrderNo());
         if (!payments.isEmpty()) {
             Payment payment = payments.get(payments.size() - 1);
             paymentMethodDesc = payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null;
@@ -493,7 +495,7 @@ public class OrderService {
         order.changeStatus(OrderStatus.CANCELLED);
 
         // 결제 상태 변경 및 PG 환불
-        List<Payment> payments = paymentRepository.findByOrderMasterOrderId(orderId);
+        List<Payment> payments = paymentRepository.findByOrderMasterOrderIdAndSiteCdAndOrderNo(orderId, order.getSiteCd(), order.getOrderNo());
         Payment latestPayment = null;
         if (!payments.isEmpty()) {
             latestPayment = payments.get(payments.size() - 1);
@@ -723,7 +725,8 @@ public class OrderService {
         boolean isDepositWait = paymentMethod == PaymentMethod.VIRTUAL_ACCOUNT
                 || paymentMethod == PaymentMethod.BANK_TRANSFER;
         OrderStatus orderStatus = isDepositWait ? OrderStatus.PAYMENT_WAIT : OrderStatus.PREPARING;
-        PaymentStatus paymentStatus = isDepositWait ? PaymentStatus.DEPOSIT_WAIT : PaymentStatus.PAID;
+        PaymentStatus paymentStatus = isDepositWait ? PaymentStatus.PAYMENT_WAIT : PaymentStatus.PAID;
+        LocalDateTime paymentDate = isDepositWait ? null : LocalDateTime.now();
 
         // 8. 스냅샷 기반 주문 상세 생성 + 재고 차감
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -873,6 +876,9 @@ public class OrderService {
                 .paymentPrice(paymentPrice)
                 .paymentStatus(paymentStatus)
                 .paymentMethod(paymentMethod)
+                .paymentDate(paymentDate)
+                .siteCd(order.getSiteCd())
+                .orderNo(order.getOrderNo())
                 .build();
         payment.setPaymentKey(request.getPaymentKey());
         paymentRepository.save(payment);
@@ -920,7 +926,7 @@ public class OrderService {
 
     /**
      * 무통장입금/가상계좌 입금 확인 처리
-     * PAYMENT_WAIT → PAID, DEPOSIT_WAIT → PAID
+     * PAYMENT_WAIT → PAID, PAYMENT_WAIT → PAID
      */
     @Transactional
     public void confirmDeposit(Long orderId) {

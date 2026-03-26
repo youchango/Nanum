@@ -85,7 +85,7 @@ public class OrderTemp {
 
     @Column(name = "status", length = 20, nullable = false)
     @Builder.Default
-    private String status = "PENDING";
+    private String status = "PAYMENT_WAIT";
 
     @Version
     @Column(name = "version")

@@ -12,4 +12,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, Payment
     List<Payment> findTop5ByOrderByPaymentDateDesc();
  
     List<Payment> findByOrderMasterOrderId(Long orderId);
+
+    List<Payment> findByOrderMasterOrderIdAndSiteCdAndOrderNo(Long orderId, String siteCd, String orderNo);
 }
