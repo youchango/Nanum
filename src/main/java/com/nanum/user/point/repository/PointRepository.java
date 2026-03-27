@@ -15,8 +15,8 @@ public interface PointRepository extends JpaRepository<Point, Long>, PointReposi
 
     List<Point> findTop5ByOrderByCreatedAtDesc();
 
-    @Query("SELECT COALESCE(SUM(CASE WHEN p.pointGubun = 'SAVE' THEN p.pointUse ELSE 0 END), 0) " +
-            "- COALESCE(SUM(CASE WHEN p.pointGubun = 'USE' THEN p.pointUse ELSE 0 END), 0) " +
+    @Query("SELECT COALESCE(SUM(CASE WHEN p.pointType = com.nanum.domain.point.model.PointType.SAVE THEN p.pointUse ELSE 0 END), 0) " +
+            "- COALESCE(SUM(CASE WHEN p.pointType = com.nanum.domain.point.model.PointType.USE THEN p.pointUse ELSE 0 END), 0) " +
             "FROM Point p WHERE p.member.memberCode = :memberCode")
     int calculateBalance(@Param("memberCode") String memberCode);
 

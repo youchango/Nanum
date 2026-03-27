@@ -14,13 +14,14 @@ import com.nanum.user.order.repository.OrderDetailRepository;
 import com.nanum.user.order.repository.OrderRepository;
 import com.nanum.user.payment.repository.PaymentRepository;
 import com.nanum.user.delivery.repository.DeliveryRepository;
+import com.nanum.user.point.repository.PointRepository;
 import com.nanum.domain.delivery.model.Delivery;
 import com.nanum.domain.delivery.model.DeliveryStatus;
+import com.nanum.domain.point.model.Point;
+import com.nanum.domain.point.model.PointType;
 import com.nanum.domain.product.repository.ProductOptionRepository;
 import com.nanum.domain.product.repository.ProductRepository;
 import com.nanum.admin.inout.service.AdminInoutService;
-import com.nanum.domain.product.model.Product;
-import com.nanum.domain.product.model.ProductOption;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,6 +50,7 @@ public class AdminOrderService {
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
     private final AdminInoutService adminInoutService;
+    private final PointRepository pointRepository;
 
     public Map<String, Object> getOrders(AdminOrderSearchDTO searchDTO) {
         Manager manager = getCurrentManager();
@@ -283,6 +285,54 @@ public class AdminOrderService {
         order.changeStatus(com.nanum.domain.order.model.OrderStatus.SHIPPING);
     }
 
+    /**
+     * 배송 완료 처리
+     */
+    @Transactional
+    public void completeDelivery(Long orderId) {
+        OrderMaster order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + orderId));
+
+        Manager manager = getCurrentManager();
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        if (order.getStatus() != com.nanum.domain.order.model.OrderStatus.SHIPPING) {
+            throw new IllegalStateException("배송중 상태의 주문만 완료 처리가 가능합니다.");
+        }
+
+        // 1. 주문 상태 변경
+        order.changeStatus(com.nanum.domain.order.model.OrderStatus.DELIVERED);
+
+        // 2. 배송 상태 변경 (모든 관련 배송 건 완료 처리)
+        List<Delivery> deliveries = deliveryRepository.findByOrderId(orderId);
+        for (Delivery delivery : deliveries) {
+            delivery.complete();
+            deliveryRepository.save(delivery);
+        }
+
+        // 3. 포인트 적립 처리
+        List<OrderDetail> details = orderDetailRepository.findByOrderId(orderId);
+        int totalPointAmount = details.stream()
+                .mapToInt(d -> d.getPointAmount() != null ? d.getPointAmount() : 0)
+                .sum();
+
+        if (totalPointAmount > 0) {
+            Point pointRecord = Point.builder()
+                    .pointUse(totalPointAmount)
+                    .pointBigo("주문 적립 (" + order.getOrderNo() + ")")
+                    .pointType(PointType.SAVE)
+                    .member(order.getMember())
+                    .orderNo(order.getOrderNo())
+                    .build();
+            
+            pointRecord.setSiteCd(order.getSiteCd()); // @Setter 사용
+            
+            pointRepository.save(pointRecord);
+        }
+    }
+
     private OrderDTO.Response convertToResponse(OrderMaster order) {
         return OrderDTO.Response.builder()
                 .orderId(order.getOrderId())
@@ -304,6 +354,7 @@ public class AdminOrderService {
         return OrderDTO.OrderDetailResponse.builder()
                 .orderDetailId(detail.getId())
                 .productId(detail.getProductId())
+                .orderNo(detail.getOrderNo())
                 .productName(detail.getProductName())
                 .optionName(detail.getOptionName())
                 .quantity(detail.getQuantity())

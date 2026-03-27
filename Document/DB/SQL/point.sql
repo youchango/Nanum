@@ -1,9 +1,9 @@
-﻿CREATE TABLE point (
+CREATE TABLE point (
   point_id int(11) NOT NULL AUTO_INCREMENT COMMENT '포인트코드',
   site_cd varchar(20) DEFAULT NULL COMMENT '사이트코드',
   point_use int(11) NOT NULL COMMENT '사용/적립 포인트',
   point_bigo varchar(255) DEFAULT NULL COMMENT '포인트 상세 이력',
-  point_gubun varchar(20) NOT NULL COMMENT '구분(SAVE:적립, USE:사용)',
+  point_type varchar(20) NOT NULL COMMENT '포인트 구분(SAVE:적립, USE:사용)',
   member_code varchar(30) NOT NULL COMMENT '회원코드',
   order_no varchar(50) DEFAULT NULL COMMENT '주문번호',
   created_at datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일',

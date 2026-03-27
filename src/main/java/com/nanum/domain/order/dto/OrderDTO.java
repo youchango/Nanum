@@ -154,6 +154,7 @@ public class OrderDTO {
     public static class OrderDetailResponse {
         private Long orderDetailId;
         private Long productId;
+        private String orderNo;
         private String productName;
         private String optionName;
         private int quantity;

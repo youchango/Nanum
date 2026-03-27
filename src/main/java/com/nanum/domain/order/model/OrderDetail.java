@@ -24,6 +24,9 @@ public class OrderDetail extends BaseEntity {
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
+    @Column(name = "order_no", nullable = false, length = 50)
+    private String orderNo;
+
     @Column(name = "order_seq", nullable = false)
     private Integer orderSeq;
 
@@ -111,5 +114,9 @@ public class OrderDetail extends BaseEntity {
     @Builder.Default
     @Column(name = "review_yn", nullable = false, length = 1)
     private String reviewYn = "N";
+
+    @Column(name = "point_amount")
+    @ColumnDefault("0")
+    private Integer pointAmount;
 
 }

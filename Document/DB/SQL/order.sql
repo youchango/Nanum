@@ -1,4 +1,4 @@
-﻿-- 1. Cart (Shopping Cart)
+-- 1. Cart (Shopping Cart)
 CREATE TABLE cart (
     cart_id          INT AUTO_INCREMENT COMMENT '장바구니ID',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
@@ -26,7 +26,7 @@ CREATE TABLE order_master (
     order_no         VARCHAR(50) NOT NULL COMMENT '주문번호(UUID)',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
-    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
+    order_status     VARCHAR(20) DEFAULT 'PAYMENT_WAIT' NOT NULL COMMENT '주문상태(PAYMENT_WAIT:결제대기, PREPARING:배송준비, SHIPPING:배송중, DELIVERED:배송완료, CANCELLED:주문취소, RETURN_REQUEST:반품요청, EXCHANGE_REQUEST:교환요청)',
     order_name 		 VARCHAR(200) NULL COMMENT '주문명',
     -- Amount Info
     total_price      DECIMAL(19,4) DEFAULT 0 NOT NULL COMMENT '총주문금액',
@@ -61,9 +61,10 @@ CREATE TABLE order_master (
 CREATE TABLE order_detail (
     order_detail_id  INT AUTO_INCREMENT COMMENT '주문상세ID',
     order_id         INT NOT NULL COMMENT '주문ID',
+    order_no         VARCHAR(50) NOT NULL COMMENT '주문번호',
     order_seq        INT NOT NULL COMMENT '주문순번',
     site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
-    order_status     VARCHAR(20) DEFAULT 'PAY_WAIT' NOT NULL COMMENT '주문상태(PAY_WAIT, PAID, PREPARE, DELIVERY, COMPLETE, CANCEL, REFUND)',
+    order_status     VARCHAR(20) DEFAULT 'PAYMENT_WAIT' NOT NULL COMMENT '주문상태(PAYMENT_WAIT:결제대기, PREPARING:배송준비, SHIPPING:배송중, DELIVERED:배송완료, CANCELLED:주문취소, RETURN_REQUEST:반품요청, EXCHANGE_REQUEST:교환요청)',
     product_id       INT NOT NULL COMMENT '상품ID',
     option_id        INT NULL COMMENT '옵션ID',
     product_name     VARCHAR(200) NOT NULL COMMENT '상품명(스냅샷)',
@@ -73,6 +74,7 @@ CREATE TABLE order_detail (
     option_price     DECIMAL(19,4) DEFAULT 0 COMMENT '옵션가격',
     quantity         INT NOT NULL COMMENT '주문수량',
     total_price      DECIMAL(19,4) NOT NULL COMMENT '총금액(구 sub_total)',
+    point_amount     INT DEFAULT 0 NOT NULL COMMENT '적립포인트',
     
     delivery_num     VARCHAR(100) NULL COMMENT '송장번호',
     delivery_corp    VARCHAR(200) NULL COMMENT '택배사명',

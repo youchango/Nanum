@@ -47,4 +47,12 @@ public class Delivery extends BaseEntity {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
+
+    /**
+     * 배송 완료 처리
+     */
+    public void complete() {
+        this.status = DeliveryStatus.DELIVERED;
+        this.completedAt = LocalDateTime.now();
+    }
 }

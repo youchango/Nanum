@@ -32,8 +32,9 @@ public class Point {
     @Column(name = "point_bigo")
     private String pointBigo;
 
-    @Column(name = "point_gubun", length = 20, nullable = false)
-    private String pointGubun; // SAVE:적립, USE:사용
+    @Enumerated(EnumType.STRING)
+    @Column(name = "point_type", length = 20, nullable = false)
+    private PointType pointType; // SAVE:적립, USE:사용
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
@@ -50,10 +51,10 @@ public class Point {
     private Long createdBy;
 
     @Builder
-    public Point(Integer pointUse, String pointBigo, String pointGubun, Member member, String orderNo) {
+    public Point(Integer pointUse, String pointBigo, PointType pointType, Member member, String orderNo) {
         this.pointUse = pointUse;
         this.pointBigo = pointBigo;
-        this.pointGubun = pointGubun;
+        this.pointType = pointType;
         this.member = member;
         this.orderNo = orderNo;
     }

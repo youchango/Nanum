@@ -17,6 +17,7 @@ import com.nanum.user.payment.repository.PaymentRepository;
 import com.nanum.domain.point.dto.PointDto;
 import com.nanum.domain.point.dto.PointSearchDto;
 import com.nanum.domain.point.model.Point;
+import com.nanum.domain.point.model.PointType;
 import com.nanum.user.point.repository.PointRepository;
  
 import java.math.BigDecimal;
@@ -73,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .member(payment.getMember())
                     .pointUse(-usedPoint)
                     .pointBigo("Payment usage for payment: " + paymentId)
-                    .pointGubun("USE")
+                    .pointType(PointType.USE)
                     .orderNo(null) // Payment doesn't have orderNo readily available in this context, using
                                    // null as permitted
                     .build();
@@ -127,7 +128,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .member(payment.getMember())
                     .pointUse(payment.getUsedPoint().intValue())
                     .pointBigo("Refund for cancelled payment: " + paymentId)
-                    .pointGubun("SAVE")
+                    .pointType(PointType.SAVE)
                     .orderNo(null)
                     .build();
             pointRepository.save(pointRefund);

@@ -16,6 +16,7 @@ import com.nanum.domain.payment.model.Payment;
 import com.nanum.domain.payment.model.PaymentMethod;
 import com.nanum.domain.payment.model.PaymentStatus;
 import com.nanum.domain.point.model.Point;
+import com.nanum.domain.point.model.PointType;
 import com.nanum.domain.product.model.Product;
 import com.nanum.domain.product.model.ProductStatus;
 import com.nanum.domain.product.model.ProductOption;
@@ -147,6 +148,9 @@ public class OrderService {
                 }
             }
 
+            // 포인트 적립률 조회
+            BigDecimal pointRate = siteInfo != null ? siteInfo.getPointRate() : BigDecimal.ZERO;
+
             // 옵션 추가금 및 옵션명
             int optionExtraPrice = 0;
             String optionName = null;
@@ -187,6 +191,7 @@ public class OrderService {
             orderedProductIds.add(product.getId());
 
             OrderDetail detail = OrderDetail.builder()
+                    .orderNo(orderNo)
                     .orderSeq(i + 1)
                     .siteCd(SITE_CD)
                     .productId(product.getId())
@@ -198,6 +203,7 @@ public class OrderService {
                     .quantity(item.getQuantity())
                     .totalPrice(itemTotal)
                     .orderStatus(OrderStatus.PAYMENT_WAIT)
+                    .pointAmount(itemTotal.multiply(pointRate).divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.FLOOR).intValue())
                     .build();
 
             orderDetails.add(detail);
@@ -326,7 +332,7 @@ public class OrderService {
             Point pointRecord = Point.builder()
                     .pointUse(requestedPoint)
                     .pointBigo("주문 사용 (" + orderNo + ")")
-                    .pointGubun("USE")
+                    .pointType(PointType.USE)
                     .member(member)
                     .orderNo(orderNo)
                     .build();
@@ -534,7 +540,7 @@ public class OrderService {
             Point pointRestore = Point.builder()
                     .pointUse(order.getUsedPoint().intValue())
                     .pointBigo("주문 취소 복원 (" + order.getOrderNo() + ")")
-                    .pointGubun("SAVE")
+                    .pointType(PointType.SAVE)
                     .member(member)
                     .orderNo(order.getOrderNo())
                     .build();
@@ -617,6 +623,12 @@ public class OrderService {
             snapshot.put("optionExtraPrice", optionExtraPrice);
             snapshot.put("unitPrice", unitPrice);
             snapshot.put("itemTotal", itemTotal);
+            
+            // 포인트 적립 정보 추가
+            BigDecimal pointRate = siteMap.get(product.getId()) != null ? siteMap.get(product.getId()).getPointRate() : BigDecimal.ZERO;
+            snapshot.put("pointRate", pointRate);
+            snapshot.put("pointAmount", itemTotal.multiply(pointRate).divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.FLOOR).intValue());
+            
             itemSnapshots.add(snapshot);
         }
 
@@ -795,6 +807,7 @@ public class OrderService {
             orderedProductIds.add(productId);
 
             OrderDetail detail = OrderDetail.builder()
+                    .orderNo(orderTemp.getOrderNo())
                     .orderSeq(i + 1)
                     .siteCd(SITE_CD)
                     .productId(productId)
@@ -806,6 +819,7 @@ public class OrderService {
                     .quantity(quantity)
                     .totalPrice(itemTotal)
                     .orderStatus(orderStatus)
+                    .pointAmount(((Number) snap.get("pointAmount")).intValue())
                     .build();
             orderDetails.add(detail);
         }
@@ -882,7 +896,7 @@ public class OrderService {
             Point pointRecord = Point.builder()
                     .pointUse(requestedPoint)
                     .pointBigo("주문 사용 (" + orderTemp.getOrderNo() + ")")
-                    .pointGubun("USE")
+                    .pointType(PointType.USE)
                     .member(member)
                     .orderNo(orderTemp.getOrderNo())
                     .build();
@@ -1112,6 +1126,7 @@ public class OrderService {
         return OrderDTO.OrderDetailResponse.builder()
                 .orderDetailId(d.getId())
                 .productId(d.getProductId())
+                .orderNo(d.getOrderNo())
                 .productName(d.getProductName())
                 .optionName(d.getOptionName())
                 .quantity(d.getQuantity())

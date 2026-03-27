@@ -59,4 +59,11 @@ public class AdminOrderController {
         adminOrderService.registerDelivery(id, requests);
         return ApiResponse.success("Delivery Registered");
     }
+
+    @Operation(summary = "배송 완료 처리", description = "배송중인 주문을 배송완료 처리하고 배송 정보를 업데이트합니다.")
+    @PostMapping("/{id}/complete-delivery")
+    public ApiResponse<String> completeDelivery(@PathVariable Long id) {
+        adminOrderService.completeDelivery(id);
+        return ApiResponse.success("Delivery Completed");
+    }
 }

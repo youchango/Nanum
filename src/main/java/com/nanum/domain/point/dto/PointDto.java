@@ -4,6 +4,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 import com.nanum.domain.point.model.Point;
+import com.nanum.domain.point.model.PointType;
 
 @Data
 public class PointDto {
@@ -11,7 +12,7 @@ public class PointDto {
     private Integer pointUse;
     private String pointBigo;
     private String memberCode;
-    private String pointGubun;
+    private PointType pointType;
     private String orderNo;
     private LocalDateTime createdAt;
 
@@ -19,7 +20,7 @@ public class PointDto {
         this.pointId = point.getPointId();
         this.pointUse = point.getPointUse();
         this.pointBigo = point.getPointBigo();
-        this.pointGubun = point.getPointGubun();
+        this.pointType = point.getPointType();
         this.orderNo = point.getOrderNo();
         this.memberCode = point.getMember().getMemberCode();
         this.createdAt = point.getCreatedAt();

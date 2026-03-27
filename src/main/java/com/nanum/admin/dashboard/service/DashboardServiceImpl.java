@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
  
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
  
 @Service
@@ -86,7 +84,7 @@ public class DashboardServiceImpl implements DashboardService {
                                 .map(p -> DashboardDTO.PointSummary.builder()
                                                  .memberCode(p.getMember() != null ? p.getMember().getMemberCode() : "")
                                                  .point(p.getPointUse() != null ? p.getPointUse().longValue() : 0L)
-                                                 .type(p.getPointGubun())
+                                                 .type(p.getPointType().name())
                                                  .processDate(p.getCreatedAt())
                                                  .build())
                                 .toList();
