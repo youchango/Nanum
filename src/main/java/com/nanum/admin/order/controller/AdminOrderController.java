@@ -39,6 +39,13 @@ public class AdminOrderController {
         return ApiResponse.success("Order Status Updated");
     }
 
+    @Operation(summary = "주문 메모 수정", description = "특정 주문 ID에 대해 관리자 메모를 업데이트합니다.")
+    @PatchMapping("/{id}/memo")
+    public ApiResponse<String> updateMemo(@PathVariable Long id, @RequestBody OrderDTO.MemoUpdateRequest request) {
+        adminOrderService.updateMemo(id, request);
+        return ApiResponse.success("Order Memo Updated");
+    }
+
     @Operation(summary = "결제 확인 처리", description = "결제대기 상태의 주문을 결제완료 처리하고 배송준비 상태로 변경합니다.")
     @PostMapping("/{id}/confirm-payment")
     public ApiResponse<String> confirmPayment(@PathVariable Long id) {

@@ -144,4 +144,23 @@ public class AdminMemberController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    /**
+     * 회원의 메모를 업데이트합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @param request    메모 내용이 담긴 맵 (memo 키)
+     * @return 성공 메시지
+     */
+    @Operation(summary = "회원 메모 수정", description = "회원의 관리자 메모를 수정합니다.")
+    @PatchMapping("/{memberCode}/memo")
+    public ResponseEntity<ApiResponse<Object>> updateMemo(@PathVariable String memberCode,
+            @RequestBody Map<String, String> request) {
+        try {
+            adminMemberService.updateMemo(memberCode, request.get("memo"));
+            return ResponseEntity.ok(ApiResponse.success("Member memo updated successfully", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

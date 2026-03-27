@@ -85,12 +85,15 @@ public class OrderMaster extends BaseEntity {
     @Column(name = "delivery_memo")
     private String deliveryMemo;
 
-    @Column(name = "tracking_number")
-    private String trackingNumber;
+    @Column(name = "memo", columnDefinition = "TEXT")
+    private String memo;
 
     // Business Methods
     public void changeStatus(OrderStatus status) {
         this.status = status;
     }
 
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
 }

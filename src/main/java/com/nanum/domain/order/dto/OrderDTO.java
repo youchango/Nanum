@@ -79,6 +79,7 @@ public class OrderDTO {
         private String receiverDetail;
         private String receiverZipcode;
         private LocalDateTime createdAt;
+        private String memo;
         private List<OrderDetailResponse> items;
     }
 
@@ -102,10 +103,10 @@ public class OrderDTO {
         private String receiverDetail;
         private String receiverZipcode;
         private String deliveryMemo;
-        private String trackingNumber;
         private String paymentMethod;
         private PaymentStatus paymentStatus;
         private LocalDateTime createdAt;
+        private String memo;
         private List<OrderDetailResponse> items;
         private List<PaymentResponse> payments;
         private List<DeliveryResponse> deliveries;
@@ -170,7 +171,6 @@ public class OrderDTO {
     @AllArgsConstructor
     public static class StatusUpdateRequest {
         private OrderStatus status;
-        private String trackingNumber;
     }
 
     // --- PG 연동용 DTO ---
@@ -243,5 +243,13 @@ public class OrderDTO {
         private Long orderDetailId;
         private String deliveryCorp;
         private String trackingNumber;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemoUpdateRequest {
+        private String memo;
     }
 }

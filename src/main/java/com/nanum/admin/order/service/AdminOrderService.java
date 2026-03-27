@@ -149,10 +149,11 @@ public class AdminOrderService {
                 .receiverZipcode(order.getReceiverZipcode())
                 .deliveryMemo(order.getDeliveryMemo())
                 .memberCode(order.getMember() != null ? order.getMember().getMemberCode() : null)
-                .trackingNumber(order.getTrackingNumber())
+                .memo(order.getMemo())
                 .paymentMethod(paymentMethodDesc)
                 .paymentStatus(paymentStatus)
                 .createdAt(order.getCreatedAt())
+                .memo(order.getMemo())
                 .items(items.stream().map(this::convertToDetailItemResponse).collect(Collectors.toList()))
                 .payments(payments.stream().map(this::convertToPaymentResponse).collect(Collectors.toList()))
                 .deliveries(deliveryRepository.findByOrderId(id).stream()
@@ -171,6 +172,19 @@ public class AdminOrderService {
         }
 
         order.changeStatus(request.getStatus());
+    }
+
+    @Transactional
+    public void updateMemo(Long id, OrderDTO.MemoUpdateRequest request) {
+        OrderMaster order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다. ID: " + id));
+        
+        Manager manager = getCurrentManager();
+        if (manager.getMbType() != ManagerType.MASTER && !manager.getSiteCd().equals(order.getSiteCd())) {
+            throw new IllegalArgumentException("접근 권한이 없습니다.");
+        }
+
+        order.setMemo(request.getMemo());
     }
 
     @Transactional
@@ -345,6 +359,7 @@ public class AdminOrderService {
                 .memberCode(order.getMember() != null ? order.getMember().getMemberCode() : null)
                 .receiverName(order.getReceiverName())
                 .createdAt(order.getCreatedAt())
+                .memo(order.getMemo())
                 .build();
     }
 

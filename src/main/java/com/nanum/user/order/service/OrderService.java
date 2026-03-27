@@ -465,7 +465,6 @@ public class OrderService {
                 .receiverDetail(order.getReceiverDetail())
                 .receiverZipcode(order.getReceiverZipcode())
                 .deliveryMemo(order.getDeliveryMemo())
-                .trackingNumber(order.getTrackingNumber())
                 .paymentMethod(paymentMethodDesc)
                 .paymentStatus(paymentStatus)
                 .createdAt(order.getCreatedAt())

@@ -581,7 +581,7 @@ CREATE TABLE order_master (
     receiver_address  VARCHAR(255) NOT NULL COMMENT '주소',
     receiver_detail   VARCHAR(255) NOT NULL COMMENT '상세주소',
     delivery_memo     VARCHAR(200) NULL COMMENT '배송메모',
-    tracking_number   VARCHAR(50) NULL COMMENT '운송장번호',
+    memo              TEXT NULL COMMENT '관리자메모',
     -- BaseEntity Information
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일시(주문일시)',
     created_by       VARCHAR(50) NULL COMMENT '생성자',

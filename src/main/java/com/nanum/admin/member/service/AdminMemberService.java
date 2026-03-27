@@ -297,6 +297,19 @@ public class AdminMemberService {
         member.setApplyYn(applyYn);
     }
 
+    /**
+     * 회원의 메모를 업데이트합니다.
+     *
+     * @param memberCode 회원 고유 코드
+     * @param memo       업데이트할 메모 내용
+     */
+    @Transactional
+    public void updateMemo(String memberCode, String memo) {
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. Code: " + memberCode));
+        member.setMemo(memo);
+    }
+
     // Member Code 생성 helper
     private String generateMemberCode(String prefix) {
         return memberRepository.findTopByMemberCodeStartingWithOrderByMemberCodeDesc(prefix)
