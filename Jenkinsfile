@@ -46,12 +46,12 @@ pipeline {
                     sh "docker stop ${DOCKER_IMAGE_NAME} || true"
                     sh "docker rm ${DOCKER_IMAGE_NAME} || true"
 
-// [추가] -e SPRING_PROFILES_ACTIVE=prod (또는 dev) 한 줄만 추가하세요!
+                    // [수정 완료] 포트를 9021:9021로 정확히 맞췄습니다!
                     sh """
                         docker run -d \
                             --restart unless-stopped \
                             --name ${DOCKER_IMAGE_NAME} \
-                            -p 9021:8080 \
+                            -p 9021:9021 \
                             -v ${HOST_UPLOAD_PATH}:/app/upload \
                             -e SPRING_PROFILES_ACTIVE=dev \
                             ${DOCKER_IMAGE_NAME}:latest
