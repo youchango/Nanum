@@ -46,13 +46,14 @@ pipeline {
                     sh "docker stop ${DOCKER_IMAGE_NAME} || true"
                     sh "docker rm ${DOCKER_IMAGE_NAME} || true"
 
-                    // [수정] 포트 9021, 백엔드용 볼륨 경로 적용
+// [추가] -e SPRING_PROFILES_ACTIVE=prod (또는 dev) 한 줄만 추가하세요!
                     sh """
                         docker run -d \
                             --restart unless-stopped \
                             --name ${DOCKER_IMAGE_NAME} \
                             -p 9021:8080 \
                             -v ${HOST_UPLOAD_PATH}:/app/upload \
+                            -e SPRING_PROFILES_ACTIVE=dev \
                             ${DOCKER_IMAGE_NAME}:latest
                     """
                 }
