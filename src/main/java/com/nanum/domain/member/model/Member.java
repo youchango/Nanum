@@ -71,15 +71,10 @@ public class Member {
     @Column(name = "memo", length = 2000)
     private String memo; // 관리자 메모
 
-    @Column(name = "sms_yn", length = 1, nullable = false)
+    @Column(name = "marketing_yn", length = 1, nullable = false)
     @org.hibernate.annotations.ColumnDefault("'N'")
     @Builder.Default
-    private String smsYn = "N"; // SMS 수신 동의 (Y/N)
-
-    @Column(name = "email_yn", length = 1, nullable = false)
-    @org.hibernate.annotations.ColumnDefault("'N'")
-    @Builder.Default
-    private String emailYn = "N"; // 이메일 수신 동의 (Y/N)
+    private String marketingYn = "N"; // 마케팅 수신 동의 (Y/N)
 
     @Column(name = "login_fail_count", nullable = false)
     @org.hibernate.annotations.ColumnDefault("0")

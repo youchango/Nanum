@@ -64,6 +64,7 @@ public class InquiryService {
 
         Inquiry inquiry = Inquiry.builder()
                 .type(request.getType())
+                .siteCd(request.getSiteCd())
                 .productId(request.getProductId())
                 .orderNo(request.getOrderNo())
                 .title(request.getTitle())
@@ -77,8 +78,13 @@ public class InquiryService {
         return inquiry.getId();
     }
 
-    public Page<InquiryDTO.Response> getProductInquiries(Long productId, String memberId, Pageable pageable) {
-        Page<Inquiry> page = inquiryRepository.findByProductIdAndDeleteYnOrderByCreatedAtDesc(productId, "N", pageable);
+    public Page<InquiryDTO.Response> getProductInquiries(Long productId, String siteCd, String memberId, Pageable pageable) {
+        Page<Inquiry> page;
+        if (siteCd != null && !siteCd.isBlank()) {
+            page = inquiryRepository.findByProductIdAndSiteCdAndDeleteYnOrderByCreatedAtDesc(productId, siteCd, "N", pageable);
+        } else {
+            page = inquiryRepository.findByProductIdAndDeleteYnOrderByCreatedAtDesc(productId, "N", pageable);
+        }
 
         String currentMemberCode = null;
         if (memberId != null) {

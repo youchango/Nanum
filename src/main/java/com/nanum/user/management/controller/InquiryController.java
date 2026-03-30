@@ -50,9 +50,10 @@ public class InquiryController implements ResponseSupport {
     @Operation(summary = "상품 문의 목록", description = "특정 상품에 대한 문의 목록을 조회합니다. 비밀글은 작성자만 내용을 볼 수 있습니다.")
     public ResponseEntity<ApiResponse<Page<InquiryDTO.Response>>> getProductInquiries(
             @PathVariable Long productId,
+            @RequestParam(required = false) String siteCd,
             @AuthenticationPrincipal UserDetails userDetails,
             @PageableDefault(size = 10) Pageable pageable) {
         String memberId = userDetails != null ? userDetails.getUsername() : null;
-        return success(inquiryService.getProductInquiries(productId, memberId, pageable));
+        return success(inquiryService.getProductInquiries(productId, siteCd, memberId, pageable));
     }
 }

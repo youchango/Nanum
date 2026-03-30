@@ -20,8 +20,14 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long>, Inquiry
     List<Inquiry> findTop5ByOrderByCreatedAtDesc();
 
     // 상품 문의 - 공개글 조회 (비밀글 제외)
+    Page<Inquiry> findByProductIdAndSiteCdAndDeleteYnAndIsSecretOrderByCreatedAtDesc(Long productId, String siteCd, String deleteYn, String isSecret, Pageable pageable);
+
+    // 상품 문의 - 전체 (사이트별)
+    Page<Inquiry> findByProductIdAndSiteCdAndDeleteYnOrderByCreatedAtDesc(Long productId, String siteCd, String deleteYn, Pageable pageable);
+
+    // 상품 문의 - 공개글 조회 (비밀글 제외, 사이트 미지정 - 하위 호환용)
     Page<Inquiry> findByProductIdAndDeleteYnAndIsSecretOrderByCreatedAtDesc(Long productId, String deleteYn, String isSecret, Pageable pageable);
 
-    // 상품 문의 - 전체 (작성자 본인의 비밀글 포함 처리는 서비스에서)
+    // 상품 문의 - 전체 (사이티 미지정 - 하위 호환용)
     Page<Inquiry> findByProductIdAndDeleteYnOrderByCreatedAtDesc(Long productId, String deleteYn, Pageable pageable);
 }

@@ -162,6 +162,7 @@ public class ProductDTO {
         private int price; // 등급별 적용된 실제 판매가
         private ProductStatus status;
         private String applyYn;
+        private String deleteYn;
         private String optionYn;
         private String description;
 

@@ -125,6 +125,11 @@ public class MemberDTO {
     private String memo;
 
     /**
+     * 마케팅 정보 수신 동의 여부 (Y/N)
+     */
+    private String marketingYn;
+
+    /**
      * DTO를 Member 엔티티로 변환합니다.
      *
      * @return Member 엔티티
@@ -140,6 +145,7 @@ public class MemberDTO {
         member.setAddress(this.address);
         member.setAddressDetail(this.addressDetail);
         member.setEmail(this.email);
+        member.setMarketingYn(this.marketingYn);
         // role, memberType 등은 서비스에서 설정
         return member;
     }

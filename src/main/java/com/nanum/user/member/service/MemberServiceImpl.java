@@ -69,7 +69,9 @@ public class MemberServiceImpl implements MemberService {
         member.setAddress(memberDTO.getAddress());
         member.setAddressDetail(memberDTO.getAddressDetail());
         member.setEmail(memberDTO.getEmail());
-
+        if (memberDTO.getMarketingYn() != null) {
+            member.setMarketingYn(memberDTO.getMarketingYn());
+        }
         // 회원 유형 및 권한 설정 (U: 사용자, B: 업무자, M: 관리자)
         MemberRole role = MemberRole.ROLE_USER;
         MemberType memberType = MemberType.U;
@@ -141,8 +143,7 @@ public class MemberServiceImpl implements MemberService {
         member.setZipcode(request.getZipcode());
         member.setAddress(request.getAddress());
         member.setAddressDetail(request.getAddressDetail());
-        member.setSmsYn(request.getSmsYn());
-        member.setEmailYn(request.getEmailYn());
+        member.setMarketingYn(request.getMarketingYn());
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             // 기존 비밀번호 검증 필수

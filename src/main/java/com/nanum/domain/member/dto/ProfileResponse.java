@@ -14,8 +14,7 @@ public class ProfileResponse {
     private String zipcode;
     private String address;
     private String addressDetail;
-    private String smsYn;
-    private String emailYn;
+    private String marketingYn;
     private String memberType;
     // 기업회원 정보
     private String companyName;
@@ -33,8 +32,7 @@ public class ProfileResponse {
                 .zipcode(member.getZipcode())
                 .address(member.getAddress())
                 .addressDetail(member.getAddressDetail())
-                .smsYn(member.getSmsYn())
-                .emailYn(member.getEmailYn())
+                .marketingYn(member.getMarketingYn())
                 .memberType(member.getMemberType() != null ? member.getMemberType().name() : "U")
                 .build();
     }

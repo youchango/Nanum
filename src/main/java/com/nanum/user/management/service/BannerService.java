@@ -34,9 +34,14 @@ public class BannerService {
                 .sorted((b1, b2) -> Integer.compare(b1.getSortOrder(), b2.getSortOrder()))
                 .map(banner -> {
                     BannerDTO.Response response = BannerDTO.Response.from(banner);
-                    List<com.nanum.domain.file.dto.FileResponseDTO> files = fileService
-                            .getFiles(com.nanum.domain.file.model.ReferenceType.BANNER, String.valueOf(banner.getId()))
-                            .stream()
+                    List<com.nanum.domain.file.model.FileStore> rawFiles = fileService
+                            .getFiles(com.nanum.domain.file.model.ReferenceType.BANNER, String.valueOf(banner.getId()));
+                            
+                    if (!rawFiles.isEmpty()) {
+                        response.setImageUrl(fileService.getFullUrl(rawFiles.get(0).getPath()));
+                    }
+                    
+                    List<com.nanum.domain.file.dto.FileResponseDTO> files = rawFiles.stream()
                             .map(com.nanum.domain.file.dto.FileResponseDTO::from)
                             .collect(Collectors.toList());
                     response.setFiles(files);

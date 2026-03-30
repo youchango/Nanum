@@ -155,9 +155,6 @@ public class AdminOrderService {
                 .createdAt(order.getCreatedAt())
                 .memo(order.getMemo())
                 .items(items.stream().map(this::convertToDetailItemResponse).collect(Collectors.toList()))
-                .payments(payments.stream().map(this::convertToPaymentResponse).collect(Collectors.toList()))
-                .deliveries(deliveryRepository.findByOrderId(id).stream()
-                        .map(this::convertToDeliveryResponse).collect(Collectors.toList()))
                 .build();
     }
 
@@ -379,34 +376,6 @@ public class AdminOrderService {
                 .build();
     }
 
-    private OrderDTO.PaymentResponse convertToPaymentResponse(Payment p) {
-        return OrderDTO.PaymentResponse.builder()
-                .paymentId(p.getPaymentId())
-                .totalPrice(p.getTotalPrice())
-                .discountPrice(p.getDiscountPrice())
-                .usedPoint(p.getUsedPoint())
-                .usedCoupon(p.getUsedCoupon())
-                .paymentPrice(p.getPaymentPrice())
-                .paymentStatus(p.getPaymentStatus())
-                .paymentMethod(p.getPaymentMethod() != null ? p.getPaymentMethod().name() : null)
-                .bankName(p.getBankName())
-                .bankAccountNum(p.getBankAccountNum())
-                .depositorName(p.getDepositorName())
-                .paymentDate(p.getPaymentDate())
-                .build();
-    }
-
-    private OrderDTO.DeliveryResponse convertToDeliveryResponse(Delivery d) {
-        return OrderDTO.DeliveryResponse.builder()
-                .deliveryId(d.getId())
-                .orderDetailId(d.getOrderDetailId())
-                .deliveryCorp(d.getDeliveryCorp())
-                .trackingNumber(d.getTrackingNumber())
-                .status(d.getStatus() != null ? d.getStatus().name() : null)
-                .shippedAt(d.getShippedAt())
-                .completedAt(d.getCompletedAt())
-                .build();
-    }
 
     private Manager getCurrentManager() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

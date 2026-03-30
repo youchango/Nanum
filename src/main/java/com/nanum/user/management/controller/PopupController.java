@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,8 +24,9 @@ public class PopupController implements ResponseSupport {
     private final PopupService popupService;
 
     @GetMapping
-    @Operation(summary = "팝업 목록 조회", description = "현재 활성화된 모든 팝업 광고 목록을 조회하여 반환합니다.")
-    public ResponseEntity<ApiResponse<List<PopupDTO.Response>>> getPopups() {
-        return success(popupService.getPopups());
+    @Operation(summary = "팝업 목록 조회", description = "현재 활성화된 지정 사이트의 모든 팝업 광고 목록을 조회하여 반환합니다.")
+    public ResponseEntity<ApiResponse<List<PopupDTO.Response>>> getPopups(
+            @RequestParam(name = "site_cd") String siteCd) {
+        return success(popupService.getPopups(siteCd));
     }
 }

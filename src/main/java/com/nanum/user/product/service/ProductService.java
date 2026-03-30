@@ -36,6 +36,7 @@ public class ProductService {
 
                 return products.stream()
                                 .map(p -> toMallResponse(p, siteCd, member, false))
+                                .filter(java.util.Objects::nonNull)
                                 .collect(Collectors.toList());
         }
 
@@ -68,6 +69,7 @@ public class ProductService {
 
                 return products.stream()
                                 .map(p -> toMallResponse(p, siteCd, member, false))
+                                .filter(java.util.Objects::nonNull)
                                 .collect(Collectors.toList());
         }
 
@@ -75,15 +77,15 @@ public class ProductService {
                 Product product = productRepository.findById(productId)
                                 .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
-                if ("Y".equals(product.getDeleteYn()) || !"Y".equals(product.getApplyYn())) {
-                        throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
-                }
-
                 com.nanum.domain.member.model.Member member = memberCode != null
                                 ? memberRepository.findByMemberCode(memberCode).orElse(null)
                                 : null;
 
-                return toMallResponse(product, siteCd, member, true); // 상세 조회 시 모든 이미지 포함
+                ProductDTO.MallProductResponse response = toMallResponse(product, siteCd, member, true);
+                if (response == null) {
+                        throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+                }
+                return response;
         }
 
         /**
@@ -101,14 +103,17 @@ public class ProductService {
                 com.nanum.domain.product.model.ProductSite productSite = productSiteRepository
                                 .findByProductAndSiteCd(product, siteCd)
                                 .stream().findFirst()
-                                .orElseThrow(() -> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+                                .orElse(null);
 
-                if (!"Y".equals(productSite.getViewYn()) || "Y".equals(productSite.getDeleteYn())) {
-                        throw new BusinessException(ErrorCode.ENTITY_NOT_FOUND);
+                if (!includeDetailImages) {
+                        if (productSite == null || !"Y".equals(productSite.getViewYn()) || "Y".equals(productSite.getDeleteYn())
+                                        || "Y".equals(product.getDeleteYn()) || !"Y".equals(product.getApplyYn())) {
+                                return null; // 목록 조회 시 필터링 되도록 null 반환
+                        }
                 }
 
                 // 2. 회원 등급별 가격 결정
-                int price = getBasePriceByMemberType(productSite, member);
+                int price = productSite != null ? getBasePriceByMemberType(productSite, member) : product.getRetailPrice();
 
                 // 3. 이미지 정보 처리
                 List<ProductDTO.Image> images = fileService
@@ -156,6 +161,7 @@ public class ProductService {
                                 .retailPrice(product.getRetailPrice())
                                 .suggestedPrice(product.getSuggestedPrice())
                                 .applyYn(product.getApplyYn())
+                                .deleteYn(product.getDeleteYn())
                                 .price(price)
                                 .status(product.getStatus())
                                 .optionYn(product.getOptionYn())

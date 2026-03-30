@@ -17,6 +17,5 @@ public class ProfileUpdateRequest {
     private String addressDetail;
     private String currentPassword; // 기존 비밀번호 (비밀번호 변경 시 필수)
     private String password;       // 새 비밀번호
-    private String smsYn;
-    private String emailYn;
+    private String marketingYn;
 }

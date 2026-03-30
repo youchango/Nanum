@@ -21,6 +21,7 @@ public class InquiryDTO {
         private String title;
         private String content;
         private String isSecret;
+        private String siteCd;
     }
 
     @Getter

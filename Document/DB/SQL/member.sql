@@ -1,4 +1,4 @@
-﻿CREATE TABLE member (
+CREATE TABLE member (
     id               INT AUTO_INCREMENT COMMENT 'ID',
     member_code      VARCHAR(20) NOT NULL COMMENT '회원코드',
     member_id        VARCHAR(50) NOT NULL COMMENT '회원아이디',
@@ -19,8 +19,7 @@
     withdraw_at      DATETIME NULL COMMENT '탈퇴일',
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '생성일',
     updated_at       DATETIME NULL COMMENT '수정일',
-    sms_yn           CHAR(1) DEFAULT 'N' NOT NULL COMMENT 'SMS 수신 여부',
-    email_yn         CHAR(1) DEFAULT 'N' NOT NULL COMMENT '이메일 수신 여부',
+    marketing_yn     CHAR(1) DEFAULT 'N' NOT NULL COMMENT '마케팅수신정보동의여부',
     PRIMARY KEY (id),
     UNIQUE KEY uq_member_code (member_code),
     UNIQUE KEY uq_member_id (member_id),

@@ -108,8 +108,6 @@ public class OrderDTO {
         private LocalDateTime createdAt;
         private String memo;
         private List<OrderDetailResponse> items;
-        private List<PaymentResponse> payments;
-        private List<DeliveryResponse> deliveries;
     }
 
     @Getter
