@@ -1,28 +1,23 @@
-# 1단계: Build stage
-FROM node:20-alpine AS build-stage
+# 1. 자바 실행 환경 설정 (프로젝트 자바 버전에 맞춰 17 또는 21 등으로 수정)
+FROM openjdk:21-jdk-slim
+
+# 2. 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드 인자(API URL) 주입
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# 3. 타임존 설정 (로그 시간이 한국 시간으로 나오게 함 - 선택사항)
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# 4. 빌드된 JAR 파일 복사
+# Jenkins가 'Build Backend' 단계에서 생성한 jar 파일을 컨테이너 내부로 가져옵니다.
+COPY build/libs/*.jar app.jar
 
-# 2단계: Production stage (Nginx)
-FROM nginx:stable-alpine
+# 5. 업로드 폴더 생성 (Jenkinsfile의 CONTAINER_UPLOAD_PATH와 동일하게)
+# 이 폴더는 실행 시 호스트의 /home/ttcc/nanum/upload와 연결됩니다.
+RUN mkdir -p /app/upload
 
-# 빌드된 정적 파일 복사
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# 6. 포트 노출 (백엔드 기본 8080)
+EXPOSE 8080
 
-# [중요] 사용자가 업로드한 파일을 서빙하기 위한 nginx 설정 복사
-# 프로젝트 루트에 nginx.conf 파일을 미리 만들어두어야 합니다.
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# 업로드된 이미지가 저장될 내부 디렉토리 생성
-RUN mkdir -p /usr/share/nginx/html/uploads
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# 7. 어플리케이션 실행
+ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "app.jar"]
