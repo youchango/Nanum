@@ -6,7 +6,8 @@ pipeline {
         BACKEND_IMAGE_NAME = "nanum-backend"
 
         // 업로드 파일 볼륨 공유 경로 설정
-        HOST_UPLOAD_PATH = "/backup/home/ctso/uploads"
+        HOST_UPLOAD_PATH = "/home/ttcc/nanum/upload"
+
         CONTAINER_UPLOAD_PATH = "/app/uploads"
     }
 
