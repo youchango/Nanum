@@ -2,20 +2,20 @@ shop:
   site-cd: SITECD000001
 
 server:
-  port: 9013
+  port: 9021
   servlet:
     context-path: /
 
 spring:
   datasource:
     # Docker Internal Connect (db container name)
-    url: jdbc:mariadb://db:3306/db_nanum?serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mariadb://58.225.62.238:33306/db_nanum?serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
     username: root  
     password: ttcc1234
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:

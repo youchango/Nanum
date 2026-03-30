@@ -86,12 +86,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // 모든 Origin 허용
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP
-                                                                                                            // 메서드
-        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
-        configuration.setAllowCredentials(true); // 자격 증명 허용
-        configuration.setMaxAge(3600L); // Preflight 요청 캐시 시간 (1시간)
+
+        // [수정] "*" 대신 실제 접속하는 프론트엔드 도메인과 로컬 개발 환경 도메인을 정확히 입력합니다.
+        configuration.setAllowedOrigins(Arrays.asList(
+                "https://nanum.ttcc.co.kr", // 실제 운영 프론트엔드 주소
+                "http://localhost:5173",    // 로컬 Vite 개발 주소
+                "http://localhost:3000"     // 혹시 모를 로컬 React 기본 주소
+        ));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
