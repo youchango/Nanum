@@ -2,46 +2,40 @@ pipeline {
     agent any
 
     environment {
-        // [변경] ctso-backend -> nanum-backend (Nanum 브랜드 통일)
-        BACKEND_IMAGE_NAME = "nanum-backend"
+        // [수정] 백엔드 명칭으로 변경
+        DOCKER_IMAGE_NAME = "nanum-backend"
 
-        // 업로드 파일 볼륨 공유 경로 설정
+        // [유지] 요청하신 호스트 서버 실제 저장 경로
         HOST_UPLOAD_PATH = "/home/ttcc/nanum/upload"
-
-        CONTAINER_UPLOAD_PATH = "/app/uploads"
-    }
-
-    parameters {
-        // 배포 환경 선택 파라미터 (dev/prod)
-        choice(name: 'DEPLOY_PROFILE', choices: ['dev', 'prod'], description: 'Spring Boot 실행 프로파일 선택')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // 현재 레포지토리(Nanum Backend) Checkout
                 checkout scm
                 echo 'Nanum Backend Checkout Complete'
             }
         }
 
+        // 백엔드는 빌드 과정이 필요하므로 이 단계만 유지합니다.
         stage('Build Backend') {
             steps {
-                dir('.') {
-                    // Gradle Clean Build (테스트 제외)
-                    sh './gradlew clean build -x test'
+                script {
+                    sh "chmod +x gradlew"
+                    sh "./gradlew clean build -x test"
                 }
             }
         }
 
-        stage('Docker Build Backend') {
+        stage('Docker Build') {
             steps {
-                dir('.') {
-                    script {
-                        // 빌드 번호 태그 및 latest 태그로 이미지 생성
-                        docker.build("${BACKEND_IMAGE_NAME}:${BUILD_NUMBER}")
-                        docker.build("${BACKEND_IMAGE_NAME}:latest")
-                    }
+                script {
+                    sh """
+                        docker build \
+                            -t ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} \
+                            -t ${DOCKER_IMAGE_NAME}:latest \
+                            .
+                    """
                 }
             }
         }
@@ -49,36 +43,35 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // [변경] 컨테이너명: ctso-backend -> nanum-backend
-                    sh 'docker stop nanum-backend || true'
-                    sh 'docker rm nanum-backend || true'
+                    sh "docker stop ${DOCKER_IMAGE_NAME} || true"
+                    sh "docker rm ${DOCKER_IMAGE_NAME} || true"
 
-                    // [변경] 포트: 9013:8080 -> 9021:8080
-                    // 볼륨 마운트, 포트, Spring Profile 주입
+                    // [수정] 포트 9021, 백엔드용 볼륨 경로 적용
                     sh """
                         docker run -d \
                             --restart unless-stopped \
-                            --name nanum-backend \
+                            --name ${DOCKER_IMAGE_NAME} \
                             -p 9021:8080 \
-                            -v ${HOST_UPLOAD_PATH}:${CONTAINER_UPLOAD_PATH} \
-                            -e SPRING_PROFILES_ACTIVE=${params.DEPLOY_PROFILE} \
-                            ${BACKEND_IMAGE_NAME}:latest
+                            -v ${HOST_UPLOAD_PATH}:/app/upload \
+                            ${DOCKER_IMAGE_NAME}:latest
                     """
                 }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh "docker image prune -f"
             }
         }
     }
 
     post {
-        always {
-            // 빌드 완료 후 워크스페이스 정리
-            cleanWs()
-        }
         success {
-            echo "nanum-backend 배포 성공 (포트: 9021, 프로파일: ${params.DEPLOY_PROFILE})"
+            echo "${DOCKER_IMAGE_NAME} 배포 성공 (포트: 9021, 볼륨: ${HOST_UPLOAD_PATH})"
         }
         failure {
-            echo "nanum-backend 빌드/배포 실패"
+            echo "${DOCKER_IMAGE_NAME} 빌드/배포 실패"
         }
     }
 }
