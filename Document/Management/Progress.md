@@ -18,7 +18,15 @@
 - [x] 프로젝트 초기화 (Spring Boot, Gradle)
 - [x] DB Schema 설계 및 구축 (PostgreSQL)
 - [x] 멀티 모듈 구조 설계
-- [ ] CI/CD 파이프라인 구축
+- [x] CI/CD 파이프라인 구축 (@2026-03-30)
+    - [x] 패키지 매니저 NPM 단일화 (Nanum_Master `package-lock.json` 생성, `npm ci` 전환)
+    - [x] Nanum_User `Dockerfile` 신규 생성 (Multi-stage, `npm ci`, 포트 9023:80)
+    - [x] Nanum_Master `Dockerfile` 개선 (`npm ci --legacy-peer-deps` 적용)
+    - [x] Nanum_Master `.dockerignore` 강화 (yarn.lock, 환경변수, 문서 등 제외 추가)
+    - [x] `Jenkinsfile` 전면 업데이트 (3개 레포 모두):
+        - Nanum Backend: `ctso-backend` → `nanum-backend`, 포트 9013 → 9021
+        - Nanum_Master: `ctso-frontend` → `nanum-master`, 포트 9014 → 9022, API URL 갱신
+        - Nanum_User: 배포 스테이지 신규 추가, 포트 9023, API URL 설정
 - [x] SCM 회원가입 (비즈니스 로직 및 통합 테스트)
 - [x] 쇼핑몰 통합 대시보드 고도화 (Backend)
     - [x] DashboardDTO 및 Service/Controller 구현
