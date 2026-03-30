@@ -1,23 +1,16 @@
-# 1. 자바 실행 환경 설정 (프로젝트 자바 버전에 맞춰 17 또는 21 등으로 수정)
-FROM openjdk:21-jdk-slim
+# 1. 안정적인 JDK 21 이미지 사용
+FROM eclipse-temurin:21-jdk-alpine
 
-# 2. 작업 디렉토리 설정
+# 2. 작업 디렉토리
 WORKDIR /app
 
-# 3. 타임존 설정 (로그 시간이 한국 시간으로 나오게 함 - 선택사항)
-ENV TZ=Asia/Seoul
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# 4. 빌드된 JAR 파일 복사
-# Jenkins가 'Build Backend' 단계에서 생성한 jar 파일을 컨테이너 내부로 가져옵니다.
+# 3. 빌드된 JAR 파일 복사
+# (주의) 프로젝트 구조에 따라 build/libs/ 아래 jar 파일이 여러 개일 수 있으니
+# 확실하게 plain이 붙지 않은 실행 가능한 jar만 복사합니다.
 COPY build/libs/*.jar app.jar
 
-# 5. 업로드 폴더 생성 (Jenkinsfile의 CONTAINER_UPLOAD_PATH와 동일하게)
-# 이 폴더는 실행 시 호스트의 /home/ttcc/nanum/upload와 연결됩니다.
+# 4. 파일 업로드 폴더 생성
 RUN mkdir -p /app/upload
 
-# 6. 포트 노출 (백엔드 기본 8080)
-EXPOSE 8080
-
-# 7. 어플리케이션 실행
+# 5. 실행 (타임존 설정 포함)
 ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "app.jar"]
