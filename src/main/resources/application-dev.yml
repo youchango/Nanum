@@ -2,7 +2,7 @@ shop:
   site-cd: SITECD000001
 
 server:
-  port: 9013
+  port: 9021
   servlet:
     context-path: /
 
