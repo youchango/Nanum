@@ -247,7 +247,7 @@ public class OrderService {
         MemberCoupon memberCoupon = null;
         if (request.getMemberCouponId() != null) {
             memberCoupon = memberCouponRepository
-                    .findByIssueIdAndMemberMemberCode(request.getMemberCouponId(), member.getMemberCode())
+                    .findByIssueIdAndMemberMemberCodeAndSiteCd(request.getMemberCouponId(), member.getMemberCode(), SITE_CD)
                     .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
 
             if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
@@ -845,8 +845,8 @@ public class OrderService {
         BigDecimal usedCouponAmount = BigDecimal.ZERO;
         MemberCoupon memberCoupon = null;
         if (orderTemp.getMemberCouponId() != null) {
-            memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCode(
-                    orderTemp.getMemberCouponId(), member.getMemberCode()).orElse(null);
+            memberCoupon = memberCouponRepository.findByIssueIdAndMemberMemberCodeAndSiteCd(
+                    orderTemp.getMemberCouponId(), member.getMemberCode(), orderTemp.getSiteCd()).orElse(null);
             if (memberCoupon != null && MemberCouponStatus.UNUSED.equals(memberCoupon.getStatus())) {
                 usedCouponAmount = totalPrice.subtract(paymentPrice.add(usedPointAmount).subtract(deliveryPrice))
                         .max(BigDecimal.ZERO);
@@ -1089,7 +1089,7 @@ public class OrderService {
 
     private int calculateCouponDiscount(Member member, Long memberCouponId, BigDecimal totalPrice) {
         MemberCoupon memberCoupon = memberCouponRepository
-                .findByIssueIdAndMemberMemberCode(memberCouponId, member.getMemberCode())
+                .findByIssueIdAndMemberMemberCodeAndSiteCd(memberCouponId, member.getMemberCode(), SITE_CD)
                 .orElseThrow(() -> new BusinessException("유효하지 않은 쿠폰입니다.", ErrorCode.ENTITY_NOT_FOUND));
         if (MemberCouponStatus.USED.equals(memberCoupon.getStatus())) {
             throw new BusinessException("이미 사용된 쿠폰입니다.", ErrorCode.INVALID_INPUT_VALUE);

@@ -33,8 +33,9 @@ public class Wishlist extends com.nanum.global.common.dto.BaseEntity {
     private Product product;
 
     @Builder
-    public Wishlist(Member member, Product product) {
+    public Wishlist(Member member, Product product, String siteCd) {
         this.member = member;
         this.product = product;
+        this.siteCd = siteCd;
     }
 }

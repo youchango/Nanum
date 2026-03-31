@@ -11,17 +11,17 @@ import java.util.Optional;
 
 public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long> {
 
-    List<MemberCoupon> findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(String memberCode, MemberCouponStatus status);
+    List<MemberCoupon> findByMemberMemberCodeAndSiteCdAndStatusOrderByIssuedAtDesc(String memberCode, String siteCd, MemberCouponStatus status);
 
-    Page<MemberCoupon> findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(String memberCode, MemberCouponStatus status, Pageable pageable);
+    Page<MemberCoupon> findByMemberMemberCodeAndSiteCdAndStatusOrderByIssuedAtDesc(String memberCode, String siteCd, MemberCouponStatus status, Pageable pageable);
 
-    List<MemberCoupon> findByMemberMemberCodeOrderByIssuedAtDesc(String memberCode);
+    List<MemberCoupon> findByMemberMemberCodeAndSiteCdOrderByIssuedAtDesc(String memberCode, String siteCd);
 
-    Page<MemberCoupon> findByMemberMemberCodeOrderByIssuedAtDesc(String memberCode, Pageable pageable);
+    Page<MemberCoupon> findByMemberMemberCodeAndSiteCdOrderByIssuedAtDesc(String memberCode, String siteCd, Pageable pageable);
 
-    Optional<MemberCoupon> findByIssueIdAndMemberMemberCode(Long issueId, String memberCode);
+    Optional<MemberCoupon> findByIssueIdAndMemberMemberCodeAndSiteCd(Long issueId, String memberCode, String siteCd);
 
     Optional<MemberCoupon> findByOrderIdAndStatus(Long orderId, MemberCouponStatus status);
 
-    int countByCouponIdAndMemberMemberCode(Long couponId, String memberCode);
+    int countByCouponIdAndMemberMemberCodeAndSiteCd(Long couponId, String memberCode, String siteCd);
 }

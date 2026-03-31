@@ -28,6 +28,9 @@ public class MemberCoupon {
     @JoinColumn(name = "member_code", referencedColumnName = "member_code")
     private Member member;
 
+    @Column(name = "site_cd", length = 20)
+    private String siteCd;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;

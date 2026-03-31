@@ -31,38 +31,38 @@ public class CouponService {
     /**
      * 사용 가능한 쿠폰 조회 (미사용 + 유효기간 내) - 페이징
      */
-    public Page<CouponDTO.Response> getAvailableCoupons(String memberId, Pageable pageable) {
+    public Page<CouponDTO.Response> getAvailableCoupons(String memberId, String siteCd, Pageable pageable) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         return memberCouponRepository
-                .findByMemberMemberCodeAndStatusOrderByIssuedAtDesc(member.getMemberCode(), MemberCouponStatus.UNUSED, pageable)
+                .findByMemberMemberCodeAndSiteCdAndStatusOrderByIssuedAtDesc(member.getMemberCode(), siteCd, MemberCouponStatus.UNUSED, pageable)
                 .map(CouponDTO.Response::from);
     }
 
     /**
      * 전체 쿠폰 조회 (사용 완료 포함) - 페이징
      */
-    public Page<CouponDTO.Response> getAllCoupons(String memberId, Pageable pageable) {
+    public Page<CouponDTO.Response> getAllCoupons(String memberId, String siteCd, Pageable pageable) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         return memberCouponRepository
-                .findByMemberMemberCodeOrderByIssuedAtDesc(member.getMemberCode(), pageable)
+                .findByMemberMemberCodeAndSiteCdOrderByIssuedAtDesc(member.getMemberCode(), siteCd, pageable)
                 .map(CouponDTO.Response::from);
     }
 
     /**
      * 다운로드 가능한 (이벤트/프로모션) 쿠폰 조회
      */
-    public List<CouponDTO.DownloadableResponse> getDownloadableCoupons(String memberId) {
+    public List<CouponDTO.DownloadableResponse> getDownloadableCoupons(String memberId, String siteCd) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         String memberType = member.getMemberType() != null ? member.getMemberType().toString() : "U";
 
         // 현재 날짜 기준 발급 가능한 쿠폰 목록 조회 (등급 및 기간 반영)
-        List<com.nanum.domain.coupon.model.Coupon> availableCoupons = couponRepository.findDownloadableCoupons(memberType);
+        List<com.nanum.domain.coupon.model.Coupon> availableCoupons = couponRepository.findDownloadableCoupons(memberType, siteCd);
 
         return availableCoupons.stream().map(coupon -> {
             CouponDTO.DownloadableResponse response = CouponDTO.DownloadableResponse.from(coupon);
@@ -71,7 +71,7 @@ public class CouponService {
             boolean isGlobalLimitReached = coupon.getIssueLimit() != null && coupon.getIssueCount() >= coupon.getIssueLimit();
 
             // 개인 발급 제한 체크
-            int myIssueCount = memberCouponRepository.countByCouponIdAndMemberMemberCode(coupon.getId(), member.getMemberCode());
+            int myIssueCount = memberCouponRepository.countByCouponIdAndMemberMemberCodeAndSiteCd(coupon.getId(), member.getMemberCode(), siteCd);
             boolean isPersonalLimitReached = myIssueCount >= coupon.getMemberIssueLimit();
 
             response.setCanDownload(!isGlobalLimitReached && !isPersonalLimitReached);
@@ -83,7 +83,7 @@ public class CouponService {
      * 쿠폰 사용자가 직접 다운로드(발급)
      */
     @Transactional
-    public void downloadCoupon(Long couponId, String memberId) {
+    public void downloadCoupon(Long couponId, String memberId, String siteCd) {
         Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -108,7 +108,7 @@ public class CouponService {
         }
 
         // 개인당 발행 제한 점검
-        int currentCount = memberCouponRepository.countByCouponIdAndMemberMemberCode(couponId, member.getMemberCode());
+        int currentCount = memberCouponRepository.countByCouponIdAndMemberMemberCodeAndSiteCd(couponId, member.getMemberCode(), siteCd);
         if (currentCount >= coupon.getMemberIssueLimit()) {
             throw new IllegalArgumentException("이미 최대 인당 발급 횟수를 초과히였습니다.");
         }
@@ -117,6 +117,7 @@ public class CouponService {
         MemberCoupon newMemberCoupon = MemberCoupon.builder()
                 .coupon(coupon)
                 .member(member)
+                .siteCd(siteCd)
                 .status(MemberCouponStatus.UNUSED)
                 .expiredAt(coupon.getValidEndDate())
                 .build();

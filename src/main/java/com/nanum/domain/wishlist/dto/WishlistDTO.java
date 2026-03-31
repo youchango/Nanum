@@ -14,6 +14,7 @@ public class WishlistDTO {
     @AllArgsConstructor
     public static class Request {
         private Long productId;
+        private String siteCd;
     }
 
     @Getter
@@ -28,5 +29,6 @@ public class WishlistDTO {
         private String thumbnailUrl;
         private int retailPrice;
         private int unitPrice;
+        private String siteCd;
     }
 }

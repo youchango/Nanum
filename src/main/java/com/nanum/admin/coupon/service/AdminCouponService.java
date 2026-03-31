@@ -85,7 +85,7 @@ public class AdminCouponService {
             }
 
             // Check member issue limit
-            int currentMemberCount = memberCouponRepository.countByCouponIdAndMemberMemberCode(couponId, member.getMemberCode());
+            int currentMemberCount = memberCouponRepository.countByCouponIdAndMemberMemberCodeAndSiteCd(couponId, member.getMemberCode(), coupon.getSiteCd());
             if (currentMemberCount >= coupon.getMemberIssueLimit()) {
                 continue; // Skip member if their personal limit is reached
             }
@@ -93,6 +93,7 @@ public class AdminCouponService {
             MemberCoupon memberCoupon = MemberCoupon.builder()
                     .coupon(coupon)
                     .member(member)
+                    .siteCd(coupon.getSiteCd())
                     .status(MemberCouponStatus.UNUSED)
                     .expiredAt(coupon.getValidEndDate())
                     .build();

@@ -65,6 +65,12 @@
     - [x] 주문 상세 조회 연동 (이전 상태 복구 완료)
     - [x] **공지사항 상세 페이지 HTML 렌더링 수정 (dangerouslySetInnerHTML 적용)** (@2026-03-30)
     - [x] **1:1 문의 및 상품 문의 등록 시 siteCd 자동 연동 및 필터링 고도화** (@2026-03-30)
+    - [x] **관심상품(Wishlist) 및 쿠폰 시스템 사이트별 데이터 격리(siteCd) 적용 완료** (@2026-03-31)
+    - [x] **JSX 파일을 TSX로 전면 전환 (All-at-once 마이그레이션)** (@2026-03-31)
+        - [x] TypeScript 환경 구성 (`tsconfig.json`, `package.json` 의존성 추가)
+        - [x] `src` 디렉토리 내 모든 파일 확장자 일괄 변경 (`.jsx` -> `.tsx`, `.js` -> `.ts`)
+        - [x] 핵심 인프라 레이어(API, Context, Hooks, Utils) 타입 정의 및 안정화
+        - [x] 최상위 컴포넌트(`App.tsx`, `main.tsx`) 및 공통 레이아웃 타입 지정
     - [ ] 1:1문의 작성 및 내역 확인
 
 ### 4. 상품 및 쇼핑 (Product & Shop)

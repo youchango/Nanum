@@ -38,7 +38,7 @@ public class WishlistService {
         private final FileStoreRepository fileStoreRepository;
 
         @Transactional
-        public boolean toggleWishlist(String memberId, Long productId) {
+        public boolean toggleWishlist(String memberId, Long productId, String siteCd) {
                 Member member = memberRepository.findByMemberId(memberId)
                                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
@@ -47,7 +47,7 @@ public class WishlistService {
 
                 // 현재 유효한 찜 상태 확인
                 Optional<Wishlist> existing = wishlistRepository
-                                .findByMemberMemberCodeAndProduct_Id(member.getMemberCode(), productId);
+                                .findByMemberMemberCodeAndProduct_Id(member.getMemberCode(), productId, siteCd);
 
                 if (existing.isPresent()) {
                         Wishlist wl = existing.get();
@@ -56,35 +56,35 @@ public class WishlistService {
                 } else {
                         // 과거에 삭제되었던 내역이 있는지 먼저 복구 시도
                         boolean deletedExists = wishlistRepository
-                                        .existsDeletedByMemberAndProduct(member.getMemberCode(), productId);
+                                        .existsDeletedByMemberAndProduct(member.getMemberCode(), productId, siteCd);
                         if (deletedExists) {
-                                wishlistRepository.restoreWishlist(member.getMemberCode(), productId);
+                                wishlistRepository.restoreWishlist(member.getMemberCode(), productId, siteCd);
                         } else {
-                                wishlistRepository.save(new Wishlist(member, product));
+                                wishlistRepository.save(new Wishlist(member, product, siteCd));
                         }
                         return true;
                 }
         }
 
         @Transactional
-        public void deleteWishlist(String memberId, Long productId) {
+        public void deleteWishlist(String memberId, Long productId, String siteCd) {
                 Member member = memberRepository.findByMemberId(memberId)
                                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
                 Wishlist wishlist = wishlistRepository
-                                .findByMemberMemberCodeAndProduct_Id(member.getMemberCode(), productId)
+                                .findByMemberMemberCodeAndProduct_Id(member.getMemberCode(), productId, siteCd)
                                 .orElseThrow(() -> new IllegalArgumentException("찜 내역을 찾을 수 없습니다."));
 
                 wishlist.delete(member.getMemberCode());
         }
 
-        public Page<WishlistDTO.Response> getMyWishlist(String memberId, Pageable pageable) {
+        public Page<WishlistDTO.Response> getMyWishlist(String memberId, String siteCd, Pageable pageable) {
                 Member member = memberRepository.findByMemberId(memberId)
                                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
                 MemberRole role = member.getRole();
 
                 Page<Wishlist> wishlistPage = wishlistRepository
-                                .findWishlistWithDetailsByMemberCode(member.getMemberCode(), pageable);
+                                .findWishlistWithDetailsByMemberCode(member.getMemberCode(), siteCd, pageable);
 
                 List<String> productIds = wishlistPage.getContent().stream()
                                 .map(w -> String.valueOf(w.getProduct().getId()))
@@ -133,6 +133,7 @@ public class WishlistService {
                                                         .retailPrice(p.getRetailPrice() != null ? p.getRetailPrice()
                                                                         : 0)
                                                         .unitPrice(calculatedBasePrice)
+                                                        .siteCd(wishlist.getSiteCd())
                                                         .build();
                                 })
                                 .collect(Collectors.toList());

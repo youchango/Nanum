@@ -28,7 +28,7 @@ public class WishlistController {
     public ResponseEntity<ApiResponse<Boolean>> toggleWishlist(
             @RequestBody WishlistDTO.Request request,
             Principal principal) {
-        boolean isAdded = wishlistService.toggleWishlist(principal.getName(), request.getProductId());
+        boolean isAdded = wishlistService.toggleWishlist(principal.getName(), request.getProductId(), request.getSiteCd());
         return ResponseEntity.ok(ApiResponse.success(isAdded));
     }
 
@@ -36,17 +36,19 @@ public class WishlistController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteWishlist(
             @PathVariable Long productId,
+            @RequestParam String siteCd,
             Principal principal) {
-        wishlistService.deleteWishlist(principal.getName(), productId);
+        wishlistService.deleteWishlist(principal.getName(), productId, siteCd);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @Operation(summary = "내 찜 목록 조회", description = "현재 사용자가 찜한 모든 상품 목록을 페이징하여 조회합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<WishlistDTO.Response>>> getMyWishlist(
+            @RequestParam String siteCd,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Principal principal) {
-        Page<WishlistDTO.Response> wishlist = wishlistService.getMyWishlist(principal.getName(), pageable);
+        Page<WishlistDTO.Response> wishlist = wishlistService.getMyWishlist(principal.getName(), siteCd, pageable);
         return ResponseEntity.ok(ApiResponse.success(wishlist));
     }
 }

@@ -28,6 +28,7 @@ CREATE TABLE coupon (
 CREATE TABLE member_coupon (
     issue_id         INT AUTO_INCREMENT COMMENT '발급ID',
     coupon_id        INT NOT NULL COMMENT '쿠폰ID',
+    site_cd          VARCHAR(20) NULL COMMENT '사이트코드',
     member_code      VARCHAR(30) NOT NULL COMMENT '회원코드',
     status           VARCHAR(10) DEFAULT 'UNUSED' NOT NULL COMMENT '상태(UNUSED, USED, EXPIRED)',
     used_at          DATETIME NULL COMMENT '사용일시',

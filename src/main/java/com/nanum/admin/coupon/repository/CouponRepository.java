@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, Long>, QuerydslPredicateExecutor<Coupon> {
     
-    @Query("SELECT c FROM Coupon c WHERE c.validEndDate >= CURRENT_TIMESTAMP AND c.validStartDate <= CURRENT_TIMESTAMP AND (c.targetMemberType = 'ALL' OR c.targetMemberType = :memberType)")
-    List<Coupon> findDownloadableCoupons(@Param("memberType") String memberType);
+    @Query("SELECT c FROM Coupon c WHERE c.siteCd = :siteCd AND c.validEndDate >= CURRENT_TIMESTAMP AND c.validStartDate <= CURRENT_TIMESTAMP AND (c.targetMemberType = 'ALL' OR c.targetMemberType = :memberType)")
+    List<Coupon> findDownloadableCoupons(@Param("memberType") String memberType, @Param("siteCd") String siteCd);
 }
